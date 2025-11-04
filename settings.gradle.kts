@@ -10,5 +10,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "OOP24-uno"
-include("app")
+rootProject.name = "uno"
