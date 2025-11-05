@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import uno.Model.Cards.Card;
+
 /**
  * Classe astratta che rappresenta un mazzo di carte generico.
  * <T extends Card> assicura che il mazzo possa contenere solo oggetti di tipo Card.

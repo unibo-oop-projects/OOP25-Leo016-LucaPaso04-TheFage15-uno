@@ -1,7 +1,7 @@
 // Percorso: src/main/java/uno/Model/Card.java
 package uno.Model.Cards;
 
-import uno.Controller.GameController;
+import uno.Model.Game.Game;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
 
@@ -31,10 +31,8 @@ public interface Card {
     boolean canBePlayedOn(Card topCard);
 
     /**
-     * Esegue l'azione/effetto speciale della carta.
-     * Il Controller chiamerà questo metodo dopo che la carta è stata giocata.
-     *
-     * @param controller Il GameController che gestisce il flusso del gioco.
+     * Esegue l'effetto speciale della carta sulla partita.
+     * @param game L'istanza della partita corrente.
      */
-    void executeEffect(GameController controller);
+    void performEffect(Game game);
 }
