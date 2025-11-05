@@ -1,5 +1,9 @@
 // Percorso: src/main/java/uno/Model/AbstractCard.java
-package uno.Model;
+package uno.Model.Cards.Types;
+
+import uno.Model.Cards.Card;
+import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardValue;
 
 /**
  * Classe base astratta che fornisce un'implementazione comune
@@ -7,21 +11,21 @@ package uno.Model;
  */
 public abstract class AbstractCard implements Card {
 
-    protected final Color color;
-    protected final Value value;
+    protected final CardColor color;
+    protected final CardValue value;
 
-    public AbstractCard(Color color, Value value) {
+    public AbstractCard(CardColor color, CardValue value) {
         this.color = color;
         this.value = value;
     }
 
     @Override
-    public Color getColor() {
+    public CardColor getColor() {
         return color;
     }
 
     @Override
-    public Value getValue() {
+    public CardValue getValue() {
         return value;
     }
 

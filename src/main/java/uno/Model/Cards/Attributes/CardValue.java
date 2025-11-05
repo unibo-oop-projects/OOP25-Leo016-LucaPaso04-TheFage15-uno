@@ -1,7 +1,6 @@
-// Percorso: src/main/java/uno/Model/Value.java
-package uno.Model;
+package uno.Model.Cards.Attributes;
 
-public enum Value {
+public enum CardValue {
     // Carte Numerate
     ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE,
     

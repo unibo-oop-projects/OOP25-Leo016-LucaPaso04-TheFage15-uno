@@ -1,16 +1,19 @@
 // Percorso: src/main/java/uno/Model/WildCard.java
-package uno.Model;
+package uno.Model.Cards.Types;
 
 import uno.Controller.GameController;
+import uno.Model.Cards.Card;
+import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardValue;
 
 /**
  * Rappresenta una carta Jolly (Jolly standard o Jolly+4).
  */
 public class WildCard extends AbstractCard {
 
-    public WildCard(Value value) {
-        super(Color.WILD, value); // Il colore "base" è WILD
-        if (value != Value.WILD && value != Value.WILD_DRAW_FOUR) {
+    public WildCard(CardValue value) {
+        super(CardColor.WILD, value); // Il colore "base" è WILD
+        if (value != CardValue.WILD && value != CardValue.WILD_DRAW_FOUR) {
             throw new IllegalArgumentException("Valore non valido per WildCard.");
         }
     }
@@ -22,7 +25,7 @@ public class WildCard extends AbstractCard {
         controller.promptPlayerForColorChoice();
         
         // 2. Se è un +4, applica l'effetto aggiuntivo
-        if (this.value == Value.WILD_DRAW_FOUR) {
+        if (this.value == CardValue.WILD_DRAW_FOUR) {
             controller.makeNextPlayerDraw(4);
         }
     }

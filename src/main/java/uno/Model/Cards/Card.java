@@ -1,7 +1,9 @@
 // Percorso: src/main/java/uno/Model/Card.java
-package uno.Model;
+package uno.Model.Cards;
 
 import uno.Controller.GameController;
+import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardValue;
 
 /**
  * Interfaccia che definisce il contratto per qualsiasi carta da gioco Uno.
@@ -12,12 +14,12 @@ public interface Card {
     /**
      * @return Il colore della carta (o WILD).
      */
-    Color getColor();
+    CardColor getColor();
 
     /**
      * @return Il valore/tipo della carta (es. NINE, SKIP, WILD).
      */
-    Value getValue();
+    CardValue getValue();
 
     /**
      * Determina se questa carta può essere legalmente giocata

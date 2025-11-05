@@ -1,7 +1,9 @@
 // Percorso: src/main/java/uno/Model/NumberedCard.java
-package uno.Model;
+package uno.Model.Cards.Types;
 
 import uno.Controller.GameController;
+import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardValue;
 
 /**
  * Rappresenta una carta numerata (0-9).
@@ -9,10 +11,10 @@ import uno.Controller.GameController;
  */
 public class NumberedCard extends AbstractCard {
 
-    public NumberedCard(Color color, Value value) {
+    public NumberedCard(CardColor color, CardValue value) {
         super(color, value);
         // Controllo di sicurezza
-        if (value.ordinal() > Value.NINE.ordinal()) {
+        if (value.ordinal() > CardValue.NINE.ordinal()) {
             throw new IllegalArgumentException("NumberedCard deve avere un valore tra 0 e 9.");
         }
     }
