@@ -35,4 +35,6 @@ public interface Card {
      * @param game L'istanza della partita corrente.
      */
     void performEffect(Game game);
+
+    
 }

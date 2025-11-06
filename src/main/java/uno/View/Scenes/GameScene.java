@@ -33,10 +33,11 @@ public class GameScene extends JPanel implements GameModelObserver {
     private final JPanel infoPanel;
 
     // Componenti dinamici
-    private final JLabel discardPileCard;
-    private final JButton drawDeckButton;
-    private final JLabel statusLabel;
-    private final JButton unoButton;
+    // Questi ora sono 'final' e inizializzati nei metodi 'create...'
+    private  JLabel discardPileCard;
+    private  JButton drawDeckButton;
+    private  JLabel statusLabel;
+    private  JButton unoButton;
 
     public GameScene(Game gameModel) {
         super(new BorderLayout(10, 10));
@@ -46,8 +47,9 @@ public class GameScene extends JPanel implements GameModelObserver {
         setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // --- Creazione Pannelli ---
+        // I metodi 'create' ora inizializzano i campi final
         opponentsPanel = createOpponentsPanel();
-        centerPanel = createCenterPanel();
+        centerPanel = createCenterPanel(); 
         playerHandPanel = createPlayerHandPanel();
         infoPanel = createInfoPanel();
 
@@ -57,11 +59,10 @@ public class GameScene extends JPanel implements GameModelObserver {
         add(new JScrollPane(playerHandPanel), BorderLayout.SOUTH); // Mano del giocatore scrollabile
         add(infoPanel, BorderLayout.EAST);
 
-        // --- Componenti dinamici (per riferimento) ---
-        discardPileCard = (JLabel) centerPanel.getComponent(1);
-        drawDeckButton = (JButton) centerPanel.getComponent(0);
-        statusLabel = (JLabel) infoPanel.getComponent(0);
-        unoButton = (JButton) ((JPanel) playerHandPanel.getParent().getParent().getComponent(0)).getComponent(1); // Complesso, ma prende il bottone UNO
+
+        // --- Le righe che causavano il crash sono state RIMOSSE ---
+        // non c'è più bisogno di cercare i componenti
+
 
         // --- Collegamento Azioni -> Controller ---
         drawDeckButton.addActionListener(e -> {
@@ -70,6 +71,7 @@ public class GameScene extends JPanel implements GameModelObserver {
             }
         });
 
+        // Questo ora funziona perché 'unoButton' è stato inizializzato
         unoButton.addActionListener(e -> {
             if (controllerObserver != null) {
                 controllerObserver.onCallUno();
@@ -93,14 +95,15 @@ public class GameScene extends JPanel implements GameModelObserver {
     @Override
     public void onGameUpdate() {
         // 1. Aggiorna etichetta di stato
+        // Questo ora funziona perché 'statusLabel' è un campo valido
         statusLabel.setText("Turno di: " + gameModel.getCurrentPlayer().getName()); 
         // TODO: Aggiungere info colore corrente, ecc.
 
         // 2. Aggiorna Pila degli Scarti
-        if (gameModel.getDiscardPile().isEmpty()) {
+        if (gameModel.isDiscardPileEmpty()) {
             discardPileCard.setText("Vuota");
         } else {
-            Card topCard = gameModel.getDiscardPile().get(gameModel.getDiscardPile().size() - 1);
+            Card topCard = gameModel.getTopDiscardCard();
             discardPileCard.setText(topCard.toString()); // Usiamo toString() per ora
         }
 
@@ -108,6 +111,7 @@ public class GameScene extends JPanel implements GameModelObserver {
         playerHandPanel.removeAll(); // Rimuove le vecchie carte
         
         // Assumiamo che il giocatore umano sia il primo
+        // TODO: Assicurarsi di prendere il giocatore corretto
         for (Card card : gameModel.getCurrentPlayer().getHand()) {
             JButton cardButton = new JButton(card.toString());
             cardButton.setPreferredSize(new Dimension(80, 120));
@@ -141,16 +145,18 @@ public class GameScene extends JPanel implements GameModelObserver {
     private JPanel createCenterPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         
-        JButton deckBtn = new JButton("[MAZZO]");
-        deckBtn.setPreferredSize(new Dimension(80, 120));
+        // Inizializza il campo 'drawDeckButton'
+        this.drawDeckButton = new JButton("[MAZZO]");
+        this.drawDeckButton.setPreferredSize(new Dimension(80, 120));
         
-        JLabel discardLabel = new JLabel("SCARTI");
-        discardLabel.setPreferredSize(new Dimension(80, 120));
-        discardLabel.setHorizontalAlignment(JLabel.CENTER);
-        discardLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        // Inizializza il campo 'discardPileCard'
+        this.discardPileCard = new JLabel("SCARTI");
+        this.discardPileCard.setPreferredSize(new Dimension(80, 120));
+        this.discardPileCard.setHorizontalAlignment(JLabel.CENTER);
+        this.discardPileCard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         
-        panel.add(deckBtn);
-        panel.add(discardLabel);
+        panel.add(this.drawDeckButton);
+        panel.add(this.discardPileCard);
         return panel;
     }
 
@@ -166,11 +172,14 @@ public class GameScene extends JPanel implements GameModelObserver {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createTitledBorder("Info Partita"));
         
-        panel.add(new JLabel("Turno di: ...")); // Sarà aggiornato
+        // Inizializza il campo 'statusLabel'
+        this.statusLabel = new JLabel("Turno di: ..."); 
+        panel.add(this.statusLabel);
         
-        JButton unoBtn = new JButton("UNO!");
-        unoBtn.setPreferredSize(new Dimension(100, 40));
-        panel.add(unoBtn);
+        // Inizializza il campo 'unoButton'
+        this.unoButton = new JButton("UNO!");
+        this.unoButton.setPreferredSize(new Dimension(100, 40));
+        panel.add(this.unoButton);
         
         return panel;
     }

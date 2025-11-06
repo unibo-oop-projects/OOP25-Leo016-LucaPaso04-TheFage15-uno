@@ -4,6 +4,7 @@ package uno.Model.Cards.Types;
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
+import uno.Model.Game.Game;
 
 /**
  * Classe base astratta che fornisce un'implementazione comune
@@ -37,6 +38,16 @@ public abstract class AbstractCard implements Card {
     public boolean canBePlayedOn(Card topCard) {
         // Regola standard: stesso colore o stesso valore
         return this.color == topCard.getColor() || this.value == topCard.getValue();
+    }
+
+    /**
+     * Implementazione di default per l'effetto della carta.
+     * Le carte numeriche non hanno effetti, quindi questo metodo è vuoto.
+     * Le classi figlie (es. SkipCard) faranno l'override di questo metodo.
+     */
+    @Override
+    public void performEffect(Game game) {
+        // Nessun effetto di default
     }
 
     @Override
