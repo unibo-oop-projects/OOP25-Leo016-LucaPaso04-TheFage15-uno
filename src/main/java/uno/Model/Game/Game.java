@@ -16,13 +16,13 @@ public class Game {
 
     private final List<GameModelObserver> observers = new ArrayList<>(); // <-- LISTA OBSERVER
     private final Deck<Card> drawDeck;
-    private final List<Card> discardPile;
+    private final DiscardPile discardPile;
     private final List<Player> players;
     private int currentPlayerIndex;
 
     public Game(Deck<Card> deck) {
         this.drawDeck = deck;
-        this.discardPile = new ArrayList<>();
+        this.discardPile = new DiscardPile();
         this.players = new ArrayList<>();
         this.currentPlayerIndex = 0;
         // Aggiungi giocatori di default (esempio)
@@ -60,7 +60,7 @@ public class Game {
         
         // Sposta la carta
         players.get(currentPlayerIndex).getHand().remove(card);
-        discardPile.add(card);
+        discardPile.addCard(card);
         
         // Passa il turno (logica base)
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
@@ -88,7 +88,7 @@ public class Game {
     }
     
     public List<Card> getDiscardPile() {
-        return discardPile;
+        return discardPile.getCards();
     }
     
     // TODO: Aggiungere altri getter (getPlayers, ecc.)
