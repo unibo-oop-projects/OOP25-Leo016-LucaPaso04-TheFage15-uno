@@ -2,59 +2,85 @@ package uno.View.Scenes;
 
 import uno.Controller.MenuObserver;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Il pannello (JPanel) che rappresenta la schermata del menu principale.
+ * Questa versione utilizza una grafica più moderna e accessibile.
  */
 public class MenuScene extends JPanel {
 
     private MenuObserver observer;
 
+    // Palette di colori moderna (puoi cambiarla)
+    private static final Color BACKGROUND_COLOR = new Color(30, 30, 30);
+    private static final Color TITLE_COLOR = Color.WHITE;
+    private static final Color BUTTON_COLOR = new Color(211, 47, 47); // Rosso UNO
+    private static final Color BUTTON_HOVER_COLOR = new Color(255, 82, 82);
+    private static final Color BUTTON_TEXT_COLOR = Color.WHITE;
+
     public MenuScene() {
-        super(new BorderLayout(10, 10)); // Layout principale
-        setBorder(new EmptyBorder(20, 20, 20, 20));
+        super(new GridBagLayout()); // Usiamo GridBagLayout per centrare tutto
+        setBackground(BACKGROUND_COLOR);
+
+        // Pannello interno che conterrà i componenti,
+        // questo pannello sarà centrato da GridBagLayout.
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setOpaque(false); // Rende il pannello trasparente
 
         // 1. Titolo
         JLabel title = new JLabel("UNO");
-        title.setFont(new Font("Arial", Font.BOLD, 48));
-        title.setHorizontalAlignment(JLabel.CENTER);
-        add(title, BorderLayout.NORTH);
+        title.setFont(new Font("Helvetica Neue", Font.BOLD, 82));
+        title.setForeground(TITLE_COLOR);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setBorder(new EmptyBorder(0, 0, 40, 0)); // Spazio sotto il titolo
 
-        // 2. Pannello centrale per i bottoni
-        JPanel buttonPanel = new JPanel();
-        // BoxLayout per impilare i bottoni verticalmente
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-
-        // Aggiungiamo i bottoni con spaziatura
-        JButton classicButton = createMenuButton("Modalità Classica");
-        JButton flipButton = createMenuButton("Modalità Flip (Non implementata)");
-        JButton quitButton = createMenuButton("Esci");
-
-        buttonPanel.add(classicButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spaziatore
-        buttonPanel.add(flipButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spaziatore
-        buttonPanel.add(quitButton);
-
-        // Aggiungiamo il pannello di bottoni al centro (in un box per centrarlo)
-        Box centerBox = Box.createVerticalBox();
-        centerBox.add(Box.createVerticalGlue());
-        centerBox.add(buttonPanel);
-        centerBox.add(Box.createVerticalGlue());
+        // 2. Creazione Bottoni Stilizzati
+        JButton classicButton = createStyledButton("Modalità Classica");
+        classicButton.setMnemonic(KeyEvent.VK_C); // Accessibilità (Alt+C)
         
-        add(centerBox, BorderLayout.CENTER);
+        JButton flipButton = createStyledButton("Modalità Flip");
+        flipButton.setMnemonic(KeyEvent.VK_F); // Accessibilità (Alt+F)
+        
+        JButton quitButton = createStyledButton("Esci dal Gioco");
+        quitButton.setMnemonic(KeyEvent.VK_E); // Accessibilità (Alt+E)
 
-        // 3. Colleghiamo gli ActionListeners
+        // 3. Aggiunta componenti al pannello interno
+        contentPanel.add(title);
+        contentPanel.add(classicButton);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Spaziatore
+        contentPanel.add(flipButton);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Spaziatore
+        contentPanel.add(quitButton);
+        
+        // 4. Aggiungiamo il pannello centrale alla scena
+        // GridBagConstraints dice a GridBagLayout di centrare il componente
+        add(contentPanel, new GridBagConstraints());
+
+        // 5. Colleghiamo gli ActionListeners
         classicButton.addActionListener(e -> {
             if (observer != null) {
                 observer.onStartClassicGame();
@@ -83,13 +109,49 @@ public class MenuScene extends JPanel {
     }
 
     /**
-     * Helper per creare un bottone di menu standard.
+     * Helper per creare un bottone con uno stile moderno e accessibile.
      */
-    private JButton createMenuButton(String text) {
-        JButton button = new JButton(text);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT); // Centra il bottone
-        button.setMaximumSize(new Dimension(300, 50)); // Dimensione fissa
-        button.setFont(new Font("Arial", Font.PLAIN, 18));
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text) {
+            // Sovrascriviamo paintComponent per disegnare bordi arrotondati
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Colore di sfondo (cambia in hover)
+                if (getModel().isRollover()) {
+                    g2.setColor(BUTTON_HOVER_COLOR);
+                } else {
+                    g2.setColor(getBackground());
+                }
+                
+                // Disegna un rettangolo arrotondato
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20); // 20px di raggio
+                
+                // Disegna il testo del bottone (centrato)
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+
+        button.setFont(new Font("Helvetica Neue", Font.BOLD, 18));
+        button.setBackground(BUTTON_COLOR);
+        button.setForeground(BUTTON_TEXT_COLOR);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(350, 60));
+        button.setPreferredSize(new Dimension(350, 60));
+        button.setMinimumSize(new Dimension(350, 60));
+
+        // Rimuove il bordo e l'area di focus di default di Swing
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(false); // Necessario per il disegno personalizzato
+        button.setOpaque(false);
+        
+        // Cambia il cursore a "mano" quando si passa sopra
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         return button;
     }
 }

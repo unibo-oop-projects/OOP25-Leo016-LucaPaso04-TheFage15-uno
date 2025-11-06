@@ -60,10 +60,6 @@ public class GameScene extends JPanel implements GameModelObserver {
         add(infoPanel, BorderLayout.EAST);
 
 
-        // --- Le righe che causavano il crash sono state RIMOSSE ---
-        // non c'è più bisogno di cercare i componenti
-
-
         // --- Collegamento Azioni -> Controller ---
         drawDeckButton.addActionListener(e -> {
             if (controllerObserver != null) {
