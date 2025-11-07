@@ -2,6 +2,7 @@ package uno.Model.Game;
 
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Cards.Deck.Deck;
 import uno.Model.Player.Player;
 import uno.View.GameModelObserver;
@@ -24,7 +25,7 @@ public class Game {
     // --- NUOVI CAMPI ---
     private final TurnManager turnManager; // Delega la gestione dei turni
     private GameState currentState;
-    private CardColor currentWildColor;
+    private CardColor currentColor;
 
     /**
      * Costruisce una nuova partita.
@@ -41,7 +42,7 @@ public class Game {
         this.turnManager = new TurnManager(players); 
         
         this.currentState = GameState.RUNNING;
-        this.currentWildColor = null;
+        this.currentColor = null;
         
         // NOTA: La distribuzione delle carte ora è gestita da GameSetup
         // nel MenuController, non più qui.
@@ -62,34 +63,191 @@ public class Game {
     // --- METODI DI GIOCO ---
     
     public void playCard(Card card) {
-        // TODO: Aggiungere la logica di validazione della mossa
-        // (es. if (!isValidMove(card))) { throw new IllegalStateException("Mossa non valida!"); }
+        Player player = getCurrentPlayer();
+
+        // --- INIZIO LOGICA DI VALIDAZIONE ---
         
+        // 1. Controlla lo stato del gioco
+        if (this.currentState != GameState.RUNNING) {
+            throw new IllegalStateException("Non è possibile giocare una carta ora (Stato: " + this.currentState + ")");
+        }
+        
+        // 2. Controlla se il giocatore ha la carta
+        if (!player.getHand().contains(card)) {
+            throw new IllegalStateException("Il giocatore non ha questa carta!");
+        }
+
+        // 3. Controlla se la mossa è valida secondo le regole
+        if (!isValidMove(card)) {
+            throw new IllegalStateException("Mossa non valida! La carta " + card + " non può essere giocata.");
+        }
+        
+        // --- FINE LOGICA DI VALIDAZIONE ---
+
+        // Se la mossa è valida, aggiorna il currentColor.
+        if (card.getColor() == CardColor.WILD) {
+            this.currentColor = null; // Sarà impostato da onColorChosen()
+        } else {
+            // Se è una carta colorata, quello è il nuovo colore attivo.
+            this.currentColor = card.getColor();
+        }
+
         // Esegui effetto carta (polimorfismo)
-        card.performEffect(this); 
+        card.performEffect(this);
         
         // Sposta la carta
-        getCurrentPlayer().playCard(card);
+        player.playCard(card);
         discardPile.addCard(card);
         
-        // --- LOGICA DI AVANZAMENTO TURNO DELEGATA ---
-        // Non passiamo il turno solo se stiamo aspettando una scelta di colore.
+        // --- LOGICA DI AVANZAMENTO TURNO ---
+        // Non passiamo il turno solo se stiamo aspettando una scelta di colore
+        // (impostato da performEffect -> requestColorChoice).
         if (this.currentState != GameState.WAITING_FOR_COLOR) {
             this.turnManager.advanceTurn();
         }
         
         notifyObservers();
     }
+
+    /**
+     * Controlla se la carta che si sta tentando di giocare è valida
+     * in base allo stato attuale del gioco (carta in cima e colore attivo).
+     */
+    private boolean isValidMove(Card cardToPlay) {
+        Card topCard = getTopDiscardCard(); //
+        
+        // Determina il colore attivo. Se currentColor è impostato (da un Jolly),
+        // usa quello. Altrimenti, usa il colore della carta in cima.
+        CardColor activeColor = (this.currentColor != null) ? this.currentColor : topCard.getColor();
+
+        // 1. Regola Jolly Standard (WILD)
+        if (cardToPlay.getValue() == CardValue.WILD) {
+            return true;
+        }
+
+        // 2. Regola Jolly +4 (WILD_DRAW_FOUR)
+        if (cardToPlay.getValue() == CardValue.WILD_DRAW_FOUR) {
+            // Regola ufficiale: puoi giocarla solo se NON hai
+            // altre carte che corrispondono al COLORE ATTIVO.
+            for (Card cardInHand : getCurrentPlayer().getHand()) {
+                if (cardInHand.getColor() == activeColor) {
+                    return false; // Mossa illegale: hai un'altra carta giocabile
+                }
+            }
+            return true; // Mossa legale
+        }
+
+        // 3. Regole Standard (non-Jolly)
+        // La carta è valida se corrisponde al colore ATTIVO...
+        if (cardToPlay.getColor() == activeColor) {
+            return true;
+        }
+        
+        // ...o se corrisponde al VALORE della carta in cima.
+        if (cardToPlay.getValue() == topCard.getValue()) {
+            return true;
+        }
+
+        // Se nessuna regola è soddisfatta, la mossa non è valida
+        return false;
+    }
     
-    public void playerDrawCard(Player player) {
+    /**
+     * Metodo helper per controllare se il giocatore ha mosse valide.
+     */
+    private boolean playerHasPlayableCard(Player player) {
+        for (Card card : player.getHand()) {
+            if (isValidMove(card)) {
+                return true; // Trovata una carta giocabile
+            }
+        }
+        return false; // Nessuna carta giocabile
+    }
+
+    /**
+     * Azione logica chiamata quando il giocatore clicca "Pesca".
+     * Contiene le regole "non puoi pescare se hai mosse" e "pesca solo 1".
+     */
+    public void playerInitiatesDraw() {
+        Player player = getCurrentPlayer();
+
+        if (currentState != GameState.RUNNING) {
+            throw new IllegalStateException("Non puoi pescare ora.");
+        }
+
+        // 1. Regola: "Massimo una carta"
+        if (turnManager.hasDrawnThisTurn()) {
+            throw new IllegalStateException("Hai già pescato in questo turno. Devi giocare la carta o passare.");
+        }
+
+        // 2. Regola: "Non se hai carte da giocare"
+        if (playerHasPlayableCard(player)) {
+            throw new IllegalStateException("Mossa non valida! Hai una carta giocabile, non puoi pescare.");
+        }
+
+        // Ok, il giocatore deve pescare
+        System.out.println(player.getName() + " non ha mosse, pesca una carta.");
+        turnManager.setHasDrawnThisTurn(true); // Imposta il flag!
+        
+        drawCardForPlayer(player); // Pesca la carta
+
+        // Notifica la View per mostrare la nuova carta
+        notifyObservers();
+    }
+
+    /**
+     * Il giocatore sceglie di passare il turno.
+     * Valido solo se il giocatore è obbligato a farlo (ha pescato e non può/vuole giocare).
+     */
+    public void playerPassTurn() {
+        if (currentState != GameState.RUNNING) {
+            throw new IllegalStateException("Non puoi passare ora.");
+        }
+
+        // Puoi passare solo se hai pescato (perché non avevi mosse)
+        if (!turnManager.hasDrawnThisTurn()) {
+            // Potresti avere una mossa, quindi non puoi passare
+            if (playerHasPlayableCard(getCurrentPlayer())) {
+                throw new IllegalStateException("Non puoi passare, hai una mossa valida.");
+            } else {
+                throw new IllegalStateException("Non puoi passare, devi prima pescare una carta.");
+            }
+        }
+
+        // Se sei qui, hai pescato e hai scelto di passare
+        System.out.println(getCurrentPlayer().getName() + " passa il turno.");
+        turnManager.advanceTurn(); // Avanza al prossimo giocatore
+        notifyObservers();
+    }
+    
+    /**
+     * Metodo fisico di pesca (precedentemente playerDrawCard).
+     * Rimescola il mazzo se necessario.
+     * NON notifica gli observer.
+     */
+    private void drawCardForPlayer(Player player) {
         if (drawDeck.isEmpty()) {
-            // TODO: Logica per rimescolare gli scarti
-            notifyObservers(); 
+            System.out.println("Mazzo di pesca vuoto. Rimescolo gli scarti...");
+            List<Card> cardsToReshuffle = discardPile.takeAllExceptTop();
+            
+            if (cardsToReshuffle.isEmpty()) {
+                System.out.println("Nessuna carta da rimescolare. Impossibile pescare.");
+                return; 
+            }
+            for (Card card : cardsToReshuffle) {
+                drawDeck.addCard(card);
+            }
+            drawDeck.shuffle();
+            System.out.println("Mazzo rimescolato con " + cardsToReshuffle.size() + " carte.");
+        }
+        
+        if (drawDeck.isEmpty()) {
+            System.out.println("Mazzo ancora vuoto. Impossibile pescare.");
             return;
         }
+
         player.addCardToHand(drawDeck.drawCard());
-        
-        notifyObservers();
+        // Rimosso notifyObservers() - sarà gestito dal metodo chiamante
     }
 
     // --- METODI GETTER ---
@@ -117,8 +275,8 @@ public class Game {
         return this.currentState;
     }
     
-    public CardColor getCurrentWildColor() {
-        return this.currentWildColor;
+    public CardColor getCurrentColor() {
+        return this.currentColor;
     }
 
     public Deck<Card> getDrawDeck() {
@@ -127,6 +285,10 @@ public class Game {
 
     public DiscardPile getDiscardPile() {
         return this.discardPile;
+    }
+
+    public List<Player> getPlayers() {
+        return this.players;
     }
     
     // --- METODI PER GLI EFFETTI DELLE CARTE (Delegano al TurnManager) ---
@@ -140,8 +302,9 @@ public class Game {
         Player nextPlayer = this.turnManager.peekNextPlayer();
         System.out.println(nextPlayer.getName() + " pesca " + amount);
         for(int i = 0; i < amount; i++) {
-            playerDrawCard(nextPlayer);
+            drawCardForPlayer(nextPlayer); // <-- Usa il metodo rinominato
         }
+        notifyObservers(); // <-- Aggiunto notify perché drawCardForPlayer non lo fa più
     }
     
     public void reversePlayOrder() {
@@ -161,7 +324,7 @@ public class Game {
         if (this.currentState != GameState.WAITING_FOR_COLOR) {
             return;
         }
-        this.currentWildColor = color;
+        this.currentColor = color;
         this.currentState = GameState.RUNNING; 
         
         // Ora che il colore è stato scelto, passiamo il turno.

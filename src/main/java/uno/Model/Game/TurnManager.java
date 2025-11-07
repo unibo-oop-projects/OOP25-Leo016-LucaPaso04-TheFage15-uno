@@ -13,6 +13,7 @@ public class TurnManager {
     private int currentPlayerIndex;
     private boolean isClockwise; // true = senso orario, false = antiorario
     private boolean skipNext;
+    private boolean hasDrawnThisTurn;
 
     /**
      * Crea un nuovo gestore dei turni.
@@ -23,6 +24,7 @@ public class TurnManager {
         this.currentPlayerIndex = 0; // Inizia sempre dal primo giocatore
         this.isClockwise = true;
         this.skipNext = false;
+        this.hasDrawnThisTurn = false;
     }
 
     /**
@@ -38,16 +40,18 @@ public class TurnManager {
      * Applica qualsiasi effetto "salta" in sospeso.
      */
     public void advanceTurn() {
-        // Se l'effetto "skip" è attivo, salta un giocatore
+        // --- MODIFICA ---
+        // Resetta i flag per il *nuovo* turno
+        this.skipNext = false; 
+        this.hasDrawnThisTurn = false; 
+
         int increment = skipNext ? 2 : 1;
-        skipNext = false; // Resetta il flag
+        // skipNext = false; // Spostato sopra
 
         int direction = isClockwise ? 1 : -1;
         int nextIndex = (currentPlayerIndex + (increment * direction));
 
-        // Gestione del "giro" (wrap-around)
         if (nextIndex < 0) {
-            // Caso antiorario dal giocatore 0
             currentPlayerIndex = players.size() + nextIndex;
         } else {
             currentPlayerIndex = nextIndex % players.size();
@@ -84,5 +88,21 @@ public class TurnManager {
      */
     public void skipNextPlayer() {
         this.skipNext = true;
+    }
+
+    // --- NUOVI METODI GETTER/SETTER ---
+
+    /**
+     * @return true se il giocatore corrente ha già pescato.
+     */
+    public boolean hasDrawnThisTurn() {
+        return this.hasDrawnThisTurn;
+    }
+
+    /**
+     * Imposta il flag per la pesca.
+     */
+    public void setHasDrawnThisTurn(boolean value) {
+        this.hasDrawnThisTurn = value;
     }
 }

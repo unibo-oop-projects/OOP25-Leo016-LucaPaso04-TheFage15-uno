@@ -1,6 +1,7 @@
 package uno.Controller;
 
 import uno.Model.Cards.Card;
+import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Game.Game;
 import uno.View.GameFrame;
 import uno.View.Scenes.GameScene;
@@ -46,16 +47,18 @@ public class GameController implements GameViewObserver {
 
     @Override
     public void onDrawCard() {
-        System.out.println("L'utente pesca una carta");
+        System.out.println("L'utente clicca 'Pesca'");
         try {
-            gameModel.playerDrawCard(gameModel.getCurrentPlayer());
+            // Chiama il nuovo metodo con la logica di validazione
+            gameModel.playerInitiatesDraw(); 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(gameScene, 
-                "Errore durante la pesca: " + e.getMessage(), 
-                "Errore", 
+                e.getMessage(), // Messaggio d'errore (es. "Hai già pescato")
+                "Mossa non valida", 
                 JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     @Override
     public void onCallUno() {
@@ -78,6 +81,29 @@ public class GameController implements GameViewObserver {
             MenuScene menuScene = new MenuScene();
             menuScene.setObserver(menuController);
             mainFrame.showScene(menuScene);
+        }
+    }
+
+    @Override
+    public void onColorChosen(CardColor color) {
+        System.out.println("Colore scelto: " + color);
+        gameModel.setColor(color);
+    }
+    
+
+    /**
+     * Implementazione del nuovo metodo "Passa".
+     */
+    @Override
+    public void onPassTurn() {
+        System.out.println("L'utente clicca 'Passa'");
+        try {
+            gameModel.playerPassTurn();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(gameScene, 
+                e.getMessage(), // Messaggio (es. "Non puoi passare se non hai pescato")
+                "Mossa non valida", 
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -2,6 +2,7 @@ package uno.Model.Game;
 
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardValue;
+import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Deck.Deck;
 import uno.Model.Player.Player;
 
@@ -74,6 +75,14 @@ public class GameSetup {
 
         // Aggiunge la prima carta valida alla pila degli scarti
         discardPile.addCard(firstCard);
+
+        // Se la prima carta è un Jolly, la logica di scelta colore
+        // verrà attivata da performEffect.
+        // Se è una carta colorata, impostiamo quello come colore iniziale.
+        if (firstCard.getColor() != CardColor.WILD) {
+            // Imposta il colore attivo iniziale nella partita
+            game.setColor(firstCard.getColor());
+        }
 
         // Applica l'effetto della prima carta (es. Salta, Inverti, Pesca 2, Jolly)
         // La classe Game gestirà questo effetto sul "primo" giocatore.

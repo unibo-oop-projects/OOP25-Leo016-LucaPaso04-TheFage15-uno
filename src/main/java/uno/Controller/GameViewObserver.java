@@ -30,4 +30,11 @@ public interface GameViewObserver {
      * Chiamato quando l'utente vuole tornare al menu.
      */
     void onBackToMenu();
+
+    /**
+     * Chiamato quando l'utente clicca il bottone "Passa".
+     */
+    void onPassTurn();
+
+    void onChooseColor();
 }
