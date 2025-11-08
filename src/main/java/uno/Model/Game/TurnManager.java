@@ -40,22 +40,30 @@ public class TurnManager {
      * Applica qualsiasi effetto "salta" in sospeso.
      */
     public void advanceTurn() {
-        // --- MODIFICA ---
-        // Resetta i flag per il *nuovo* turno
-        this.skipNext = false; 
-        this.hasDrawnThisTurn = false; 
+        // 1. Salva chi ha appena finito il turno
+        Player playerWhoseTurnEnded = getCurrentPlayer();
 
-        int increment = skipNext ? 2 : 1;
-        // skipNext = false; // Spostato sopra
+        // 2. Controlla se il flag SKIP è attivo
+        //    (impostato da game.skipNextPlayer() durante il turno)
+        int increment = this.skipNext ? 2 : 1;
 
+        // 3. Resetta i flag per il *nuovo* turno
+        this.skipNext = false;         // Il flag "skip" è stato "consumato"
+        this.hasDrawnThisTurn = false; // Il nuovo giocatore non ha ancora pescato
+
+        // 4. Calcola la direzione e il prossimo indice
         int direction = isClockwise ? 1 : -1;
         int nextIndex = (currentPlayerIndex + (increment * direction));
 
+        // 5. Gestisci il "giro" (wrap-around)
         if (nextIndex < 0) {
+            // Caso antiorario dal giocatore 0
             currentPlayerIndex = players.size() + nextIndex;
         } else {
             currentPlayerIndex = nextIndex % players.size();
         }
+
+        // TODO: Gestire logica di reset Uno!
     }
 
     /**

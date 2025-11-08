@@ -62,6 +62,8 @@ public class MenuController implements MenuObserver {
         
         // 7. Mostra la nuova scena
         frame.showScene(gameScene);
+
+        gameController.onGameUpdate();
     }
 
     @Override

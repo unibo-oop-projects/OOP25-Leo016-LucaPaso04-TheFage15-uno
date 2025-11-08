@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Box;
@@ -45,6 +46,7 @@ public class GameScene extends JPanel implements GameModelObserver {
     // Componenti dinamici
     private  JLabel discardPileCard;
     private  JButton drawDeckButton;
+    private JButton passButton;
     private  JLabel statusLabel;
     private  JButton unoButton;
 
@@ -100,6 +102,12 @@ public class GameScene extends JPanel implements GameModelObserver {
             }
         });
 
+        passButton.addActionListener(e -> {
+            if (controllerObserver != null) {
+                controllerObserver.onPassTurn();
+            }
+        });
+
         unoButton.addActionListener(e -> {
             if (controllerObserver != null) {
                 controllerObserver.onCallUno();
@@ -117,6 +125,34 @@ public class GameScene extends JPanel implements GameModelObserver {
     public void setObserver(GameViewObserver observer) {
         this.controllerObserver = observer;
         this.colorChooserPanel.setObserver(observer); // <-- COLLEGA IL SOTTO-PANNELLO
+    }
+
+    /**
+     * NUOVO METODO: Abilita o disabilita tutti i controlli di input umano.
+     * Chiamato dal GameController.
+     * @param enabled true per abilitare, false per disabilitare.
+     */
+    public void setHumanInputEnabled(boolean enabled) {
+        this.unoButton.setEnabled(enabled);
+        
+        // Logica specifica: i bottoni di gioco sono attivi
+        // SOLO se è il turno dell'umano E non ha ancora pescato.
+        boolean hasDrawn = gameModel.hasCurrentPlayerDrawn(gameModel.getCurrentPlayer());
+        
+        this.drawDeckButton.setEnabled(enabled && !hasDrawn);
+        this.passButton.setEnabled(enabled && hasDrawn);
+
+        // Abilita/Disabilita le carte in mano
+        for (Component comp : playerHandPanel.getComponents()) {
+            if (comp instanceof JButton) {
+                // Le carte si possono giocare solo se non hai pescato
+                comp.setEnabled(enabled && !hasDrawn);
+            }
+        }
+        
+        if (!enabled) {
+            colorChooserPanel.setVisible(false); // Nascondi se l'IA sta giocando
+        }
     }
 
     /**
@@ -138,6 +174,13 @@ public class GameScene extends JPanel implements GameModelObserver {
             // Ri-abilita i bottoni
             drawDeckButton.setEnabled(true);
             unoButton.setEnabled(true);
+        }
+
+        // --- LOGICA AGGIUNTA PER IL BOTTONE PASSA ---
+        if (gameModel.getGameState() == GameState.RUNNING && gameModel.hasCurrentPlayerDrawn(gameModel.getCurrentPlayer())) {
+            passButton.setEnabled(true);
+        } else {
+            passButton.setEnabled(false);
         }
         
         // 2. Aggiorna Pila degli Scarti
@@ -206,6 +249,26 @@ public class GameScene extends JPanel implements GameModelObserver {
         repaint();
     }
 
+    /**
+     * Mostra un popup che annuncia il vincitore e blocca la scena.
+     * @param winnerName Il nome del giocatore che ha vinto.
+     */
+    public void showWinnerPopup(String winnerName) {
+        // Assicura che l'input sia disabilitato
+        setHumanInputEnabled(false);
+        
+        // Mostra un popup modale (blocca l'interazione)
+        JOptionPane.showMessageDialog(
+            this, // Il genitore è questa GameScene
+            winnerName + " ha vinto la partita!", 
+            "Partita Terminata", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
+        
+        // TODO: A questo punto potresti voler mostrare un bottone "Torna al Menu"
+        // che chiama controllerObserver.onBackToMenu()
+    }
+
     // --- Metodi di Inizializzazione GUI ---
 
     private JPanel createOpponentsPanel() {
@@ -225,9 +288,15 @@ public class GameScene extends JPanel implements GameModelObserver {
         this.discardPileCard.setHorizontalAlignment(JLabel.CENTER);
         this.discardPileCard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         this.discardPileCard.setOpaque(true); // Per mostrare il colore di sfondo
+
+        this.passButton = new JButton("Passa"); // <-- INIZIALIZZA IL BOTTONE
+        this.passButton.setPreferredSize(new Dimension(80, 50));
+        this.passButton.setEnabled(false); // Disabilitato di default, si abilita dopo aver pescato.
         
         panel.add(this.drawDeckButton);
         panel.add(this.discardPileCard);
+        panel.add(this.passButton);
+
         return panel;
     }
 

@@ -1,11 +1,22 @@
 package uno.Model.Player;
 
+import uno.Model.Cards.Card;
+import uno.Model.Game.Game;
+import java.util.ArrayList;
+import java.util.List;
+
+
 public abstract class AIPlayer extends Player {
     public AIPlayer(String name) {
         super(name);
     }
     //Metodo astratto da implementare nelle classi figlie delle modalità AI
-    public abstract void AIPlayCard();
+   // public abstract void AIPlayCard();
+
+    public boolean isPlayable(Card card) {
+        // Implementa la logica per verificare se la carta è giocabile
+        return true;
+    }
 
     // Logica di gioco generale valida per tutte le AI
     /*public void makeMove() {

@@ -3,27 +3,107 @@ package uno.Controller;
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Game.Game;
+import uno.Model.Game.GameState;
+import uno.Model.Player.AIPlayer; // <-- IMPORTA
+import uno.Model.Player.Player;   // <-- IMPORTA
 import uno.View.GameFrame;
 import uno.View.Scenes.GameScene;
 import uno.View.Scenes.MenuScene;
+import uno.View.GameModelObserver; // <-- IMPORTA
 
 import javax.swing.JOptionPane;
+import javax.swing.Timer; // <-- IMPORTA PER IL RITARDO
+import java.awt.event.ActionEvent; // <-- IMPORTA
+import java.awt.event.ActionListener; // <-- IMPORTA
 
 /**
  * Controller che gestisce la logica di interazione
  * tra la GameScene (View) e il Game (Model).
  */
-public class GameController implements GameViewObserver {
+public class GameController implements GameViewObserver, GameModelObserver {
 
     private final Game gameModel;
     private final GameScene gameScene;
     private final GameFrame mainFrame;
 
+    private Timer aiTimer; // Timer per il ritardo dell'IA
+
     public GameController(Game gameModel, GameScene gameScene, GameFrame mainFrame) {
         this.gameModel = gameModel;
         this.gameScene = gameScene;
         this.mainFrame = mainFrame;
+
+        this.gameModel.addObserver(this);
     }
+
+    /**
+     * Metodo di aggiornamento chiamato dal Modello (Game).
+     * Questo è il "Game Loop" che attiva l'IA.
+     */
+    @Override
+    public void onGameUpdate() {
+        // --- CONTROLLO STATO PARTITA ---
+        // Il Controller REAGISCE allo stato impostato dal Modello
+        
+        if (gameModel.getGameState() == GameState.GAME_OVER) {
+            // Se il modello dice che il gioco è finito, fermiamo tutto.
+            if (aiTimer != null) {
+                aiTimer.stop(); // Ferma il timer dell'IA
+            }
+            gameScene.setHumanInputEnabled(false); // Disabilita tutti i bottoni
+            
+            // Mostra il messaggio di vittoria
+            Player winner = gameModel.getWinner();
+            gameScene.showWinnerPopup(winner.getName());
+            return; // Non fare nient'altro
+        }
+        
+        // Ogni volta che il gioco si aggiorna, controlliamo chi sta giocando
+        checkAndRunAITurn();
+    }
+
+    /**
+     * Controlla se il giocatore corrente è un'IA. Se sì, avvia il suo turno.
+     */
+    private void checkAndRunAITurn() {
+        // Se il gioco sta aspettando un input (colore) o è finito, non fare nulla.
+        if (gameModel.getGameState() != GameState.RUNNING) {
+            return;
+        }
+
+        Player currentPlayer = gameModel.getCurrentPlayer();
+
+        // Controlla se il giocatore è un'istanza di AIPlayer
+        if (currentPlayer instanceof AIPlayer) {
+            
+            // Disabilita la UI umana per evitare input concorrenti
+            gameScene.setHumanInputEnabled(false); 
+            
+            // L'IA non gioca subito. Creiamo un Timer per un breve ritardo.
+            int AI_DELAY = 1000; // 1 secondo (1000ms)
+            
+            ActionListener aiTask = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Esegui la logica decisionale dell'IA
+                    ((AIPlayer) currentPlayer).takeTurn(gameModel);
+                    // (Questo chiamerà game.playCard o game.passTurn,
+                    // che a sua volta chiamerà notifyObservers()
+                    // e farà ripartire questo ciclo onGameUpdate())
+                }
+            };
+            
+            aiTimer = new Timer(AI_DELAY, aiTask);
+            aiTimer.setRepeats(false); // Esegui solo una volta
+            aiTimer.start();
+            
+        } else {
+            // È il turno di un giocatore umano
+            gameScene.setHumanInputEnabled(true);
+        }
+    }
+
+    // --- Metodi chiamati dalla View (Input Umano) ---
 
     @Override
     public void onPlayCard(Card card) {

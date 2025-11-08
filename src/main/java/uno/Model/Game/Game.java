@@ -21,6 +21,7 @@ public class Game {
     private final Deck<Card> drawDeck;
     private final DiscardPile discardPile;
     private final List<Player> players;
+    private Player winner; // <-- NUOVO CAMPO PER IL VINCITORE
     
     // --- NUOVI CAMPI ---
     private final TurnManager turnManager; // Delega la gestione dei turni
@@ -35,6 +36,7 @@ public class Game {
     public Game(Deck<Card> deck, List<Player> players) {
         this.drawDeck = deck;
         this.players = players;
+        this.winner = null; // Inizializza il vincitore a null
         this.discardPile = new DiscardPile();
         
         // --- COLLEGAMENTO ---
@@ -98,6 +100,17 @@ public class Game {
         // Sposta la carta
         player.playCard(card);
         discardPile.addCard(card);
+
+        // --- CONTROLLO VITTORIA ---
+        // Controlla se il giocatore ha vinto DOPO aver giocato la carta
+        if (player.hasWon()) {
+            this.currentState = GameState.GAME_OVER;
+            this.winner = player;
+            System.out.println("PARTITA FINITA! Il vincitore è " + this.winner.getName());
+            notifyObservers(); // Notifica la View che la partita è finita
+            return; // Non avanzare il turno, la partita è bloccata
+        }
+        // -------------------------
         
         // --- LOGICA DI AVANZAMENTO TURNO ---
         // Non passiamo il turno solo se stiamo aspettando una scelta di colore
@@ -165,6 +178,15 @@ public class Game {
     }
 
     /**
+     * Metodo helper per vedere se il giocatore ha pescato in questo turno.
+     * @return true se ha pescato, false altrimenti.
+     */
+
+    public boolean hasCurrentPlayerDrawn(Player player) {
+        return turnManager.hasDrawnThisTurn();
+    }
+
+    /**
      * Azione logica chiamata quando il giocatore clicca "Pesca".
      * Contiene le regole "non puoi pescare se hai mosse" e "pesca solo 1".
      */
@@ -176,7 +198,7 @@ public class Game {
         }
 
         // 1. Regola: "Massimo una carta"
-        if (turnManager.hasDrawnThisTurn()) {
+        if (hasCurrentPlayerDrawn(player)) {
             throw new IllegalStateException("Hai già pescato in questo turno. Devi giocare la carta o passare.");
         }
 
@@ -205,7 +227,7 @@ public class Game {
         }
 
         // Puoi passare solo se hai pescato (perché non avevi mosse)
-        if (!turnManager.hasDrawnThisTurn()) {
+        if (!hasCurrentPlayerDrawn(getCurrentPlayer())) {
             // Potresti avere una mossa, quindi non puoi passare
             if (playerHasPlayableCard(getCurrentPlayer())) {
                 throw new IllegalStateException("Non puoi passare, hai una mossa valida.");
@@ -225,7 +247,7 @@ public class Game {
      * Rimescola il mazzo se necessario.
      * NON notifica gli observer.
      */
-    private void drawCardForPlayer(Player player) {
+    public void drawCardForPlayer(Player player) {
         if (drawDeck.isEmpty()) {
             System.out.println("Mazzo di pesca vuoto. Rimescolo gli scarti...");
             List<Card> cardsToReshuffle = discardPile.takeAllExceptTop();
@@ -307,6 +329,14 @@ public class Game {
 
     public List<Player> getPlayers() {
         return this.players;
+    }
+
+    /**
+     * Restituisce il giocatore che ha vinto la partita.
+     * @return Il giocatore vincitore, o null se la partita è ancora in corso.
+     */
+    public Player getWinner() {
+        return this.winner;
     }
     
     // --- METODI PER GLI EFFETTI DELLE CARTE (Delegano al TurnManager) ---
