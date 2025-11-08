@@ -113,8 +113,6 @@ public class GameController implements GameViewObserver, GameModelObserver {
             gameModel.playCard(card);
             // Il modello notificherà la GameScene per l'aggiornamento
             // (grazie a gameModel.addObserver(gameScene) nel costruttore)
-
-            // TODO: Aggiungere logica per turno IA
             
         } catch (Exception e) {
             // Mostra un errore se la mossa non è valida

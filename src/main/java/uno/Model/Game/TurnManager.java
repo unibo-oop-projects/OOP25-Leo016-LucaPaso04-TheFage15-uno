@@ -113,4 +113,8 @@ public class TurnManager {
     public void setHasDrawnThisTurn(boolean value) {
         this.hasDrawnThisTurn = value;
     }
+
+    public boolean getIsClockwise() {
+        return isClockwise;
+    }
 }

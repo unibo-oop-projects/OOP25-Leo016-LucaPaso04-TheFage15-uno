@@ -44,7 +44,7 @@ public class Game {
         this.turnManager = new TurnManager(players); 
         
         this.currentState = GameState.RUNNING;
-        this.currentColor = null;
+        this.currentColor = null; // Nessun colore attivo all'inizio
         
         // NOTA: La distribuzione delle carte ora è gestita da GameSetup
         // nel MenuController, non più qui.
@@ -104,6 +104,16 @@ public class Game {
         // --- CONTROLLO VITTORIA ---
         // Controlla se il giocatore ha vinto DOPO aver giocato la carta
         if (player.hasWon()) {
+
+            //Controlla che il giocatore abbia effettivamente chiamato UNO
+            if (!player.getHasCalledUno()) {
+                // Penalità: pesca 2 carte
+                drawCardForPlayer(player);
+                drawCardForPlayer(player);
+                notifyObservers(); // Notifica la View per mostrare le nuove carte
+                throw new IllegalStateException("Non hai chiamato UNO! Penalità applicata: hai pescato 2 carte.");
+            }
+
             this.currentState = GameState.GAME_OVER;
             this.winner = player;
             System.out.println("PARTITA FINITA! Il vincitore è " + this.winner.getName());
@@ -279,9 +289,6 @@ public class Game {
         } else {
 
             drawCardForPlayer(player);
-
-            notifyObservers();
-
             drawCardForPlayer(player);
 
             notifyObservers();
@@ -338,6 +345,12 @@ public class Game {
     public Player getWinner() {
         return this.winner;
     }
+
+    // --- METODI SETTER ---
+
+    public void setCurrentColor(CardColor color) {
+        this.currentColor = color;
+    }
     
     // --- METODI PER GLI EFFETTI DELLE CARTE (Delegano al TurnManager) ---
     
@@ -358,6 +371,10 @@ public class Game {
     public void reversePlayOrder() {
         this.turnManager.reverseDirection();
         System.out.println("Ordine invertito!");
+    }
+
+    public boolean isClockwise() {
+        return this.turnManager.getIsClockwise();
     }
 
     // --- METODI PER I JOLLY ---

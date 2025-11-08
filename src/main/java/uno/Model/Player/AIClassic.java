@@ -24,6 +24,12 @@ public class AIClassic extends AIPlayer {
      */
     @Override
     public void takeTurn(Game game) {
+        // Controlla che sia il suo turno per evitare errori
+        if (game.getCurrentPlayer() != this) {
+            return;
+            //throw new IllegalStateException("Non è il turno di " + this.name);
+        }
+
         System.out.println(this.name + " sta pensando...");
 
         // 1. Trova una carta giocabile

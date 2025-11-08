@@ -72,11 +72,16 @@ public class GameSetup {
                 firstCard.getValue() == CardValue.DRAW_TWO ||
                 firstCard.getValue() == CardValue.REVERSE ||
                 firstCard.getValue() == CardValue.SKIP) {
+            System.out.println("Carta scartata: " + firstCard);
             discardPile.addCard(firstCard); // Metti la carta non valida nella pila degli scarti
             firstCard = deck.drawCard();
         }
 
         // Aggiunge la prima carta valida alla pila degli scarti
         discardPile.addCard(firstCard);
+        System.out.println("Prima carta girata: " + firstCard);
+
+        // Imposta il colore attivo in base alla prima carta
+        game.setCurrentColor(firstCard.getColor());
     }
 }

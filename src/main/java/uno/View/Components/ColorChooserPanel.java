@@ -8,6 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -20,18 +21,20 @@ import java.awt.Font;
 public class ColorChooserPanel extends JPanel {
 
     private GameViewObserver observer;
+    
+    // Colori per il tema scuro
+    private static final Color PANEL_COLOR = new Color(50, 50, 50);
+    private static final Color TEXT_COLOR = Color.WHITE;
+    private static final Font BOLD_FONT = new Font("Arial", Font.BOLD, 14);
 
     public ColorChooserPanel() {
-        // Imposta un layout verticale per i bottoni
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createTitledBorder("Scegli un Colore"));
+        setBackground(PANEL_COLOR);
+        setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(), "Scegli Colore",
+            TitledBorder.LEFT, TitledBorder.TOP, BOLD_FONT, TEXT_COLOR
+        ));
         setVisible(false); // Nascosto di default
-
-        // Aggiungi un'etichetta
-        JLabel label = new JLabel("Scegli il prossimo colore:");
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(label);
 
         // Creazione dei 4 bottoni
         JButton redButton = createColorButton("Rosso", new Color(211, 47, 47), CardColor.RED);
@@ -58,27 +61,24 @@ public class ColorChooserPanel extends JPanel {
      */
     private JButton createColorButton(String text, Color bgColor, CardColor colorEnum) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFont(BOLD_FONT);
         button.setBackground(bgColor);
         
-        // Imposta il colore del testo per una buona leggibilità
         if (colorEnum == CardColor.YELLOW) {
             button.setForeground(Color.BLACK);
         } else {
             button.setForeground(Color.WHITE);
         }
-
+        
         button.setOpaque(true);
-        button.setBorderPainted(false); // Look moderno
+        button.setBorderPainted(false);
         button.setFocusPainted(false);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setMaximumSize(new Dimension(150, 40));
         button.setPreferredSize(new Dimension(150, 40));
         
-        // Collega l'azione al controller
         button.addActionListener(e -> {
             if (observer != null) {
-                // Notifica al controller quale colore è stato scelto
                 observer.onColorChosen(colorEnum);
             }
         });

@@ -37,6 +37,10 @@ public class Player {
         return hand.size();
     }
 
+    public boolean getHasCalledUno() {
+        return hasCalledUno;
+    }
+
     /**
      * Aggiunge una carta alla mano del giocatore (es. quando pesca).
      */

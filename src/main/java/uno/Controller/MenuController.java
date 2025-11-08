@@ -35,6 +35,8 @@ public class MenuController implements MenuObserver {
         List<Player> players = new ArrayList<>();
         players.add(new Player("Giocatore 1")); // Giocatore umano
         players.add(new AIClassic("IA-1")); // Avversario
+        players.add(new AIClassic("IA-2"));
+        players.add(new AIClassic("IA-3"));
         // puoi aggiungere altri giocatori qui...
 
         // 2. Crea il Model (Mazzo e Partita)

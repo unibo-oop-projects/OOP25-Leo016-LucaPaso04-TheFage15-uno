@@ -2,156 +2,164 @@ package uno.View.Scenes;
 
 import uno.Model.Cards.Card;
 import uno.Model.Game.Game;
-import uno.Model.Player.*;
-import uno.Model.Game.GameState; // <-- IMPORTA
+import uno.Model.Game.GameState;
 import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Player.Player;
 import uno.Controller.GameViewObserver;
 import uno.View.GameModelObserver;
-import uno.View.Components.ColorChooserPanel; // <-- IMPORTA
-
+import uno.View.Components.ColorChooserPanel;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.border.Border;
 import javax.swing.Box;
-import javax.swing.border.EmptyBorder;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Component; 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
-
+import java.awt.Font; 
+import java.awt.Cursor;
+import java.awt.GridBagLayout;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 /**
  * Pannello (JPanel) che rappresenta la schermata di gioco principale.
  * Implementa GameModelObserver per essere aggiornata dal modello Game.
+ * Versione con grafica moderna e layout per 4 giocatori.
  */
 public class GameScene extends JPanel implements GameModelObserver {
 
-    private  Game gameModel;
+    // --- Colori e Font (come MenuScene) ---
+    private static final Color BACKGROUND_COLOR = new Color(30, 30, 30);
+    private static final Color PANEL_COLOR = new Color(50, 50, 50);
+    private static final Color TEXT_COLOR = Color.WHITE;
+    private static final Color BUTTON_COLOR_DRAW = new Color(33, 150, 243); // Blu
+    private static final Color BUTTON_COLOR_PASS = new Color(244, 67, 54); // Rosso
+    private static final Font BOLD_FONT = new Font("Arial", Font.BOLD, 14);
+    private static final Font NORMAL_FONT = new Font("Arial", Font.PLAIN, 12);
+    private static final Border HIGHLIGHT_BORDER = BorderFactory.createLineBorder(Color.ORANGE, 3);
+    private static final Border NORMAL_BORDER = BorderFactory.createEmptyBorder(3, 3, 3, 3); // Spessore per allineamento
+
+    private final Game gameModel;
     private GameViewObserver controllerObserver;
 
-    // Pannelli principali
-    private  JPanel opponentsPanel;
-    private  JPanel centerPanel;
-    private  JPanel playerHandPanel;
-    private  JPanel infoPanel;
-    private  ColorChooserPanel colorChooserPanel; // <-- NUOVO CAMPO
+    // --- Pannelli Giocatori ---
+    private JPanel playerHandPanel; // Sud (Umano)
+    private JPanel westAIPanel, northAIPanel, eastAIPanel; // Ovest, Nord, Est (IA)
+    private JLabel westAILabel, northAILabel, eastAILabel;
 
-    // Componenti dinamici
-    private  JLabel discardPileCard;
-    private  JButton drawDeckButton;
+    // --- Pannelli Centrali ---
+    private JPanel centerPanel;
+    private JLabel discardPileCard;
+    private JButton drawDeckButton;
     private JButton passButton;
-    private  JLabel statusLabel;
-    private  JButton unoButton;
+    
+    // --- Pannelli Laterali (Est) ---
+    private JLabel statusLabel;
+    private JButton unoButton;
+    private ColorChooserPanel colorChooserPanel; 
 
     public GameScene(Game gameModel) {
         super(new BorderLayout(10, 10));
         this.gameModel = gameModel;
-        this.gameModel.addObserver(this); // Si registra al modello
-
+        this.gameModel.addObserver(this); 
+        
+        setBackground(BACKGROUND_COLOR);
         setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // --- Creazione Pannelli ---
-        opponentsPanel = createOpponentsPanel();
-        centerPanel = createCenterPanel(); 
+        // (I metodi helper inizializzano i campi)
         playerHandPanel = createPlayerHandPanel();
+        centerPanel = createCenterPanel(); 
         
-        // --- Pannello Est (Info + Scelta Colore) ---
-        // Usiamo un pannello contenitore per impilare info e scelta colore
-        JPanel eastPanel = new JPanel();
-        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
-        
-        infoPanel = createInfoPanel();
-        colorChooserPanel = new ColorChooserPanel(); // <-- CREA IL PANNELLO
-        
-        eastPanel.add(infoPanel);
-        eastPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Spaziatore
-        eastPanel.add(colorChooserPanel); // <-- AGGIUNGI
-        eastPanel.add(Box.createVerticalGlue()); // Spinge in alto i componenti
+        // Pannelli IA (Ovest, Nord, Est)
+        westAIPanel = createOpponentPanel("IA-Ovest (1)");
+        northAIPanel = createOpponentPanel("IA-Nord (2)");
+        eastAIPanel = createOpponentPanel("IA-Est (3)");
+
+        // Pannello Est (Info + Scelta Colore + IA Est)
+        JPanel eastContainer = createEastContainer();
 
         // --- Assemblaggio Layout ---
-        add(opponentsPanel, BorderLayout.NORTH);
+        add(northAIPanel, BorderLayout.NORTH);
+        add(westAIPanel, BorderLayout.WEST);
+        add(eastContainer, BorderLayout.EAST);
         add(centerPanel, BorderLayout.CENTER);
         
-        // Pannello per la mano e il bottone UNO
-        JPanel southPanel = new JPanel(new BorderLayout());
+        // Pannello Sud (Mano Umano + Bottone UNO)
+        JPanel southPanel = new JPanel(new BorderLayout(10, 0));
+        southPanel.setOpaque(false);
         southPanel.add(new JScrollPane(playerHandPanel), BorderLayout.CENTER);
         
-        JPanel unoButtonPanel = new JPanel(); // Pannello per centrare il bottone UNO
-        unoButton = new JButton("UNO!");
-        unoButton.setFont(new Font("Arial", Font.BOLD, 24));
-        unoButton.setPreferredSize(new Dimension(100, 50));
-        unoButtonPanel.add(unoButton);
-        unoButtonPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
+        JPanel unoButtonPanel = new JPanel(new BorderLayout());
+        unoButtonPanel.setOpaque(false);
+        unoButtonPanel.setBorder(new EmptyBorder(0, 0, 10, 10));
+        this.unoButton = createStyledButton("UNO!", new Color(255, 193, 7), Color.BLACK, 100, 80); // Giallo
+        unoButtonPanel.add(this.unoButton, BorderLayout.CENTER);
         
         southPanel.add(unoButtonPanel, BorderLayout.EAST);
         add(southPanel, BorderLayout.SOUTH);
-        
-        add(eastPanel, BorderLayout.EAST); // <-- AGGIUNGI IL PANNELLO 'east'
 
         // --- Collegamento Azioni -> Controller ---
         drawDeckButton.addActionListener(e -> {
-            if (controllerObserver != null) {
-                controllerObserver.onDrawCard();
-            }
+            if (controllerObserver != null) { controllerObserver.onDrawCard(); }
         });
-
-        passButton.addActionListener(e -> {
-            if (controllerObserver != null) {
-                controllerObserver.onPassTurn();
-            }
+        passButton.addActionListener(e -> { 
+            if (controllerObserver != null) { controllerObserver.onPassTurn(); }
         });
-
         unoButton.addActionListener(e -> {
-            if (controllerObserver != null) {
-                controllerObserver.onCallUno();
-            }
+            if (controllerObserver != null) { controllerObserver.onCallUno(); }
         });
         
-        // Prima visualizzazione
-        onGameUpdate();
+        onGameUpdate(); // Prima visualizzazione
     }
 
     /**
-     * Imposta il controller che ascolterà gli eventi di questa scena.
-     * Passa l'observer anche al pannello figlio.
+     * Imposta l'observer (controller) che ascolterà gli eventi di questa scena.
+     * @param observer L'observer del controller.
      */
     public void setObserver(GameViewObserver observer) {
         this.controllerObserver = observer;
-        this.colorChooserPanel.setObserver(observer); // <-- COLLEGA IL SOTTO-PANNELLO
+        this.colorChooserPanel.setObserver(observer);
     }
 
     /**
-     * NUOVO METODO: Abilita o disabilita tutti i controlli di input umano.
-     * Chiamato dal GameController.
-     * @param enabled true per abilitare, false per disabilitare.
+     * Abilita o disabilita tutti i controlli di input umano.
      */
     public void setHumanInputEnabled(boolean enabled) {
         this.unoButton.setEnabled(enabled);
         
-        // Logica specifica: i bottoni di gioco sono attivi
-        // SOLO se è il turno dell'umano E non ha ancora pescato.
+        boolean isHumanTurn = gameModel.getCurrentPlayer().getClass() == Player.class;
         boolean hasDrawn = gameModel.hasCurrentPlayerDrawn(gameModel.getCurrentPlayer());
-        
+        // Il bottone Pesca è attivo solo se è il tuo turno E non hai ancora pescato
         this.drawDeckButton.setEnabled(enabled && !hasDrawn);
+        // Il bottone Passa è attivo solo se è il tuo turno E hai già pescato
         this.passButton.setEnabled(enabled && hasDrawn);
 
-        // Abilita/Disabilita le carte in mano
+        // --- CORREZIONE LOGICA ---
+        // Le carte in mano sono abilitate se è il turno dell'umano.
+        // La logica "isMoveValid" in Game.java impedirà di giocare
+        // una carta non valida.
         for (Component comp : playerHandPanel.getComponents()) {
             if (comp instanceof JButton) {
-                // Le carte si possono giocare solo se non hai pescato
-                comp.setEnabled(enabled && !hasDrawn);
+                // Rimuoviamo "!hasDrawn". Le carte sono sempre giocabili
+                // se è il turno dell'umano.
+                comp.setEnabled(enabled); 
             }
         }
         
-        if (!enabled) {
-            colorChooserPanel.setVisible(false); // Nascondi se l'IA sta giocando
+        if (!enabled && !isHumanTurn) {
+            System.out.println("Disabilito input umano.");
+            colorChooserPanel.setVisible(false);
         }
     }
 
@@ -160,178 +168,234 @@ public class GameScene extends JPanel implements GameModelObserver {
      */
     @Override
     public void onGameUpdate() {
+        boolean isHumanTurn = gameModel.getCurrentPlayer().getClass() == Player.class;
         
-        // --- LOGICA PER MOSTRARE/NASCONDERE LA SCELTA COLORE ---
+        // --- Gestione Stato (Visibilità) ---
         if (gameModel.getGameState() == GameState.WAITING_FOR_COLOR) {
-            colorChooserPanel.setVisible(true);
+            setHumanInputEnabled(false); 
+            if (isHumanTurn) { 
+                System.out.println("Mostro il pannello di scelta colore.");
+                colorChooserPanel.setVisible(true);
+            }
             statusLabel.setText("Scegli un colore!");
-            // Disabilita gli altri bottoni
-            drawDeckButton.setEnabled(false);
-            unoButton.setEnabled(false);
-        } else {
+        } else if (gameModel.getGameState() == GameState.RUNNING) {
             colorChooserPanel.setVisible(false);
-            statusLabel.setText("Turno di: " + gameModel.getCurrentPlayer().getName());
-            // Ri-abilita i bottoni
-            drawDeckButton.setEnabled(true);
-            unoButton.setEnabled(true);
-        }
 
-        // --- LOGICA AGGIUNTA PER IL BOTTONE PASSA ---
-        if (gameModel.getGameState() == GameState.RUNNING && gameModel.hasCurrentPlayerDrawn(gameModel.getCurrentPlayer())) {
-            passButton.setEnabled(true);
-        } else {
-            passButton.setEnabled(false);
+            String direction = gameModel.isClockwise() ? "Orario" : "Antiorario";
+            statusLabel.setText("<html><div style='text-align: center;'>Turno di: " 
+                + gameModel.getCurrentPlayer().getName() 
+                + "<br>Direzione: " + direction + "</div></html>"); // <-- USA <br> PER ANDARE A CAPO
         }
         
-        // 2. Aggiorna Pila degli Scarti
+        // --- Aggiornamento Pila Scarti ---
         if (gameModel.isDiscardPileEmpty()) {
             discardPileCard.setText("Vuota");
             discardPileCard.setBackground(Color.LIGHT_GRAY);
         } else {
             Card topCard = gameModel.getTopDiscardCard();
-            discardPileCard.setText(topCard.toString()); 
+            discardPileCard.setText("<html><div style='text-align: center;'>" + topCard.getValue() + "<br>" + topCard.getColor() + "</div></html>");
             
-            // Imposta il colore di sfondo della label
-            discardPileCard.setBackground(convertCardColor(gameModel.getCurrentColor()));
-            discardPileCard.setForeground(Color.BLACK); // Resetta il testo a nero
-            
-            if(gameModel.getCurrentColor() == CardColor.BLUE || 
-               gameModel.getCurrentColor() == CardColor.RED ||
-               gameModel.getCurrentColor() == CardColor.WILD) {
+            CardColor activeColor = gameModel.getCurrentColor();
+            System.out.println("Colore attivo: " + activeColor);
+
+            discardPileCard.setBackground(convertCardColor(activeColor));
+            discardPileCard.setForeground(Color.BLACK);
+            if(activeColor == CardColor.BLUE || activeColor == CardColor.RED || activeColor == CardColor.WILD || activeColor == null) {
                 discardPileCard.setForeground(Color.WHITE);
             }
         }
 
-        // 3. Aggiorna Mano del Giocatore (Umano)
+        // --- Aggiornamento Mano Umano ---
         playerHandPanel.removeAll(); 
-        
-        // Assumiamo che il giocatore umano sia il primo
-        Player humanPlayer = gameModel.getPlayers().get(0); // Meglio un metodo game.getHumanPlayer()
-        
+        Player humanPlayer = gameModel.getPlayers().get(0); 
         for (Card card : humanPlayer.getHand()) {
-            JButton cardButton = new JButton(card.toString());
-            cardButton.setPreferredSize(new Dimension(80, 120));
-            // TODO: Aggiungere stile al bottone della carta
-            
-            // Disabilita i bottoni delle carte se non è il tuo turno
-            // o se stai scegliendo un colore
-            if (gameModel.getGameState() != GameState.RUNNING || 
-                gameModel.getCurrentPlayer() != humanPlayer) {
-                cardButton.setEnabled(false);
-            }
-            
+            JButton cardButton = createCardButton(card);
             cardButton.addActionListener(e -> {
-                if (controllerObserver != null) {
-                    controllerObserver.onPlayCard(card);
-                }
+                if (controllerObserver != null) { controllerObserver.onPlayCard(card); }
             });
             playerHandPanel.add(cardButton);
         }
 
-        // 4. Aggiorna Pannello Avversari
-        opponentsPanel.removeAll();
-        for (int i = 1; i < gameModel.getPlayers().size(); i++) {
-            Player ai = gameModel.getPlayers().get(i);
-            JLabel aiLabel = new JLabel(ai.getName() + ": " + ai.getHandSize() + " carte");
-            aiLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
-            
-            // Evidenzia il giocatore di turno
-            if(gameModel.getCurrentPlayer() == ai) {
-                aiLabel.setFont(new Font("Arial", Font.BOLD, 14));
-                aiLabel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
-            }
-            
-            opponentsPanel.add(aiLabel);
-        }
+        setHumanInputEnabled(isHumanTurn && gameModel.getGameState() == GameState.RUNNING);
+        
+        // --- Aggiornamento Pannelli IA ---
+        updateOpponentPanel(westAIPanel, westAILabel, gameModel.getPlayers().get(1));
+        updateOpponentPanel(northAIPanel, northAILabel, gameModel.getPlayers().get(2));
+        updateOpponentPanel(eastAIPanel, eastAILabel, gameModel.getPlayers().get(3));
 
-        // Forza il ridisegno dei pannelli aggiornati
         revalidate();
         repaint();
     }
-
+    
     /**
-     * Mostra un popup che annuncia il vincitore e blocca la scena.
-     * @param winnerName Il nome del giocatore che ha vinto.
+     * Mostra un popup che annuncia il vincitore.
      */
+
     public void showWinnerPopup(String winnerName) {
-        // Assicura che l'input sia disabilitato
         setHumanInputEnabled(false);
-        
-        // Mostra un popup modale (blocca l'interazione)
-        JOptionPane.showMessageDialog(
-            this, // Il genitore è questa GameScene
-            winnerName + " ha vinto la partita!", 
-            "Partita Terminata", 
-            JOptionPane.INFORMATION_MESSAGE
-        );
-        
-        // TODO: A questo punto potresti voler mostrare un bottone "Torna al Menu"
-        // che chiama controllerObserver.onBackToMenu()
+        JOptionPane.showMessageDialog(this, winnerName + " ha vinto la partita!", 
+            "Partita Terminata", JOptionPane.INFORMATION_MESSAGE);
     }
+    
+    // --- Metodi Helper per la Creazione GUI ---
 
-    // --- Metodi di Inizializzazione GUI ---
+    private JPanel createOpponentPanel(String title) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(PANEL_COLOR);
+        panel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(), title, 
+            TitledBorder.CENTER, TitledBorder.TOP, BOLD_FONT, TEXT_COLOR
+        ));
+        panel.setPreferredSize(new Dimension(120, 100));
 
-    private JPanel createOpponentsPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Avversari"));
+        JLabel cardLabel = new JLabel("X carte");
+        cardLabel.setFont(BOLD_FONT);
+        cardLabel.setForeground(TEXT_COLOR);
+        cardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        cardLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        // Salva il riferimento alla label corretta
+        if (title.contains("Ovest")) { this.westAILabel = cardLabel; }
+        else if (title.contains("Nord")) { this.northAILabel = cardLabel; }
+        else if (title.contains("Est")) { this.eastAILabel = cardLabel; }
+        
+        panel.add(Box.createVerticalGlue());
+        panel.add(cardLabel);
+        panel.add(Box.createVerticalGlue());
         return panel;
+    }
+    
+    private void updateOpponentPanel(JPanel panel, JLabel label, Player ai) {
+        label.setText(ai.getHandSize() + " carte");
+        if (gameModel.getCurrentPlayer() == ai) {
+            panel.setBorder(BorderFactory.createTitledBorder(
+                HIGHLIGHT_BORDER, ai.getName(),
+                TitledBorder.CENTER, TitledBorder.TOP, BOLD_FONT, Color.ORANGE
+            ));
+        } else {
+            panel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(), ai.getName(),
+                TitledBorder.CENTER, TitledBorder.TOP, BOLD_FONT, TEXT_COLOR
+            ));
+        }
     }
 
     private JPanel createCenterPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
         
-        this.drawDeckButton = new JButton("[MAZZO]");
-        this.drawDeckButton.setPreferredSize(new Dimension(80, 120));
+        this.drawDeckButton = createStyledButton("[MAZZO]", BUTTON_COLOR_DRAW, Color.WHITE, 100, 150);
         
         this.discardPileCard = new JLabel("SCARTI");
-        this.discardPileCard.setPreferredSize(new Dimension(80, 120));
+        this.discardPileCard.setPreferredSize(new Dimension(100, 150));
+        this.discardPileCard.setFont(BOLD_FONT);
         this.discardPileCard.setHorizontalAlignment(JLabel.CENTER);
         this.discardPileCard.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        this.discardPileCard.setOpaque(true); // Per mostrare il colore di sfondo
-
-        this.passButton = new JButton("Passa"); // <-- INIZIALIZZA IL BOTTONE
-        this.passButton.setPreferredSize(new Dimension(80, 50));
-        this.passButton.setEnabled(false); // Disabilitato di default, si abilita dopo aver pescato.
+        this.discardPileCard.setOpaque(true); 
         
-        panel.add(this.drawDeckButton);
-        panel.add(this.discardPileCard);
-        panel.add(this.passButton);
-
+        this.passButton = createStyledButton("Passa", BUTTON_COLOR_PASS, Color.WHITE, 100, 40);
+        
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(this.drawDeckButton, gbc);
+        gbc.gridx = 1; gbc.gridy = 0;
+        panel.add(this.discardPileCard, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2;
+        panel.add(this.passButton, gbc);
+        
         return panel;
     }
 
     private JPanel createPlayerHandPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        panel.setBorder(BorderFactory.createTitledBorder("La tua Mano"));
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        panel.setBackground(PANEL_COLOR);
+        TitledBorder border = BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(), "La tua Mano",
+            TitledBorder.CENTER, TitledBorder.TOP, BOLD_FONT, TEXT_COLOR
+        );
+        panel.setBorder(border);
+        panel.setPreferredSize(new Dimension(100, 150)); // Altezza per le carte
         return panel;
     }
 
     private JPanel createInfoPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder("Info Partita"));
-        
-        this.statusLabel = new JLabel("Turno di: ..."); 
-        this.statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        panel.setBackground(PANEL_COLOR);
+        panel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(), "Info Partita",
+            TitledBorder.LEFT, TitledBorder.TOP, BOLD_FONT, TEXT_COLOR
+        ));
+
+        this.statusLabel = new JLabel("Turno di: ... \n Direzione: ...");
+        this.statusLabel.setFont(BOLD_FONT);
+        this.statusLabel.setForeground(TEXT_COLOR);
         this.statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         this.statusLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        
+
         panel.add(this.statusLabel);
+
         return panel;
     }
     
-    /**
-     * Converte un CardColor in un Color di Swing.
-     */
+    private JPanel createEastContainer() {
+        JPanel eastPanel = new JPanel();
+        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
+        eastPanel.setOpaque(false);
+        
+        JPanel infoPanel = createInfoPanel();
+        colorChooserPanel = new ColorChooserPanel();
+        
+        eastPanel.add(eastAIPanel); // Pannello IA Est in cima
+        eastPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        eastPanel.add(infoPanel);
+        eastPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        eastPanel.add(colorChooserPanel);
+        eastPanel.add(Box.createVerticalGlue()); // Spinge tutto in alto
+        return eastPanel;
+    }
+    
+    private JButton createCardButton(Card card) {
+        JButton button = new JButton("<html><div style='text-align: center;'>" + card.getValue() + "<br>" + card.getColor() + "</div></html>");
+        button.setPreferredSize(new Dimension(80, 120));
+        button.setBackground(convertCardColor(card.getColor()));
+        button.setFont(new Font("Arial", Font.BOLD, 10));
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        
+        if (card.getColor() == CardColor.YELLOW) {
+            button.setForeground(Color.BLACK);
+        } else {
+            button.setForeground(Color.WHITE);
+        }
+        return button;
+    }
+    
+    private JButton createStyledButton(String text, Color bg, Color fg, int width, int height) {
+        JButton button = new JButton(text);
+        button.setFont(BOLD_FONT);
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(width, height));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+    
     private Color convertCardColor(CardColor cardColor) {
-        if (cardColor == null) return Color.LIGHT_GRAY;
+        if (cardColor == null) return Color.BLACK; // Colore Jolly attivo
         
         switch (cardColor) {
             case RED: return new Color(211, 47, 47);
             case BLUE: return new Color(33, 150, 243);
             case GREEN: return new Color(76, 175, 80);
             case YELLOW: return new Color(255, 235, 59);
-            case WILD: // Se il colore è WILD, significa che è stata appena giocata
+            case WILD:
             default:
                 return Color.DARK_GRAY;
         }

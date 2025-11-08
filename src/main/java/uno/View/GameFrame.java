@@ -14,7 +14,7 @@ public class GameFrame extends JFrame {
     public GameFrame(String title) {
         super(title);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(800, 600));
+        setMinimumSize(new Dimension(1200, 800));
         setLocationRelativeTo(null); // Centra la finestra
     }
 
