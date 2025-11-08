@@ -4,10 +4,20 @@ import uno.Model.Cards.Card;
 import uno.Model.Game.Game;
 import uno.Model.Game.GameState;
 import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Player.Player;
 import uno.Controller.GameViewObserver;
 import uno.View.GameModelObserver;
 import uno.View.Components.ColorChooserPanel;
+
+// Imports per le Immagini
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import java.awt.Image;
+import java.net.URL;
+import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -52,10 +62,16 @@ public class GameScene extends JPanel implements GameModelObserver {
     private final Game gameModel;
     private GameViewObserver controllerObserver;
 
+    // --- Dimensioni Carte ---
+    private static final int CARD_WIDTH = 80;
+    private static final int CARD_HEIGHT = 120;
+
     // --- Pannelli Giocatori ---
     private JPanel playerHandPanel; // Sud (Umano)
     private JPanel westAIPanel, northAIPanel, eastAIPanel; // Ovest, Nord, Est (IA)
     private JLabel westAILabel, northAILabel, eastAILabel;
+
+    private final Map<String, ImageIcon> cardImageCache;
 
     // --- Pannelli Centrali ---
     private JPanel centerPanel;
@@ -72,6 +88,10 @@ public class GameScene extends JPanel implements GameModelObserver {
         super(new BorderLayout(10, 10));
         this.gameModel = gameModel;
         this.gameModel.addObserver(this); 
+
+        // 1. Inizializza la cache e carica le immagini
+        this.cardImageCache = new HashMap<>();
+        loadCardImages();
         
         setBackground(BACKGROUND_COLOR);
         setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -190,19 +210,25 @@ public class GameScene extends JPanel implements GameModelObserver {
         // --- Aggiornamento Pila Scarti ---
         if (gameModel.isDiscardPileEmpty()) {
             discardPileCard.setText("Vuota");
+            discardPileCard.setIcon(null);
             discardPileCard.setBackground(Color.LIGHT_GRAY);
         } else {
             Card topCard = gameModel.getTopDiscardCard();
-            discardPileCard.setText("<html><div style='text-align: center;'>" + topCard.getValue() + "<br>" + topCard.getColor() + "</div></html>");
+            String cardName = topCard.getColor().name() + "_" + topCard.getValue().name();
+            ImageIcon icon = cardImageCache.get(cardName);
             
             CardColor activeColor = gameModel.getCurrentColor();
             System.out.println("Colore attivo: " + activeColor);
 
-            discardPileCard.setBackground(convertCardColor(activeColor));
-            discardPileCard.setForeground(Color.BLACK);
-            if(activeColor == CardColor.BLUE || activeColor == CardColor.RED || activeColor == CardColor.WILD || activeColor == null) {
-                discardPileCard.setForeground(Color.WHITE);
+            if (icon != null) {
+                discardPileCard.setIcon(icon);
+                discardPileCard.setText(null); // Rimuovi testo di fallback
+            } else {
+                discardPileCard.setIcon(null);
+                discardPileCard.setText("<html><div style='text-align: center;'>" + topCard.getValue() + "<br>" + topCard.getColor() + "</div></html>");
             }
+
+            discardPileCard.setBorder(BorderFactory.createLineBorder(convertCardColor(activeColor), 4));
         }
 
         // --- Aggiornamento Mano Umano ---
@@ -287,7 +313,8 @@ public class GameScene extends JPanel implements GameModelObserver {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         
-        this.drawDeckButton = createStyledButton("[MAZZO]", BUTTON_COLOR_DRAW, Color.WHITE, 100, 150);
+        this.drawDeckButton = new JButton();
+        styleAsCardButton(this.drawDeckButton, "CARD_BACK"); // Usa l'immagine del dorso
         
         this.discardPileCard = new JLabel("SCARTI");
         this.discardPileCard.setPreferredSize(new Dimension(100, 150));
@@ -356,21 +383,31 @@ public class GameScene extends JPanel implements GameModelObserver {
         eastPanel.add(Box.createVerticalGlue()); // Spinge tutto in alto
         return eastPanel;
     }
+
+    /**
+     * NUOVO: Metodo per applicare stile-carta a un JButton.
+     */
+    private void styleAsCardButton(JButton button, String cardName) {
+        ImageIcon icon = cardImageCache.get(cardName);
+        if (icon != null) {
+            button.setIcon(icon);
+            button.setText(null);
+        } else {
+            // Fallback se l'immagine non è trovata
+            button.setText(cardName.replace("_", " "));
+        }
+        
+        button.setPreferredSize(new Dimension(CARD_WIDTH, CARD_HEIGHT));
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
     
     private JButton createCardButton(Card card) {
-        JButton button = new JButton("<html><div style='text-align: center;'>" + card.getValue() + "<br>" + card.getColor() + "</div></html>");
-        button.setPreferredSize(new Dimension(80, 120));
-        button.setBackground(convertCardColor(card.getColor()));
-        button.setFont(new Font("Arial", Font.BOLD, 10));
-        button.setOpaque(true);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        
-        if (card.getColor() == CardColor.YELLOW) {
-            button.setForeground(Color.BLACK);
-        } else {
-            button.setForeground(Color.WHITE);
-        }
+        String cardName = card.getColor().name() + "_" + card.getValue().name();
+        JButton button = new JButton();
+        styleAsCardButton(button, cardName); // Applica lo stile
         return button;
     }
     
@@ -398,6 +435,55 @@ public class GameScene extends JPanel implements GameModelObserver {
             case WILD:
             default:
                 return Color.DARK_GRAY;
+        }
+    }
+
+    /**
+     * Carica tutte le immagini delle carte in cache all'avvio.
+     */
+    private void loadCardImages() {
+        // Loop su tutti i colori (eccetto WILD)
+        for (CardColor color : CardColor.values()) {
+            if (color == CardColor.WILD || color == CardColor.WILD) continue; 
+            
+            // Loop su tutti i valori (eccetto WILD)
+            for (CardValue value : CardValue.values()) {
+                if (value == CardValue.WILD || value == CardValue.WILD_DRAW_FOUR) continue;
+                
+                // Crea nomi come "RED_ONE", "BLUE_SKIP"
+                String cardName = color.name() + "_" + value.name();
+                loadImage(cardName);
+            }
+        }
+        // Carica le carte WILD manualmente
+        loadImage("WILD_WILD");
+        loadImage("WILD_WILD_DRAW_FOUR");
+        
+        // Carica il dorso della carta
+        loadImage("CARD_BACK");
+    }
+
+    /**
+     * Metodo helper per caricare una singola immagine nella cache.
+     * @param cardName Il nome del file (es. "RED_ONE")
+     */
+    private void loadImage(String cardName) {
+        try {
+            // le immagini sono in src/main/resources/images/cards/
+            String path = "/images/cards/" + cardName + ".png"; 
+            URL imgURL = getClass().getResource(path);
+
+            if (imgURL != null) {
+                ImageIcon icon = new ImageIcon(imgURL);
+                // Scala l'immagine alla dimensione standard
+                Image scaledImg = icon.getImage().getScaledInstance(CARD_WIDTH, CARD_HEIGHT, Image.SCALE_SMOOTH);
+                cardImageCache.put(cardName, new ImageIcon(scaledImg));
+            } else {
+                System.err.println("Immagine non trovata: " + path);
+            }
+        } catch (Exception e) {
+            System.err.println("Errore durante il caricamento di: " + cardName);
+            e.printStackTrace();
         }
     }
 }
