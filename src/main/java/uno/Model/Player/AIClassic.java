@@ -5,6 +5,8 @@ import uno.Model.Game.Game;
 import uno.Model.Cards.Attributes.CardColor; // Importa CardColor
 import uno.Model.Cards.Attributes.CardValue;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Optional; // Importa Optional
 
 /**
@@ -157,12 +159,40 @@ public class AIClassic extends AIPlayer {
     }
 
     /**
-     * Logica IA base per scegliere un colore (es. il colore più presente nella sua mano).
+     * Logica IA base per scegliere un colore (il colore più presente nella sua mano).
      */
     private CardColor chooseBestColor() {
-        // TODO: Implementare una logica reale (es. conta i colori in mano)
-        // Per ora, sceglie ROSSO di default.
-        System.out.println(this.name + " sceglie ROSSO.");
-        return CardColor.RED;
+        // Usiamo un EnumMap per contare i colori. È molto efficiente per le chiavi Enum.
+        Map<CardColor, Integer> colorCounts = new EnumMap<>(CardColor.class);
+
+        // Inizializza i conteggi a 0 per i colori che si possono scegliere
+        colorCounts.put(CardColor.RED, 0);
+        colorCounts.put(CardColor.GREEN, 0);
+        colorCounts.put(CardColor.BLUE, 0);
+        colorCounts.put(CardColor.YELLOW, 0);
+
+        // Itera sulla mano dell'IA ('this.hand' è ereditato da Player)
+        for (Card card : this.hand) {
+            CardColor color = card.getColor();
+            
+            // Contiamo solo le carte colorate, ignoriamo le WILD
+            if (colorCounts.containsKey(color)) {
+                colorCounts.put(color, colorCounts.get(color) + 1);
+            }
+        }
+
+        // Ora trova il colore con il conteggio massimo
+        CardColor bestColor = CardColor.RED; // Colore di default se la mano è vuota o ha solo Jolly
+        int maxCount = -1;
+
+        for (Map.Entry<CardColor, Integer> entry : colorCounts.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                bestColor = entry.getKey();
+            }
+        }
+        
+        System.out.println(this.name + " sceglie " + bestColor);
+        return bestColor;
     }
 }
