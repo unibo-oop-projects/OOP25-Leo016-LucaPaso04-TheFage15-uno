@@ -127,8 +127,6 @@ public class FlipDeck extends Deck<Card> {
             card = new NumberedCard(lightFace, darkFace);
         }
 
-        System.out.println("Aggiunta carta al mazzo: " + card);
-
         cards.add(card);
     }
 

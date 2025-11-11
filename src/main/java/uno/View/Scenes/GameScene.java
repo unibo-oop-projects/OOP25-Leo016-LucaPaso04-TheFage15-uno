@@ -76,8 +76,7 @@ public class GameScene extends JPanel implements GameModelObserver {
     private JPanel westAIPanel, northAIPanel, eastAIPanel; // Ovest, Nord, Est (IA)
     private JLabel westAILabel, northAILabel, eastAILabel;
 
-    private final Map<String, ImageIcon> cardImageCache;
-    private final Map<String, ImageIcon> transparentImageCache;
+    private final CardImageLoader cardImageLoader;
 
     // --- Pannelli Centrali ---
     private JPanel centerPanel;
@@ -97,10 +96,7 @@ public class GameScene extends JPanel implements GameModelObserver {
         this.gameModel.addObserver(this); 
 
         // 1. Inizializza la cache e carica le immagini
-        this.cardImageCache = new HashMap<>();
-        this.transparentImageCache = new HashMap<>();
-        loadCardImages();
-        
+        this.cardImageLoader = new CardImageLoader(CARD_WIDTH, CARD_HEIGHT);
         setBackground(BACKGROUND_COLOR);
         setBorder(new EmptyBorder(10, 10, 10, 10));
 
@@ -230,7 +226,7 @@ public class GameScene extends JPanel implements GameModelObserver {
         } else {
             Card topCard = gameModel.getTopDiscardCard();
             String cardName = topCard.getColor(gameModel).name() + "_" + topCard.getValue(gameModel).name();
-            ImageIcon icon = cardImageCache.get(cardName);
+            ImageIcon icon = cardImageLoader.getImage(cardName);
             
             CardColor activeColor = gameModel.getCurrentColor();
             System.out.println("Colore attivo: " + activeColor);
@@ -458,8 +454,8 @@ public class GameScene extends JPanel implements GameModelObserver {
      * NUOVO: Metodo per applicare stile-carta a un JButton.
      */
     private void styleAsCardButton(JButton button, String cardName) {
-        ImageIcon icon = cardImageCache.get(cardName);
-        ImageIcon transparentIcon = transparentImageCache.get(cardName);
+        ImageIcon icon = cardImageLoader.getImage(cardName);
+        ImageIcon transparentIcon = cardImageLoader.getTransparentImage(cardName);
         if (icon != null) {
             button.setIcon(icon);
             button.setDisabledIcon(transparentIcon);
@@ -511,91 +507,5 @@ public class GameScene extends JPanel implements GameModelObserver {
             case TEAL: return new Color(0, 128, 128);
             case WILD: default: return Color.DARK_GRAY;
         }
-    }
-
-    /**
-     * Carica tutte le immagini delle carte in cache all'avvio.
-     */
-    private void loadCardImages() {
-        // Loop su tutti i colori (eccetto WILD)
-        for (CardColor color : CardColor.values()) {
-            if (color == CardColor.WILD || color == CardColor.WILD) continue; 
-            
-            // Loop su tutti i valori (eccetto WILD)
-            for (CardValue value : CardValue.values()) {
-                if (value == CardValue.WILD || value == CardValue.WILD_DRAW_FOUR) continue;
-                
-                // Crea nomi come "RED_ONE", "BLUE_SKIP"
-                String cardName = color.name() + "_" + value.name();
-                loadImage(cardName);
-            }
-        }
-        // Carica le carte WILD manualmente
-        loadImage("WILD_WILD");
-        loadImage("WILD_WILD_DRAW_FOUR");
-        loadImage("WILD_WILD_DRAW_TWO");
-        loadImage("WILD_WILD_DRAW_COLOR");
-        
-        // Carica il dorso della carta
-        loadImage("CARD_BACK");
-    }
-
-    /**
-     * Metodo helper per caricare una singola immagine nella cache.
-     * @param cardName Il nome del file (es. "RED_ONE")
-     */
-    private void loadImage(String cardName) {
-        try {
-            // le immagini sono in src/main/resources/images/cards/
-            String path = "/images/cards/" + cardName + ".png"; 
-            URL imgURL = getClass().getResource(path);
-
-            if (imgURL != null) {
-                ImageIcon icon = new ImageIcon(imgURL);
-                // Scala l'immagine alla dimensione standard
-                Image scaledImg = icon.getImage().getScaledInstance(CARD_WIDTH, CARD_HEIGHT, Image.SCALE_SMOOTH);
-                cardImageCache.put(cardName, new ImageIcon(scaledImg));
-                transparentImageCache.put(cardName, createTransparentIcon(new ImageIcon(scaledImg), 0.5f));
-            } else {
-                System.err.println("Immagine non trovata: " + path);
-            }
-        } catch (Exception e) {
-            System.err.println("Errore durante il caricamento di: " + cardName);
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Crea una versione semitrasparente di una ImageIcon.
-     *
-     * @param original L'icona originale.
-     * @param alpha Il livello di trasparenza (0.0f = completamente trasparente, 
-     * 1.0f = completamente opaco).
-     * @return Una nuova ImageIcon con la trasparenza applicata.
-     */
-    public ImageIcon createTransparentIcon(ImageIcon original, float alpha) {
-        // 1. Ottieni l'immagine originale dall'icona
-        Image originalImage = original.getImage();
-        int width = original.getIconWidth();
-        int height = original.getIconHeight();
-
-        // 2. Crea una nuova immagine "tela" con canale Alfa (trasparenza)
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        // 3. Ottieni il "pennello" (Graphics2D) per disegnare sulla nuova immagine
-        Graphics2D g2d = newImage.createGraphics();
-
-        // 4. Imposta il livello di trasparenza!
-        // AlphaComposite.SRC_OVER è la modalità di "fusione" standard
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-
-        // 5. Disegna l'immagine originale sulla nuova tela (con la trasparenza impostata)
-        g2d.drawImage(originalImage, 0, 0, null);
-
-        // 6. Rilascia le risorse grafiche
-        g2d.dispose();
-
-        // 7. Restituisci la nuova icona creata dall'immagine modificata
-        return new ImageIcon(newImage);
     }
 }
