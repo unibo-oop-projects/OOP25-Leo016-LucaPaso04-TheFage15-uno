@@ -3,6 +3,7 @@ package uno.Model.Cards.Types;
 
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardFace;
 import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Game.Game;
 
@@ -12,32 +13,50 @@ import uno.Model.Game.Game;
  */
 public abstract class AbstractCard implements Card {
 
-    protected final CardColor color;
-    protected final CardValue value;
+    protected CardColor color;
+    protected CardValue value;
 
-    public AbstractCard(CardColor color, CardValue value) {
-        this.color = color;
-        this.value = value;
+    protected CardFace lightSide;
+    protected CardFace darkSide;
+
+    boolean isDarkSide = false;
+
+    // A. COSTRUTTORE PER MODALITÀ FLIP (DOPPIA FACCIA)
+    public AbstractCard(CardFace lightSide, CardFace darkSide) {
+        this.lightSide = lightSide;
+        this.darkSide = darkSide;
+    }
+
+    // B. COSTRUTTORE PER MODALITÀ CLASSICA (SINGOLA FACCIA)
+    public AbstractCard(CardColor color, CardValue value) { // <-- Questo è il vecchio costruttore che usi in StandardDeck
+        // La logica chiave: In un gioco non-Flip, i due lati sono identici.
+        CardFace singleFace = new CardFace(color, value);
+        this.lightSide = singleFace;
+        this.darkSide = singleFace; // <--- MAI NULL!
+    }
+
+    // Metodo helper che decide quale faccia è attiva
+    protected CardFace getActiveFace(Game game) {
+        return game.isDarkSide() ? darkSide : lightSide;
+    }
+
+    // Implementazione dei metodi dell'interfaccia
+    @Override
+    public CardColor getColor(Game game) {
+        return getActiveFace(game).color();
     }
 
     @Override
-    public CardColor getColor() {
-        return color;
+    public CardValue getValue(Game game) {
+        return getActiveFace(game).value();
     }
 
     @Override
-    public CardValue getValue() {
-        return value;
-    }
-
-    /**
-     * Fornisce la regola di gioco standard.
-     * Le WildCard sovrascriveranno questo metodo.
-     */
-    @Override
-    public boolean canBePlayedOn(Card topCard) {
-        // Regola standard: stesso colore o stesso valore
-        return this.color == topCard.getColor() || this.value == topCard.getValue();
+    public boolean canBePlayedOn(Card topCard, Game game) {
+        CardFace myFace = getActiveFace(game);
+        
+        // La logica ora usa i valori ATTIVI
+        return myFace.color() == topCard.getColor(game) || myFace.value() == topCard.getValue(game);
     }
 
     /**
@@ -52,7 +71,6 @@ public abstract class AbstractCard implements Card {
 
     @Override
     public String toString() {
-        // Utile per il debug
-        return color + " " + value;
+        return "C: " + this.lightSide.color() + " " + this.lightSide.value() + " / S: " + this.darkSide.color() + " " + this.darkSide.value();
     }
 }

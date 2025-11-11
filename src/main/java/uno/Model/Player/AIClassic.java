@@ -46,8 +46,8 @@ public class AIClassic extends AIPlayer {
             System.out.println(this.name + " gioca " + card);
 
             // Se la carta è un Jolly, l'IA deve anche scegliere un colore
-            if (card.getColor() == CardColor.WILD) {
-                CardColor chosenColor = chooseBestColor();
+            if (card.getColor(game) == CardColor.WILD) {
+                CardColor chosenColor = chooseBestColor(game);
                 game.setColor(chosenColor); // Imposta il colore scelto
             }
             
@@ -74,8 +74,8 @@ public class AIClassic extends AIPlayer {
                 System.out.println(this.name + " gioca " + drawnCard + " dopo averla pescata.");
 
                 // Se è giocabile, la gioca immediatamente
-                if (drawnCard.getColor() == CardColor.WILD) {
-                    CardColor chosenColor = chooseBestColor();
+                if (drawnCard.getColor(game) == CardColor.WILD) {
+                    CardColor chosenColor = chooseBestColor(game);
                     game.setColor(chosenColor); // Imposta il colore scelto
                 }
 
@@ -107,19 +107,19 @@ public class AIClassic extends AIPlayer {
         
         // Determina il colore attivo. Se currentColor è impostato (da un Jolly),
         // usa quello. Altrimenti, usa il colore della carta in cima.
-        CardColor activeColor = (game.getCurrentColor() != null) ? game.getCurrentColor() : topCard.getColor();
+        CardColor activeColor = (game.getCurrentColor() != null) ? game.getCurrentColor() : topCard.getColor(game);
 
         // 1. Regola Jolly Standard (WILD)
-        if (card.getValue() == CardValue.WILD) {
+        if (card.getValue(game) == CardValue.WILD) {
             return true;
         }
 
         // 2. Regola Jolly +4 (WILD_DRAW_FOUR)
-        if (card.getValue() == CardValue.WILD_DRAW_FOUR) {
+        if (card.getValue(game) == CardValue.WILD_DRAW_FOUR) {
             // Regola ufficiale: puoi giocarla solo se NON hai
             // altre carte che corrispondono al COLORE ATTIVO.
             for (Card cardInHand : game.getCurrentPlayer().getHand()) {
-                if (cardInHand.getColor() == activeColor) {
+                if (cardInHand.getColor(game) == activeColor) {
                     return false; // Mossa illegale: hai un'altra carta giocabile
                 }
             }
@@ -128,12 +128,12 @@ public class AIClassic extends AIPlayer {
 
         // 3. Regole Standard (non-Jolly)
         // La carta è valida se corrisponde al colore ATTIVO...
-        if (card.getColor() == activeColor) {
+        if (card.getColor(game) == activeColor) {
             return true;
         }
         
         // ...o se corrisponde al VALORE della carta in cima.
-        if (card.getValue() == topCard.getValue()) {
+        if (card.getValue(game) == topCard.getValue(game)) {
             return true;
         }
 
@@ -161,7 +161,7 @@ public class AIClassic extends AIPlayer {
     /**
      * Logica IA base per scegliere un colore (il colore più presente nella sua mano).
      */
-    private CardColor chooseBestColor() {
+    private CardColor chooseBestColor(Game game) {
         // Usiamo un EnumMap per contare i colori. È molto efficiente per le chiavi Enum.
         Map<CardColor, Integer> colorCounts = new EnumMap<>(CardColor.class);
 
@@ -173,7 +173,7 @@ public class AIClassic extends AIPlayer {
 
         // Itera sulla mano dell'IA ('this.hand' è ereditato da Player)
         for (Card card : this.hand) {
-            CardColor color = card.getColor();
+            CardColor color = card.getColor(game);
             
             // Contiamo solo le carte colorate, ignoriamo le WILD
             if (colorCounts.containsKey(color)) {

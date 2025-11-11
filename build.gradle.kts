@@ -20,9 +20,12 @@ dependencies {
     testImplementation(libs.junit.jupiter)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 
     // This dependency is used by the application.
     implementation(libs.guava)
+    implementation("com.google.code.gson:gson:2.10.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

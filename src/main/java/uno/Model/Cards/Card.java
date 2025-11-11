@@ -14,12 +14,12 @@ public interface Card {
     /**
      * @return Il colore della carta (o WILD).
      */
-    CardColor getColor();
+    CardColor getColor(Game game);
 
     /**
      * @return Il valore/tipo della carta (es. NINE, SKIP, WILD).
      */
-    CardValue getValue();
+    CardValue getValue(Game game);
 
     /**
      * Determina se questa carta può essere legalmente giocata
@@ -28,7 +28,7 @@ public interface Card {
      * @param topCard La carta in cima al mazzo degli scarti.
      * @return true se la mossa è valida, false altrimenti.
      */
-    boolean canBePlayedOn(Card topCard);
+    boolean canBePlayedOn(Card topCard, Game game);
 
     /**
      * Esegue l'effetto speciale della carta sulla partita.

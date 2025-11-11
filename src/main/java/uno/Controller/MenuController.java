@@ -86,7 +86,6 @@ public class MenuController implements MenuObserver {
         // 2. Crea il Model (Mazzo e Partita)
         FlipDeck deck = new FlipDeck();
         Game gameModel = new Game(deck, players);
-        gameModel.populateFlipMappers();
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.

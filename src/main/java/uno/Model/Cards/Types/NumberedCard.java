@@ -4,6 +4,7 @@ package uno.Model.Cards.Types;
 import uno.Model.Game.Game;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
+import uno.Model.Cards.Attributes.CardFace;
 
 /**
  * Rappresenta una carta numerata (0-9).
@@ -16,6 +17,15 @@ public class NumberedCard extends AbstractCard {
         // Controllo di sicurezza
         if (value.ordinal() > CardValue.NINE.ordinal()) {
             throw new IllegalArgumentException("NumberedCard deve avere un valore tra 0 e 9.");
+        }
+    }
+
+    public NumberedCard(CardFace lightSide, CardFace darkSide) {
+        super(lightSide, darkSide);
+        // Controllo di sicurezza
+        if (lightSide.value().ordinal() > CardValue.NINE.ordinal() ||
+            darkSide.value().ordinal() > CardValue.NINE.ordinal()) {
+            throw new IllegalArgumentException("NumberedCard deve avere un valore tra 0 e 9 su entrambi i lati.");
         }
     }
 

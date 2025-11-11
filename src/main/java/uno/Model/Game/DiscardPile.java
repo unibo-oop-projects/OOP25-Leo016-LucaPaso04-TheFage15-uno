@@ -92,20 +92,4 @@ public class DiscardPile {
         // Restituisce una copia per evitare modifiche esterne (incapsulamento)
         return new ArrayList<>(this.cards);
     }
-
-    /**
-     * Sostituisce l'intera pila degli scarti con le sue controparti.
-     */
-    public void flipPile(Function<Card, Card> translator) {
-        // 1. Traduce tutte le carte in una nuova lista temporanea.
-        List<Card> newCards = this.cards.stream()
-            .map(translator)
-            .collect(Collectors.toList());
-
-        // 2. Svuota la lista esistente (la referenza 'cards' non cambia).
-        this.cards.clear();
-
-        // 3. Aggiunge i nuovi elementi alla lista esistente.
-        this.cards.addAll(newCards);
-    }
 }

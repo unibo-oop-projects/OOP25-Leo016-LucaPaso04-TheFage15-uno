@@ -221,7 +221,7 @@ public class GameScene extends JPanel implements GameModelObserver {
             discardPileCard.setBackground(Color.LIGHT_GRAY);
         } else {
             Card topCard = gameModel.getTopDiscardCard();
-            String cardName = topCard.getColor().name() + "_" + topCard.getValue().name();
+            String cardName = topCard.getColor(gameModel).name() + "_" + topCard.getValue(gameModel).name();
             ImageIcon icon = cardImageCache.get(cardName);
             
             CardColor activeColor = gameModel.getCurrentColor();
@@ -232,7 +232,7 @@ public class GameScene extends JPanel implements GameModelObserver {
                 discardPileCard.setText(null); // Rimuovi testo di fallback
             } else {
                 discardPileCard.setIcon(null);
-                discardPileCard.setText("<html><div style='text-align: center;'>" + topCard.getValue() + "<br>" + topCard.getColor() + "</div></html>");
+                discardPileCard.setText("<html><div style='text-align: center;'>" + topCard.getValue(gameModel) + "<br>" + topCard.getColor(gameModel) + "</div></html>");
             }
 
             discardPileCard.setBorder(BorderFactory.createLineBorder(convertCardColor(activeColor), 4));
@@ -414,7 +414,7 @@ public class GameScene extends JPanel implements GameModelObserver {
     }
     
     private JButton createCardButton(Card card) {
-        String cardName = card.getColor().name() + "_" + card.getValue().name();
+        String cardName = card.getColor(gameModel).name() + "_" + card.getValue(gameModel).name();
         JButton button = new JButton();
         styleAsCardButton(button, cardName); // Applica lo stile
         return button;

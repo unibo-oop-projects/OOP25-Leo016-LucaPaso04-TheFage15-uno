@@ -1,0 +1,236 @@
+{
+    "mappings": [
+        {
+            "light": { "color": "YELLOW", "value": "ZERO" },
+            "dark":  { "color": "RED",    "value": "ZERO" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "ONE" },
+            "dark":  { "color": "RED",    "value": "ONE" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "TWO" },
+            "dark":  { "color": "RED",    "value": "TWO" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "THREE" },
+            "dark":  { "color": "RED",    "value": "THREE" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "FOUR" },
+            "dark":  { "color": "RED",    "value": "FOUR" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "FIVE" },
+            "dark":  { "color": "RED",    "value": "FIVE" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "SIX" },
+            "dark":  { "color": "RED",    "value": "SIX" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "SEVEN" },
+            "dark":  { "color": "RED",    "value": "SEVEN" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "EIGHT" },
+            "dark":  { "color": "RED",    "value": "EIGHT" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "NINE" },
+            "dark":  { "color": "RED",    "value": "NINE" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "SKIP" },
+            "dark":  { "color": "RED",    "value": "SKIP" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "REVERSE" },
+            "dark":  { "color": "RED",    "value": "REVERSE" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "DRAW_TWO" },
+            "dark":  { "color": "RED",    "value": "DRAW_TWO" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "ZERO" },
+            "dark":  { "color": "BLUE",  "value": "ZERO" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "ONE" },
+            "dark":  { "color": "BLUE",  "value": "ONE" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "TWO" },
+            "dark":  { "color": "BLUE",  "value": "TWO" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "THREE" },
+            "dark":  { "color": "BLUE",  "value": "THREE" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "FOUR" },
+            "dark":  { "color": "BLUE",  "value": "FOUR" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "FIVE" },
+            "dark":  { "color": "BLUE",  "value": "FIVE" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "SIX" },
+            "dark":  { "color": "BLUE",  "value": "SIX" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "SEVEN" },
+            "dark":  { "color": "BLUE",  "value": "SEVEN" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "EIGHT" },
+            "dark":  { "color": "BLUE",  "value": "EIGHT" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "NINE" },
+            "dark":  { "color": "BLUE",  "value": "NINE" }
+        },
+        {
+            "light": { "color": "GREEN",   "value":   "SKIP" },
+            "dark":  { "color":  "BLUE",   "value":   "SKIP" }
+        },
+        {
+            "light": { 	"color":	"GREEN",   "value":   "REVERSE" },
+            "dark":  { "color":  "BLUE",   "value":   "REVERSE" }
+        },
+        {
+            "light": { "color": "GREEN",   "value":   "DRAW_TWO" },
+            "dark":  { "color":  "BLUE",   "value":   "DRAW_TWO" }
+        },
+        {
+            "light": { "color": "RED", "value": "ZERO" },
+            "dark":  { "color": "YELLOW",    "value": "ZERO" }
+        },
+        {
+            "light": { "color": "RED", "value": "ONE" },
+            "dark":  { "color": "YELLOW",    "value": "ONE" }
+        },
+        {
+            "light": { "color": "RED", "value": "TWO" },
+            "dark":  { "color": "YELLOW",    "value": "TWO" }
+        },
+        {
+            "light": { "color": "RED", "value": "THREE" },
+            "dark":  { "color": "YELLOW",    "value": "THREE" }
+        },
+        {
+            "light": { "color": "RED", "value": "FOUR" },
+            "dark":  { "color": "YELLOW",    "value": "FOUR" }
+        },
+        {
+            "light": { "color": "RED", "value": "FIVE" },
+            "dark":  { "color": "YELLOW",    "value": "FIVE" }
+        },
+        {
+            "light": { "color": "RED", "value": "SIX" },
+            "dark":  { "color": "YELLOW",    "value": "SIX" }
+        },
+        {
+            "light": { "color": "RED", "value": "SEVEN" },
+            "dark":  { "color": "YELLOW",    "value": "SEVEN" }
+        },
+        {
+            "light": {	"color":	"RED",   	"value":	"EIGHT"	},
+            "dark":  {	"color":	"YELLOW",  	"value":	"EIGHT"	}
+        },
+        {
+            "light": {	"color":	"RED",   	"value":	"NINE"	},
+            "dark":  {	"color":	"YELLOW",  	"value":	"NINE"	}
+        },
+        {
+            "light": {	"color":	"RED",   	"value":	"SKIP"	},
+            "dark":  {	"color":	"YELLOW",  	"value":	"SKIP"	}
+        },
+        {
+            "light": {	"color":	"RED",   	"value":	"REVERSE"	},
+            "dark":  {	"color":	"YELLOW",  	"value":	"REVERSE"	}
+        },
+        {
+            "light": {	"color":	"RED",   	"value":	"DRAW_TWO"	},
+            "dark":  {	"color":	"YELLOW",  	"value":	"DRAW_TWO"	}
+        },
+        {
+            "light": { "color": "BLUE", "value": "ZERO" },
+            "dark":  { "color": "GREEN",    "value": "ZERO" }
+        },
+        {
+            "light": { "color": "BLUE", "value": "ONE" },
+            "dark":  { "color": "GREEN",    "value": "ONE" }
+        },
+        {
+            "light": { "color": "BLUE", "value": "TWO" },
+            "dark":  { "color": "GREEN",    "value": "TWO" }
+        },
+        {
+            "light": { "color": "BLUE", "value": "THREE" },
+            "dark":  { "color": "GREEN",    "value": "THREE" }
+        },
+        {
+            "light": { "color": "BLUE", "value": "FOUR" },
+            "dark":  { "color": "GREEN",    "value": "FOUR" }
+        },
+        {
+            "light": { "color": "BLUE", "value": "FIVE" },
+            "dark":  { "color": "GREEN",    "value": "FIVE" }
+        },
+        {
+            "light": {	"color":	"BLUE",   	"value":	"SIX"	},
+            "dark":  {	"color":	"GREEN",  	"value":	"SIX"	}
+        },
+        {
+            "light": {	"color":	"BLUE",   	"value":	"SEVEN"	},
+            "dark":  {	"color":	"GREEN",  	"value":	"SEVEN"	}
+        },
+        {
+            "light": {	"color":	"BLUE",   	"value":	"EIGHT"	},
+            "dark":  {	"color":	"GREEN",  	"value":	"EIGHT"	}
+        },
+        {
+            "light": {	"color":	"BLUE",   	"value":	"NINE"	},
+            "dark":  {    "color":	"GREEN",  	"value":	"NINE"	}
+        },
+        {
+            "light": {	"color":	"BLUE",   	"value":	"SKIP"	},
+            "dark":  {	"color":	"GREEN",  	"value":	"SKIP"	}
+        },
+        {
+            "light": {	"color":	"BLUE",   	"value":	"REVERSE"	},
+            "dark":  {	"color":	"GREEN",  	"value":	"REVERSE"	}
+        },
+        {
+            "light": {	"color":	"BLUE",   	"value":	"DRAW_TWO"	},
+            "dark":  {	"color":	"GREEN",  	"value":	"DRAW_TWO"	}
+        },
+        {
+            "light": { "color": "WILD", "value": "WILD" },
+            "dark":  { "color": "WILD", "value": "WILD_DRAW_FOUR" }
+        },
+        {
+            "light": { "color": "WILD", "value": "WILD_DRAW_FOUR" },
+            "dark":  { "color": "WILD", "value": "WILD" }
+        },
+        {
+            "light": { "color": "YELLOW", "value": "FLIP" },
+            "dark":  { "color": "RED", "value": "FLIP" }
+        },
+        {
+            "light": { "color": "GREEN", "value": "FLIP" },
+            "dark":  { "color": "BLUE", "value": "FLIP" }
+        },
+        {
+            "light": { "color": "RED", "value": "FLIP" },
+            "dark":  { "color": "YELLOW", "value": "FLIP" }
+        },
+        {
+            "light": { "color": "BLUE", "value": "FLIP" },
+            "dark":  { "color": "GREEN", "value": "FLIP" }
+        }
+    ]
+}

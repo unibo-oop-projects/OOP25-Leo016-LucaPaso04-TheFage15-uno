@@ -3,6 +3,7 @@ package uno.Model.Cards.Types;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Game.Game;
+import uno.Model.Cards.Attributes.CardFace;
 
 /**
  * La carta speciale FLIP (esiste solo sul Lato Chiaro).
@@ -10,8 +11,8 @@ import uno.Model.Game.Game;
  */
 public class FlipCard extends AbstractCard {
 
-    public FlipCard(CardColor color) {
-        super(color, CardValue.FLIP);
+    public FlipCard(CardFace lightSide, CardFace darkSide) {
+        super(lightSide, darkSide);
     }
 
     /**

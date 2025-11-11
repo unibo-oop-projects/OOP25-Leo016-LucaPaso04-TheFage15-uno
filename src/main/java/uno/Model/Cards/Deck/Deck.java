@@ -90,6 +90,4 @@ public abstract class Deck<T extends Card> {
     public boolean isEmpty() {
         return cards.isEmpty();
     }
-
-    public abstract void flipDeck(java.util.function.Function<Card, Card> translator);
 }

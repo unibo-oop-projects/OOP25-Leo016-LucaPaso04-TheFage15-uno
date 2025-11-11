@@ -84,9 +84,4 @@ public class StandardDeck extends Deck<Card> {
         
         // Totale: 4 (Zero) + 72 (1-9) + 24 (Azione) + 8 (Jolly) = 108 carte
     }
-
-    @Override
-    public void flipDeck(java.util.function.Function<Card, Card> translator) {
-        // Non applicabile per il mazzo standard; lascia invariato.
-    }
 }

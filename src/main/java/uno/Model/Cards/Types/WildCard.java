@@ -6,6 +6,8 @@ import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
 
+import uno.Model.Cards.Attributes.CardFace;
+
 /**
  * Rappresenta una carta Jolly standard (Cambia Colore).
  */
@@ -13,6 +15,10 @@ public class WildCard extends AbstractCard {
 
     public WildCard() {
         super(CardColor.WILD, CardValue.WILD); // Il colore "base" è WILD
+    }
+
+    public WildCard(CardFace lightSide, CardFace darkSide) {
+        super(lightSide, darkSide);
     }
 
     /**
@@ -29,7 +35,7 @@ public class WildCard extends AbstractCard {
      * può sempre essere giocata.
      */
     @Override
-    public boolean canBePlayedOn(Card topCard) {
+    public boolean canBePlayedOn(Card topCard, Game game) {
         return true;
     }
 }

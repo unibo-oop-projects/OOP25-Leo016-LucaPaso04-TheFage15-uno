@@ -49,17 +49,7 @@ public class Player {
     public void addCardToHand(Card card) {
         this.hand.add(card);
     }
-
-    /**
-     * Sostituisce l'intera mano con le sue controparti "flippate".
-     * @param translator Il metodo (da Game) che sa come tradurre una carta.
-     */
-    public void flipHand(Function<Card, Card> translator) {
-        this.hand = this.hand.stream()
-            .map(translator)
-            .collect(Collectors.toList());
-    }
-
+    
     /**
      * Rimuove una carta specifica dalla mano (quando viene giocata).
      * @param card La carta da giocare.

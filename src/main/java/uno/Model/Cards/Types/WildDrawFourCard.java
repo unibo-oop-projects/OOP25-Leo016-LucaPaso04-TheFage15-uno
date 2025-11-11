@@ -6,6 +6,8 @@ import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
 
+import uno.Model.Cards.Attributes.CardFace;
+
 /**
  * Rappresenta una carta Jolly Pesca Quattro (+4).
  */
@@ -13,6 +15,10 @@ public class WildDrawFourCard extends AbstractCard {
 
     public WildDrawFourCard() {
         super(CardColor.WILD, CardValue.WILD_DRAW_FOUR);
+    }
+
+    public WildDrawFourCard(CardFace lightSide, CardFace darkSide) {
+        super(lightSide, darkSide);
     }
 
     /**
@@ -37,7 +43,7 @@ public class WildDrawFourCard extends AbstractCard {
      * A livello di carta, è sempre "giocabile".
      */
     @Override
-    public boolean canBePlayedOn(Card topCard) {
+    public boolean canBePlayedOn(Card topCard, Game game) {
         return true;
     }
 }

@@ -4,19 +4,11 @@ import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Cards.Deck.Deck;
-import uno.Model.Cards.Types.DrawTwoCard;
-import uno.Model.Cards.Types.NumberedCard;
-import uno.Model.Cards.Types.ReverseCard;
-import uno.Model.Cards.Types.SkipCard;
-import uno.Model.Cards.Types.WildCard;
-import uno.Model.Cards.Types.WildDrawFourCard;
 import uno.Model.Player.Player;
 import uno.View.GameModelObserver;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -37,8 +29,6 @@ public class Game {
     private CardColor currentColor;
 
     private boolean isDarkSide = false; // <-- STATO FLIP
-    private final Map<String, Card> lightToDarkMap = new HashMap<>();
-    private final Map<String, Card> darkToLightMap = new HashMap<>();
 
     /**
      * Costruisce una nuova partita.
@@ -99,11 +89,11 @@ public class Game {
         // --- FINE LOGICA DI VALIDAZIONE ---
 
         // Se la mossa è valida, aggiorna il currentColor.
-        if (card.getColor() == CardColor.WILD) {
+        if (card.getColor(this) == CardColor.WILD) {
             this.currentColor = null; // Sarà impostato da onColorChosen()
         } else {
             // Se è una carta colorata, quello è il nuovo colore attivo.
-            this.currentColor = card.getColor();
+            this.currentColor = card.getColor(this);
         }
 
         // Esegui effetto carta (polimorfismo)
@@ -150,22 +140,24 @@ public class Game {
      */
     private boolean isValidMove(Card cardToPlay) {
         Card topCard = getTopDiscardCard(); //
+
+        //TODO: OGNI CARTA HA IL SUO METODO canBePlayedOn, utilizza quello per rendere più pulito questo metodo
         
         // Determina il colore attivo. Se currentColor è impostato (da un Jolly),
         // usa quello. Altrimenti, usa il colore della carta in cima.
-        CardColor activeColor = (this.currentColor != null) ? this.currentColor : topCard.getColor();
+        CardColor activeColor = (this.currentColor != null) ? this.currentColor : topCard.getColor(this);
 
         // 1. Regola Jolly Standard (WILD)
-        if (cardToPlay.getValue() == CardValue.WILD) {
+        if (cardToPlay.getValue(this) == CardValue.WILD) {
             return true;
         }
 
         // 2. Regola Jolly +4 (WILD_DRAW_FOUR)
-        if (cardToPlay.getValue() == CardValue.WILD_DRAW_FOUR) {
+        if (cardToPlay.getValue(this) == CardValue.WILD_DRAW_FOUR) {
             // Regola ufficiale: puoi giocarla solo se NON hai
             // altre carte che corrispondono al COLORE ATTIVO.
             for (Card cardInHand : getCurrentPlayer().getHand()) {
-                if (cardInHand.getColor() == activeColor) {
+                if (cardInHand.getColor(this) == activeColor) {
                     return false; // Mossa illegale: hai un'altra carta giocabile
                 }
             }
@@ -174,12 +166,12 @@ public class Game {
 
         // 3. Regole Standard (non-Jolly)
         // La carta è valida se corrisponde al colore ATTIVO...
-        if (cardToPlay.getColor() == activeColor) {
+        if (cardToPlay.getColor(this) == activeColor) {
             return true;
         }
         
         // ...o se corrisponde al VALORE della carta in cima.
-        if (cardToPlay.getValue() == topCard.getValue()) {
+        if (cardToPlay.getValue(this) == topCard.getValue(this)) {
             return true;
         }
 
@@ -394,99 +386,14 @@ public class Game {
      * Cambia lo stato del gioco e "traduce" tutte le carte.
      */
     public void flipTheWorld() {
-        this.isDarkSide = !this.isDarkSide;
+        this.isDarkSide = !this.isDarkSide; // 1. Inverti lo stato
         System.out.println("FLIP! Ora il gioco è sul lato: " + (isDarkSide ? "SCURO" : "CHIARO"));
 
-        // 1. Traduci la mano di ogni giocatore
-        for (Player player : players) {
-            player.flipHand(this::translateCard); // Passa il metodo di traduzione
-        }
+        // 2. Resetta il colore (la carta in cima ora ha un nuovo colore)
+        this.currentColor = null; 
         
-        // 2. Traduci la pila degli scarti
-        discardPile.flipPile(this::translateCard);
-        
-        // 3. Traduci il mazzo di pesca
-        drawDeck.flipDeck(this::translateCard);
-        
-        // 4. Resetta il colore Jolly
-        this.currentColor = null;
-        
-        notifyObservers(); // La View si aggiornerà
-    }
-
-    /**
-     * Metodo helper che traduce una singola carta.
-     */
-    private Card translateCard(Card card) {
-        String key = card.getColor().name() + "_" + card.getValue().name();
-        if (isDarkSide) {
-            // Se ora è il lato scuro, cerca la controparte scura
-            return lightToDarkMap.getOrDefault(key, card);
-        } else {
-            // Se ora è il lato chiaro, cerca la controparte chiara
-            return darkToLightMap.getOrDefault(key, card);
-        }
-    }
-
-    /**
-     * Popola i dizionari per la traduzione.
-     * (Questo è un esempio, dovrai completarlo)
-     */
-    public void populateFlipMappers() {
-        // Definisci i colori chiari e i valori che hanno controparti
-        CardColor[] lightColors1 = {CardColor.YELLOW, CardColor.RED};
-        CardColor[] lightColors2 = {CardColor.GREEN, CardColor.BLUE};
-        
-        CardValue[] standardValues = {
-            CardValue.ZERO, CardValue.ONE, CardValue.TWO, CardValue.THREE, CardValue.FOUR, 
-            CardValue.FIVE, CardValue.SIX, CardValue.SEVEN, CardValue.EIGHT, CardValue.NINE
-        };
-        
-        // Coppia 1: Giallo <-> Rosso
-        for (CardValue val : standardValues) {
-            mapOneCard(new NumberedCard(CardColor.YELLOW, val), new NumberedCard(CardColor.RED, val));
-        }
-        mapOneCard(new SkipCard(CardColor.YELLOW), new SkipCard(CardColor.RED));
-        mapOneCard(new ReverseCard(CardColor.YELLOW), new ReverseCard(CardColor.RED));
-        mapOneCard(new DrawTwoCard(CardColor.YELLOW), new DrawTwoCard(CardColor.RED));
-        // mapOneCard(new FlipCard(CardColor.YELLOW), new FlipCard(CardColor.RED)); // Se la carta Flip esiste
-        
-        // Coppia 2: Verde <-> Blu
-        for (CardValue val : standardValues) {
-            mapOneCard(new NumberedCard(CardColor.GREEN, val), new NumberedCard(CardColor.BLUE, val));
-        }
-        mapOneCard(new SkipCard(CardColor.GREEN), new SkipCard(CardColor.BLUE));
-        mapOneCard(new ReverseCard(CardColor.GREEN), new ReverseCard(CardColor.BLUE));
-        mapOneCard(new DrawTwoCard(CardColor.GREEN), new DrawTwoCard(CardColor.BLUE));
-        // mapOneCard(new FlipCard(CardColor.GREEN), new FlipCard(CardColor.BLUE)); // Se la carta Flip esiste
-        
-        // Coppia 3: Wild <-> Wild Draw Four
-        // Nota: le chiavi per i jolly sono diverse
-        mapOneCard(new WildCard(), new WildDrawFourCard());
-    }
-
-    /**
-     * Helper per mappare due carte in entrambe le direzioni (light <-> dark).
-     */
-    private void mapOneCard(Card lightCard, Card darkCard) {
-        String lightKey, darkKey;
-
-        // Gestione chiavi per carte non-WILD
-        if (lightCard.getColor() != CardColor.WILD) {
-            lightKey = lightCard.getColor().name() + "_" + lightCard.getValue().name();
-        } else {
-            lightKey = lightCard.getValue().name(); // Es: "WILD"
-        }
-
-        if (darkCard.getColor() != CardColor.WILD) {
-            darkKey = darkCard.getColor().name() + "_" + darkCard.getValue().name();
-        } else {
-            darkKey = darkCard.getValue().name(); // Es: "WILD_DRAW_FOUR"
-        }
-
-        // Mappa in entrambe le direzioni
-        this.lightToDarkMap.put(lightKey, darkCard);
-        this.darkToLightMap.put(darkKey, lightCard);
+        // 3. Notifica la View per ridisegnare tutto
+        notifyObservers();
     }
 
     /**

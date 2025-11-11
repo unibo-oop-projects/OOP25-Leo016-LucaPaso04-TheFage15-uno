@@ -67,11 +67,11 @@ public class GameSetup {
 
         // Regola ufficiale: se la prima carta è diversa da un numero,
         // bisogna continuare a scartare carte finchè non ne esce una valida.
-        while (firstCard.getValue() == CardValue.WILD_DRAW_FOUR ||
-                firstCard.getValue() == CardValue.WILD ||
-                firstCard.getValue() == CardValue.DRAW_TWO ||
-                firstCard.getValue() == CardValue.REVERSE ||
-                firstCard.getValue() == CardValue.SKIP) {
+        while (firstCard.getValue(game) == CardValue.WILD_DRAW_FOUR ||
+                firstCard.getValue(game) == CardValue.WILD ||
+                firstCard.getValue(game) == CardValue.DRAW_TWO ||
+                firstCard.getValue(game) == CardValue.REVERSE ||
+                firstCard.getValue(game) == CardValue.SKIP) {
             System.out.println("Carta scartata: " + firstCard);
             discardPile.addCard(firstCard); // Metti la carta non valida nella pila degli scarti
             firstCard = deck.drawCard();
@@ -82,6 +82,6 @@ public class GameSetup {
         System.out.println("Prima carta girata: " + firstCard);
 
         // Imposta il colore attivo in base alla prima carta
-        game.setCurrentColor(firstCard.getColor());
+        game.setCurrentColor(firstCard.getColor(game));
     }
 }

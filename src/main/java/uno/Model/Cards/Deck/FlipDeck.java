@@ -1,6 +1,7 @@
 package uno.Model.Cards.Deck;
 
 import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardFace;
 import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Types.NumberedCard;
@@ -13,8 +14,6 @@ import uno.Model.Cards.Types.WildDrawFourCard;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Rappresenta un mazzo di UNO classico da 108 carte.
@@ -39,71 +38,89 @@ public class FlipDeck extends Deck<Card> {
      */
     @Override
     protected void createDeck() {
-        // Lista dei 4 colori principali
-        final List<CardColor> colors = Arrays.asList(
-                CardColor.RED, 
-                CardColor.BLUE, 
-                CardColor.GREEN, 
-                CardColor.YELLOW
-        );
-
-        // Lista dei valori numerici da 1 a 9
-        final List<CardValue> numberValues = Arrays.asList(
+        // Lista dei 4 colori principali (come lato chiaro)
+        List<CardColor> lightColors = Arrays.asList(CardColor.RED, CardColor.YELLOW, CardColor.GREEN, CardColor.BLUE);
+        // Valori numerici da 1 a 9
+        List<CardValue> numberValues = Arrays.asList(
                 CardValue.ONE, CardValue.TWO, CardValue.THREE, CardValue.FOUR,
                 CardValue.FIVE, CardValue.SIX, CardValue.SEVEN, CardValue.EIGHT, CardValue.NINE
         );
 
-        for (CardColor light : colors) {
+        // Mappa per definire la controparte scura (Dark Side) di ogni colore
+        // NOTA: In un gioco reale, i valori/effetti cambierebbero, qui solo i colori.
+        for (final CardColor lightColor : lightColors) {
+            CardColor darkColor;
             
-            // 1x Carta Zero (Lato Chiaro)
-            this.cards.add(new NumberedCard(light, CardValue.ZERO));
+            // Implementazione della logica di swap richiesta dall'utente
+            if (lightColor == CardColor.RED) darkColor = CardColor.YELLOW;
+            else if (lightColor == CardColor.YELLOW) darkColor = CardColor.RED;
+            else if (lightColor == CardColor.BLUE) darkColor = CardColor.GREEN;
+            else if (lightColor == CardColor.GREEN) darkColor = CardColor.BLUE;
+            else continue; // Salta i Jolly se per errore sono inclusi qui
             
-            // 2x Carte Numeriche (1-9) (Lato Chiaro)
-            for (CardValue value : numberValues) {
-                this.cards.add(new NumberedCard(light, value));
-                this.cards.add(new NumberedCard(light, value));
+            // --- A. Carte Numeriche ---
+
+            // 1. Aggiunge una carta ZERO (1x)
+            CardFace lightZero = new CardFace(lightColor, CardValue.ZERO);
+            CardFace darkZero = new CardFace(darkColor, CardValue.ZERO);
+            this.cards.add(new NumberedCard(lightZero, darkZero));
+            
+            // 2. Aggiunge due carte 1-9 (2x)
+            for (final CardValue value : numberValues) {
+                CardFace lightFace = new CardFace(lightColor, value);
+                CardFace darkFace = new CardFace(darkColor, value);
+                this.cards.add(new NumberedCard(lightFace, darkFace));
+                this.cards.add(new NumberedCard(lightFace, darkFace));
             }
-
-            // 2x Carte Azione (Skip, Reverse, DrawTwo) (Lato Chiaro)
-            this.cards.add(new SkipCard(light));
-            this.cards.add(new SkipCard(light));
-            this.cards.add(new ReverseCard(light));
-            this.cards.add(new ReverseCard(light));
-            this.cards.add(new DrawTwoCard(light));
-            this.cards.add(new DrawTwoCard(light));
             
-            // 2x Carte Flip (Lato Chiaro)
-            this.cards.add(new FlipCard(light));
-            this.cards.add(new FlipCard(light));
+            // --- B. Carte Azione Standard (2x per tipo) ---
+            
+            // SKIP
+            CardFace lightSkip = new CardFace(lightColor, CardValue.SKIP);
+            CardFace darkSkip = new CardFace(darkColor, CardValue.SKIP); 
+            this.cards.add(new SkipCard(lightSkip, darkSkip));
+            this.cards.add(new SkipCard(lightSkip, darkSkip));
+
+            // REVERSE
+            CardFace lightReverse = new CardFace(lightColor, CardValue.REVERSE);
+            CardFace darkReverse = new CardFace(darkColor, CardValue.REVERSE);
+            this.cards.add(new ReverseCard(lightReverse, darkReverse));
+            this.cards.add(new ReverseCard(lightReverse, darkReverse));
+
+            // DRAW_TWO
+            CardFace lightDrawTwo = new CardFace(lightColor, CardValue.DRAW_TWO);
+            CardFace darkDrawTwo = new CardFace(darkColor, CardValue.DRAW_TWO);
+            this.cards.add(new DrawTwoCard(lightDrawTwo, darkDrawTwo));
+            this.cards.add(new DrawTwoCard(lightDrawTwo, darkDrawTwo));
+            
+            // --- C. Flip Card (2x per colore) ---
+            // L'effetto FlipCard fa game.flipTheWorld() su entrambi i lati.
+            CardFace lightFlip = new CardFace(lightColor, CardValue.FLIP);
+            CardFace darkFlip = new CardFace(darkColor, CardValue.FLIP); // La carta Flip girata ha un colore diverso
+            this.cards.add(new FlipCard(lightFlip, darkFlip));
+            this.cards.add(new FlipCard(lightFlip, darkFlip));
         }
 
-        // 4x Jolly (Wild) (Lato Chiaro)
-        for (int i = 0; i < 4; i++) {
-            this.cards.add(new WildCard());
-        }
+        // --- 3. Carte Jolly ---
         
-        // 4x Jolly Pesca Quattro (Wild Draw Four) (Lato Chiaro)
+        // WILD (4x)
+        CardFace lightWild = new CardFace(CardColor.WILD, CardValue.WILD);
+        // Lato scuro di Wild: assumiamo l'equivalente di WILD_DRAW_FOUR (come da mappa precedente in Game.java)
+        CardFace darkWild = new CardFace(CardColor.WILD, CardValue.WILD_DRAW_FOUR);
+
         for (int i = 0; i < 4; i++) {
-            this.cards.add(new WildDrawFourCard());
+            // Wild (Light) <-> Wild Draw Four (Dark)
+            this.cards.add(new WildCard(lightWild, darkWild));
         }
-    }
 
-    /**
-     * Sostituisce l'intero mazzo con le sue controparti "flippate"
-     * e lo mischia di nuovo.
-     */
-    @Override
-    public void flipDeck(Function<Card, Card> translator) {
-        // 1. Traduce tutte le carte in una nuova lista temporanea (modificabile).
-        List<Card> newCards = this.cards.stream()
-            .map(translator)
-            .collect(Collectors.toList());
-
-        // 2. Svuota la lista esistente (rimuove tutti i vecchi riferimenti).
-        this.cards.clear();
-
-        // 3. Aggiunge i nuovi elementi (gli elementi flippati) alla lista esistente.
-        //    Il puntatore 'this.cards' non viene modificato, solo il contenuto.
-        this.cards.addAll(newCards);
+        // WILD_DRAW_FOUR (4x)
+        CardFace lightWDF = new CardFace(CardColor.WILD, CardValue.WILD_DRAW_FOUR);
+        // Lato scuro di Wild Draw Four: assumiamo l'equivalente di WILD
+        CardFace darkWDF = new CardFace(CardColor.WILD, CardValue.WILD);
+        
+        for (int i = 0; i < 4; i++) {
+            // Wild Draw Four (Light) <-> Wild (Dark)
+            this.cards.add(new WildDrawFourCard(lightWDF, darkWDF));
+        }
     }
 }
