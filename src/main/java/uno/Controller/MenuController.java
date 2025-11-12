@@ -1,9 +1,9 @@
 package uno.Controller;
 
-import uno.Model.Cards.Deck.FlipDeck;
-import uno.Model.Cards.Deck.StandardDeck;
+import uno.Model.Cards.Deck.*;
 import uno.Model.Game.Game;
 import uno.Model.Game.GameSetup; // <-- IMPORTA
+import uno.Model.Player.AIAllWild;
 import uno.Model.Player.AIClassic;
 import uno.Model.Player.AIFlip;
 import uno.Model.Player.Player;
@@ -22,6 +22,7 @@ import java.util.List;     // <-- IMPORTA
 public class MenuController implements MenuObserver {
 
     private final GameFrame frame;
+    private final boolean isAllWild = true;
 
     public MenuController(GameFrame frame) {
         this.frame = frame;
@@ -53,7 +54,7 @@ public class MenuController implements MenuObserver {
             gameModel.getDiscardPile(), 
             players
         );
-        setup.setupNewGame();
+        setup.setupNewGame(!isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
         GameScene gameScene = new GameScene(gameModel);
@@ -96,7 +97,7 @@ public class MenuController implements MenuObserver {
             gameModel.getDiscardPile(), 
             players
         );
-        setup.setupNewGame();
+        setup.setupNewGame(!isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
         GameScene gameScene = new GameScene(gameModel);
@@ -118,13 +119,43 @@ public class MenuController implements MenuObserver {
     @Override
     public void onStartAllWildGame() {
         System.out.println("Avvio modalità All Wild...");
+        // --- IMPOSTAZIONE DELLA PARTITA ---
 
-        JOptionPane.showMessageDialog(
-            frame,
-            "La modalità All Wild non è ancora implementata.",
-            "Non Implementato",
-            JOptionPane.INFORMATION_MESSAGE
+        // 1. Crea i giocatori
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("Giocatore 1")); // Giocatore umano
+        players.add(new AIAllWild("IA-1")); // Avversario
+        players.add(new AIAllWild("IA-2"));
+        players.add(new AIAllWild("IA-3"));
+        // puoi aggiungere altri giocatori qui...
+
+        // 2. Crea il Model (Mazzo e Partita)
+        AllWildDeck deck = new AllWildDeck();
+        Game gameModel = new Game(deck, players);
+
+        // 3. Esegui il setup (distribuisci carte, gira la prima carta)
+        // Questo popola le mani dei giocatori e la pila degli scarti.
+        GameSetup setup = new GameSetup(
+            gameModel, 
+            deck, 
+            gameModel.getDiscardPile(), 
+            players
         );
+        setup.setupNewGame(isAllWild);
+
+        // 4. Crea la View del Gioco (GameScene)
+        GameScene gameScene = new GameScene(gameModel);
+
+        // 5. Crea il Controller del Gioco
+        GameController gameController = new GameController(gameModel, gameScene, frame);
+        
+        // 6. Collega la Scena al suo Controller
+        gameScene.setObserver(gameController);
+        
+        // 7. Mostra la nuova scena
+        frame.showScene(gameScene);
+
+        gameController.onGameUpdate();
     }
 
     @Override

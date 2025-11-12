@@ -54,7 +54,7 @@ class GameFlipTest {
         
         // Esegui il setup: distribuisce le carte, mette la prima carta sullo scarto.
         // Se questa chiamata non mette una carta sulla discardPile, la riga sotto la risolve.
-        gameSetup.setupNewGame();
+        gameSetup.setupNewGame(false);
 
         if (game.getDiscardPile().isEmpty()) {
             // Forza l'aggiunta di una carta se per qualche motivo non c'è

@@ -47,8 +47,13 @@ public class AIFlip extends AIPlayer {
             System.out.println("[" + this.name + "]" + " gioca " + card);
 
             // Se la carta è un Jolly, l'IA deve anche scegliere un colore
-            if (card.getColor(game) == CardColor.WILD) {
+            if (card.getColor(game) == CardColor.WILD && card.getValue(game) != CardValue.WILD_DRAW_COLOR) {
                 CardColor chosenColor = chooseBestColor(game);
+                game.setColor(chosenColor); // Imposta il colore scelto
+            }
+
+            if (card.getValue(game) == CardValue.WILD_DRAW_COLOR) {
+                CardColor chosenColor = CardColor.PURPLE;
                 game.setColor(chosenColor); // Imposta il colore scelto
             }
             

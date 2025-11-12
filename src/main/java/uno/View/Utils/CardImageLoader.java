@@ -1,4 +1,4 @@
-package uno.View.Scenes;
+package uno.View.Utils;
 
 import javax.swing.ImageIcon;
 import java.awt.Image;
@@ -47,7 +47,7 @@ public class CardImageLoader {
             "PURPLE_REVERSE", "PURPLE_FLIP", "PURPLE_DRAW_FIVE", "PURPLE_SKIP_EVERYONE",
             
             // Carte Jolly
-            "WILD_WILD", "WILD_WILD_DRAW_FOUR", "WILD_WILD_DRAW_TWO", "WILD_WILD_DRAW_COLOR",
+            "WILD_WILD", "WILD_WILD_DARK", "WILD_WILD_DRAW_FOUR", "WILD_WILD_DRAW_TWO", "WILD_WILD_DRAW_COLOR",
             
             // Dorso
             "CARD_BACK"

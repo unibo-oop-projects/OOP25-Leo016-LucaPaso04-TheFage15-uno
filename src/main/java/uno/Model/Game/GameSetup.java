@@ -38,12 +38,12 @@ public class GameSetup {
     /**
      * Esegue tutti i passaggi per avviare la partita.
      */
-    public void setupNewGame() {
+    public void setupNewGame(boolean isAllWild) {
         // 1. Distribuisci le carte
         dealInitialCards();
         
         // 2. Gira la prima carta
-        flipFirstCard();
+        flipFirstCard(isAllWild);
     }
 
     /**
@@ -62,16 +62,17 @@ public class GameSetup {
      * Gira la prima carta dal mazzo di pesca alla pila degli scarti.
      * Gestisce i casi speciali (es. se è un +4 o un Jolly).
      */
-    private void flipFirstCard() {
+    private void flipFirstCard(boolean isAllWild) {
         Card firstCard = deck.drawCard();
 
         // Regola ufficiale: se la prima carta è diversa da un numero,
         // bisogna continuare a scartare carte finchè non ne esce una valida.
-        while (firstCard.getValue(game) == CardValue.WILD_DRAW_FOUR ||
+        while ((firstCard.getValue(game) == CardValue.WILD_DRAW_FOUR ||
                 firstCard.getValue(game) == CardValue.WILD ||
                 firstCard.getValue(game) == CardValue.DRAW_TWO ||
                 firstCard.getValue(game) == CardValue.REVERSE ||
-                firstCard.getValue(game) == CardValue.SKIP) {
+                firstCard.getValue(game) == CardValue.SKIP ||
+                firstCard.getValue(game) == CardValue.FLIP) && !isAllWild) {
             System.out.println("Carta scartata: " + firstCard);
             discardPile.addCard(firstCard); // Metti la carta non valida nella pila degli scarti
             firstCard = deck.drawCard();

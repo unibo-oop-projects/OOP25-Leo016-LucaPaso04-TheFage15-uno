@@ -3,7 +3,7 @@ package uno.Model.Cards.Types;
 
 import uno.Model.Game.Game;
 import uno.Model.Cards.Card;
-
+import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardFace;
 import uno.Model.Cards.Attributes.CardValue;
 
@@ -14,6 +14,10 @@ public class WildDrawTwoCard extends AbstractCard {
 
     public WildDrawTwoCard(CardFace lightSide, CardFace darkSide) {
         super(lightSide, darkSide);
+    }
+
+    public WildDrawTwoCard() {
+        super(CardColor.WILD, CardValue.WILD_DRAW_TWO); // Il colore "base" è WILD
     }
 
     /**

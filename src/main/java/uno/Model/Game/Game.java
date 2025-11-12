@@ -27,6 +27,7 @@ public class Game {
     private final TurnManager turnManager; // Delega la gestione dei turni
     private GameState currentState;
     private CardColor currentColor;
+    private Card currentPlayedCard;
 
     private boolean isDarkSide = false; // <-- STATO FLIP
 
@@ -47,6 +48,7 @@ public class Game {
         
         this.currentState = GameState.RUNNING;
         this.currentColor = null; // Nessun colore attivo all'inizio
+        this.currentPlayedCard = null;
         
         // NOTA: La distribuzione delle carte ora è gestita da GameSetup
         // nel MenuController, non più qui.
@@ -85,6 +87,8 @@ public class Game {
         if (!isValidMove(card)) {
             throw new IllegalStateException("Mossa non valida! La carta " + card + " non può essere giocata.");
         }
+
+        this.currentPlayedCard = card;
         
         // --- FINE LOGICA DI VALIDAZIONE ---
 
@@ -330,6 +334,11 @@ public class Game {
         this.turnManager.skipNextPlayer();
         System.out.println("Giocatore saltato!");
     }
+
+    public void skipEveryone() {
+        this.turnManager.skipEveryone();
+        System.out.println("Giocatore saltato!");
+    }
     
     public void makeNextPlayerDraw(int amount) {
         Player nextPlayer = this.turnManager.peekNextPlayer();
@@ -384,11 +393,11 @@ public class Game {
             return;
         }
 
-        // Se la prima carta nella discardPile è un Cambia Colore o Jolly Pesca Quattro, allora fai setColor,
-        // altrimenti drawUntilColorChosenCard
-        Card topCard = discardPile.getTopCard();
-        if (topCard.getValue(this) == CardValue.WILD_DRAW_COLOR) {
-            drawUntilColorChosenCard();
+        // Deve prendere il valore della carta giocata (NON quella nel mazzo degli scarti)
+        Card playedCard = this.currentPlayedCard;
+
+        if (playedCard.getValue(this) == CardValue.WILD_DRAW_COLOR) {
+            drawUntilColorChosenCard(color);
             return;
         }
 
@@ -401,24 +410,27 @@ public class Game {
         notifyObservers();
     }
 
-    public void drawUntilColorChosenCard() {
-        Player player = getCurrentPlayer();
+    public void drawUntilColorChosenCard(CardColor color) {
+        // Il prossimo giocatore  deve pescare fino a trovare il colore scelto
+        Player nextPlayer = this.turnManager.peekNextPlayer();
         if (this.currentState != GameState.WAITING_FOR_COLOR) {
             return;
         }
 
-        System.out.println(player.getName() + " deve pescare fino a trovare una carta del colore scelto: " + this.currentColor);
+        System.out.println(nextPlayer.getName() + " deve pescare fino a trovare una carta del colore scelto: " + color);
 
         while (true) {
             Card drawnCard = drawDeck.drawCard();
-            player.addCardToHand(drawnCard);
-            System.out.println(player.getName() + " ha pescato: " + drawnCard);
+            nextPlayer.addCardToHand(drawnCard);
+            System.out.println(nextPlayer.getName() + " ha pescato: " + drawnCard);
 
-            if (drawnCard.getColor(this) == this.currentColor) {
-                System.out.println(player.getName() + " ha trovato una carta del colore scelto: " + drawnCard);
+            if (drawnCard.getColor(this) == color) {
+                System.out.println(nextPlayer.getName() + " ha trovato una carta del colore scelto: " + drawnCard);
                 break;
             }
         }
+
+        this.currentColor = color;
 
         // Dopo aver trovato la carta, torna allo stato di gioco normale
         this.currentState = GameState.RUNNING;

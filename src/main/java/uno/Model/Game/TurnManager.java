@@ -14,6 +14,7 @@ public class TurnManager {
     private boolean isClockwise; // true = senso orario, false = antiorario
     private boolean skipNext;
     private boolean hasDrawnThisTurn;
+    private boolean skipAllOthers;
 
     /**
      * Crea un nuovo gestore dei turni.
@@ -25,6 +26,7 @@ public class TurnManager {
         this.isClockwise = true;
         this.skipNext = false;
         this.hasDrawnThisTurn = false;
+        this.skipAllOthers = false;
     }
 
     /**
@@ -40,28 +42,28 @@ public class TurnManager {
      * Applica qualsiasi effetto "salta" in sospeso.
      */
     public void advanceTurn() {
-        // 1. Salva chi ha appena finito il turno
-        Player playerWhoseTurnEnded = getCurrentPlayer();
+        int N = players.size();
+    
+        // 1. Calcola lo step: N posizioni (salta tutti) o 1/2 (skip singolo)
+        int step;
+        if (this.skipAllOthers) {
+            step = N; // Torna al giocatore corrente
+        } else {
+            step = this.skipNext ? 2 : 1; // Logica esistente per Skip/Normale
+        }
 
-        // 2. Controlla se il flag SKIP è attivo
-        //    (impostato da game.skipNextPlayer() durante il turno)
-        int increment = this.skipNext ? 2 : 1;
-
-        // 3. Resetta i flag per il *nuovo* turno
+        // 2. Resetta i flag per il *nuovo* turno
         this.skipNext = false;         // Il flag "skip" è stato "consumato"
+        this.skipAllOthers = false;    // <-- Reset del nuovo flag
         this.hasDrawnThisTurn = false; // Il nuovo giocatore non ha ancora pescato
 
-        // 4. Calcola la direzione e il prossimo indice
+        // 3. Calcola la direzione e il prossimo indice
         int direction = isClockwise ? 1 : -1;
-        int nextIndex = (currentPlayerIndex + (increment * direction));
+        int nextIndex = (currentPlayerIndex + (step * direction));
 
-        // 5. Gestisci il "giro" (wrap-around)
-        if (nextIndex < 0) {
-            // Caso antiorario dal giocatore 0
-            currentPlayerIndex = players.size() + nextIndex;
-        } else {
-            currentPlayerIndex = nextIndex % players.size();
-        }
+        // 4. Gestisci il "giro" (wrap-around)
+        // Usa l'aritmetica modulare per gestire grandi salti negativi (N passi)
+        currentPlayerIndex = (nextIndex % N + N) % N; 
 
         // TODO: Gestire logica di reset Uno!
     }
@@ -96,6 +98,10 @@ public class TurnManager {
      */
     public void skipNextPlayer() {
         this.skipNext = true;
+    }
+
+    public void skipEveryone() {
+        this.skipAllOthers = true;
     }
 
     // --- NUOVI METODI GETTER/SETTER ---

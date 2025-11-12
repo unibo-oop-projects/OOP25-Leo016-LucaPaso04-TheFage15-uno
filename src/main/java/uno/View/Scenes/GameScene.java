@@ -9,6 +9,7 @@ import uno.Model.Player.Player;
 import uno.Controller.GameViewObserver;
 import uno.View.GameModelObserver;
 import uno.View.Components.ColorChooserPanel;
+import uno.View.Utils.CardImageLoader;
 
 // Imports per le Immagini
 import javax.imageio.ImageIO;

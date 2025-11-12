@@ -80,6 +80,10 @@ public abstract class AbstractCard implements Card {
     @Override
     public void performEffect(Game game) {
         // Nessun effetto di default
+        CardValue activeValue = this.getValue(game);
+        // Chiama il centro di controllo per eseguire l'azione corretta
+        dispatchBasicEffect(game, activeValue);
+        //TODO: Tutte le carte usano lo stesso codice, sostituisci i metodi nelle varie classi
     }
 
     /**
@@ -94,10 +98,7 @@ public abstract class AbstractCard implements Card {
                 game.skipNextPlayer();
                 break;
             case SKIP_EVERYONE:
-                //TODO: CREA UN METODO SPECIFICO NEL GAME PER QUESTO E USALO QUI
-                game.skipNextPlayer();
-                game.skipNextPlayer();
-                game.skipNextPlayer();
+                game.skipEveryone();
                 break;
             case REVERSE:
                 game.reversePlayOrder();
@@ -117,11 +118,11 @@ public abstract class AbstractCard implements Card {
             case FLIP:
                 game.flipTheWorld(this);
                 break;
-            case WILD:
+            case WILD, WILD_DARK:
                 game.requestColorChoice();
                 break;
             case WILD_DRAW_COLOR:
-                game.drawUntilColorChosenCard();
+                game.requestColorChoice();
                 break;
             case WILD_DRAW_FOUR:
                 game.makeNextPlayerDraw(4);
