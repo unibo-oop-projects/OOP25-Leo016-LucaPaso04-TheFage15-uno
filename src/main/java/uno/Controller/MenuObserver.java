@@ -22,4 +22,6 @@ public interface MenuObserver {
      * Chiamato quando l'utente clicca "Esci".
      */
     void onQuit();
+
+    void onStartAllWildGame();
 }

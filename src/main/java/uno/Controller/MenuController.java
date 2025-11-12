@@ -113,6 +113,20 @@ public class MenuController implements MenuObserver {
         gameController.onGameUpdate();
     }
 
+
+    //TO DO: Implementare modalità All Wild
+    @Override
+    public void onStartAllWildGame() {
+        System.out.println("Avvio modalità All Wild...");
+
+        JOptionPane.showMessageDialog(
+            frame,
+            "La modalità All Wild non è ancora implementata.",
+            "Non Implementato",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
     @Override
     public void onQuit() {
         System.out.println("Uscita dall'applicazione.");

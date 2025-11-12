@@ -64,6 +64,9 @@ public class MenuScene extends JPanel {
         
         JButton flipButton = createStyledButton("Modalità Flip");
         flipButton.setMnemonic(KeyEvent.VK_F); // Accessibilità (Alt+F)
+
+        JButton allWildButton = createStyledButton("Modalità All Wild");
+        allWildButton.setMnemonic(KeyEvent.VK_W); // Accessibilità (Alt+W)
         
         JButton quitButton = createStyledButton("Esci dal Gioco");
         quitButton.setMnemonic(KeyEvent.VK_E); // Accessibilità (Alt+E)
@@ -73,6 +76,8 @@ public class MenuScene extends JPanel {
         contentPanel.add(classicButton);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Spaziatore
         contentPanel.add(flipButton);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        contentPanel.add(allWildButton);
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Spaziatore
         contentPanel.add(quitButton);
         
@@ -91,6 +96,10 @@ public class MenuScene extends JPanel {
             if (observer != null) {
                 observer.onStartFlipGame();
             }
+        });
+
+        allWildButton.addActionListener(e -> {
+            if (observer != null) observer.onStartAllWildGame();
         });
 
         quitButton.addActionListener(e -> {
