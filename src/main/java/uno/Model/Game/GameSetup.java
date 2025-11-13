@@ -4,7 +4,7 @@ import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Deck.Deck;
-import uno.Model.Player.Player;
+import uno.Model.Players.Player;
 
 import java.util.List;
 
@@ -63,6 +63,11 @@ public class GameSetup {
      * Gestisce i casi speciali (es. se è un +4 o un Jolly).
      */
     private void flipFirstCard(boolean isAllWild) {
+        if(isAllWild){
+            game.setCurrentColor(CardColor.WILD);
+            return;
+        }
+
         Card firstCard = deck.drawCard();
 
         // Regola ufficiale: se la prima carta è diversa da un numero,

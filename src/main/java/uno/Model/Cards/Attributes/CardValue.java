@@ -22,6 +22,9 @@ public enum CardValue {
     WILD_DRAW_COLOR, // Jolly Pesca Colore (per Flip)
 
     // Carte per All Wild Mode
+    WILD_ALLWILD,
+    WILD_DRAW_FOUR_ALLWILD,
+    WILD_DRAW_TWO_ALLWILD,
     WILD_TARGETED_DRAW_TWO, // Jolly Pesca Due Mirato
     WILD_FORCED_SWAP, // Jolly Scambio Forzato
     WILD_REVERSE, // Jolly Inverti

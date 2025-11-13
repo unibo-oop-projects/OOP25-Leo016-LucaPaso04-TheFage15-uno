@@ -1,6 +1,7 @@
 package uno.Model.Cards.Deck;
 
 import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Cards.Attributes.CardFace;
 import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Types.*;
@@ -32,15 +33,18 @@ public class AllWildDeck extends Deck<Card> {
      */
     @Override
     protected void createDeck() {
+        CardFace wildCardFace = new CardFace(CardColor.WILD, CardValue.WILD_ALLWILD);
+        CardFace wildDrawFourCardFace = new CardFace(CardColor.WILD, CardValue.WILD_DRAW_FOUR_ALLWILD);
+        CardFace wildDrawTwoCardFace = new CardFace(CardColor.WILD, CardValue.WILD_DRAW_TWO_ALLWILD);
         // aggiungi 14 carte per Wild
         for(int i = 0; i < 14; i++) {
-            this.cards.add(new WildCard());
-            this.cards.add(new WildDrawFourCard());
+            this.cards.add(new WildCard(wildCardFace, wildCardFace));
+            this.cards.add(new WildDrawFourCard(wildDrawFourCardFace, wildDrawFourCardFace));
             this.cards.add(new WildForcedSwapCard());
             this.cards.add(new WildReverseCard());
             this.cards.add(new WildSkipCard());
             this.cards.add(new WildTargetedDrawTwoCard());
-            this.cards.add(new WildDrawTwoCard());
+            this.cards.add(new WildDrawTwoCard(wildDrawTwoCardFace, wildDrawTwoCardFace));
             this.cards.add(new WildSkipTwoCard());
         }
 

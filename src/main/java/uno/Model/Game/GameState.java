@@ -16,6 +16,7 @@ public enum GameState {
      * è in pausa in attesa che scelga un nuovo colore.
      */
     WAITING_FOR_COLOR,
+    WAITING_FOR_PLAYER,
 
     /**
      * La partita è terminata.

@@ -3,13 +3,14 @@ package uno.View.Scenes;
 import uno.Model.Cards.Card;
 import uno.Model.Game.Game;
 import uno.Model.Game.GameState;
+import uno.Model.Players.Player;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Player.Player;
 import uno.Controller.GameViewObserver;
 import uno.View.GameModelObserver;
 import uno.View.Components.ColorChooserPanel;
 import uno.View.Utils.CardImageLoader;
+import uno.View.Components.PlayerChooserPanel;
 
 // Imports per le Immagini
 import javax.imageio.ImageIO;
@@ -88,6 +89,7 @@ public class GameScene extends JPanel implements GameModelObserver {
     private JButton settingsButton;
     private JLabel statusLabel;
     private boolean isColorDialogShowing = false;
+    private boolean isPlayerDialogShowing = false;
     private JButton unoButton;
 
     public GameScene(Game gameModel) {
@@ -206,7 +208,37 @@ public class GameScene extends JPanel implements GameModelObserver {
         
         // Mostra la finestra (blocca il thread fino alla chiusura)
         dialog.setVisible(true);
-}
+    }
+
+    private void showPlayerChooser() {
+        // 1. Crea l'istanza del pannello ColorChooser
+        PlayerChooserPanel panel = new PlayerChooserPanel(this.controllerObserver, gameModel.getPlayers()); 
+        
+        // 2. Utilizza showOptionDialog per rimuovere i pulsanti di default 
+        // e impedire la chiusura tramite il tasto 'X'.
+        JOptionPane pane = new JOptionPane(
+            panel, 
+            JOptionPane.PLAIN_MESSAGE, // Tipo di messaggio (senza icone)
+            JOptionPane.DEFAULT_OPTION, // Nessun pulsante 'OK'/'Cancel'
+            null, // Nessuna icona
+            new Object[]{}, // Array vuoto per le opzioni (rimuove i pulsanti standard)
+            null
+        );
+        
+        // 3. Imposta l'azione predefinita per la chiusura della finestra:
+        // impedisce la chiusura tramite il tasto 'X' e Alt+F4.
+        pane.setInitialValue(null);
+        pane.setWantsInput(false);
+        
+        // Crea la finestra di dialogo modale che ospita il JOptionPane
+        JDialog dialog = pane.createDialog(this, "Scegli un Giocatore");
+        
+        // Imposta la chiusura su DO_NOTHING_ON_CLOSE per bloccare il tasto 'X'
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        
+        // Mostra la finestra (blocca il thread fino alla chiusura)
+        dialog.setVisible(true);
+    }
 
     /**
      * Metodo chiamato dal Modello (Game) quando lo stato cambia.
@@ -228,8 +260,21 @@ public class GameScene extends JPanel implements GameModelObserver {
                 this.isColorDialogShowing = false;
             }
             statusLabel.setText("Scegli un colore!");
+        } else if (gameModel.getGameState() == GameState.WAITING_FOR_PLAYER){
+            setHumanInputEnabled(false); 
+            if (isHumanTurn && !isPlayerDialogShowing) { 
+                System.out.println("Mostro il pannello di scelta colore.");
+                
+                this.isPlayerDialogShowing = true;
+
+                showPlayerChooser();
+
+                this.isPlayerDialogShowing = false;
+            }
+            statusLabel.setText("Scegli un giocatore!");
         } else if (gameModel.getGameState() == GameState.RUNNING) {
             this.isColorDialogShowing = false;
+            this.isPlayerDialogShowing = false;
 
             String direction = gameModel.isClockwise() ? "Orario" : "Antiorario";
             statusLabel.setText("<html><div style='text-align: center;'>Turno di: " 

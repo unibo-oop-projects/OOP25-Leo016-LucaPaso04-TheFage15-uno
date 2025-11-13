@@ -1,7 +1,8 @@
 package uno.Model.Game;
 
-import uno.Model.Player.Player;
 import java.util.List;
+
+import uno.Model.Players.Player;
 
 /**
  * Gestisce la logica di avanzamento dei turni, inclusa la direzione
@@ -14,7 +15,7 @@ public class TurnManager {
     private boolean isClockwise; // true = senso orario, false = antiorario
     private boolean skipNext;
     private boolean hasDrawnThisTurn;
-    private boolean skipAllOthers;
+    private int skipSize;
 
     /**
      * Crea un nuovo gestore dei turni.
@@ -26,7 +27,7 @@ public class TurnManager {
         this.isClockwise = true;
         this.skipNext = false;
         this.hasDrawnThisTurn = false;
-        this.skipAllOthers = false;
+        this.skipSize = 0;
     }
 
     /**
@@ -46,15 +47,15 @@ public class TurnManager {
     
         // 1. Calcola lo step: N posizioni (salta tutti) o 1/2 (skip singolo)
         int step;
-        if (this.skipAllOthers) {
-            step = N; // Torna al giocatore corrente
+        if (skipSize != 0) {
+            step = skipSize; // Torna al giocatore corrente
         } else {
             step = this.skipNext ? 2 : 1; // Logica esistente per Skip/Normale
         }
 
         // 2. Resetta i flag per il *nuovo* turno
         this.skipNext = false;         // Il flag "skip" è stato "consumato"
-        this.skipAllOthers = false;    // <-- Reset del nuovo flag
+        this.skipSize = 0;    // <-- Reset del nuovo flag
         this.hasDrawnThisTurn = false; // Il nuovo giocatore non ha ancora pescato
 
         // 3. Calcola la direzione e il prossimo indice
@@ -100,8 +101,8 @@ public class TurnManager {
         this.skipNext = true;
     }
 
-    public void skipEveryone() {
-        this.skipAllOthers = true;
+    public void skipPlayers(int n) {
+        skipSize = n;
     }
 
     // --- NUOVI METODI GETTER/SETTER ---

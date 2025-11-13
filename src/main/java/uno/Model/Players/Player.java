@@ -1,5 +1,5 @@
 // Percorso: src/main/java/uno/Model/Player/Player.java
-package uno.Model.Player;
+package uno.Model.Players;
 
 import uno.Model.Cards.Card;
 import uno.Model.Game.Game;
@@ -43,6 +43,14 @@ public class Player {
         return hasCalledUno;
     }
 
+    /**
+     * Metodo per quando vengono scambiate le carte tra giocatori.
+     * @param hand
+     */
+
+    public void setHand(List<Card> hand) {
+        this.hand = new ArrayList<>(hand);
+    }
     /**
      * Aggiunge una carta alla mano del giocatore (es. quando pesca).
      */

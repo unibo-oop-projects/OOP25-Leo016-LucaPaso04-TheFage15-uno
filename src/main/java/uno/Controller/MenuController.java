@@ -3,10 +3,10 @@ package uno.Controller;
 import uno.Model.Cards.Deck.*;
 import uno.Model.Game.Game;
 import uno.Model.Game.GameSetup; // <-- IMPORTA
-import uno.Model.Player.AIAllWild;
-import uno.Model.Player.AIClassic;
-import uno.Model.Player.AIFlip;
-import uno.Model.Player.Player;
+import uno.Model.Players.AIAllWild;
+import uno.Model.Players.AIClassic;
+import uno.Model.Players.AIFlip;
+import uno.Model.Players.Player;
 import uno.View.GameFrame;
 import uno.View.Scenes.GameScene;
 import uno.View.Scenes.MenuScene;

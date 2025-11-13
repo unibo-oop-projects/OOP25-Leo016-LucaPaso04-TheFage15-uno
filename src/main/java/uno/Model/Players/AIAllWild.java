@@ -1,4 +1,4 @@
-package uno.Model.Player;
+package uno.Model.Players;
 
 import uno.Model.Cards.Card;
 import uno.Model.Game.Game;
@@ -13,9 +13,9 @@ import java.util.Optional; // Importa Optional
  * Implementazione di una IA di livello "classico" o base.
  * Estende AIPlayer e implementa la logica decisionale.
  */
-public class AIFlip extends AIPlayer {
+public class AIAllWild extends AIPlayer {
 
-    public AIFlip(String name) {
+    public AIAllWild(String name) {
         super(name);
     }
 
@@ -24,7 +24,6 @@ public class AIFlip extends AIPlayer {
      * Chiamato dal GameController quando è il turno di questa IA.
      * @param game L'istanza corrente del modello Game.
      */
-
     @Override
     public void takeTurn(Game game) {
         // Controlla che sia il suo turno per evitare errori
@@ -33,7 +32,7 @@ public class AIFlip extends AIPlayer {
             //throw new IllegalStateException("Non è il turno di " + this.name);
         }
 
-        System.out.println("[" + this.name + "]" + " sta pensando...]");
+        System.out.println(this.name + " sta pensando...");
 
         // 1. Trova una carta giocabile
         Optional<Card> cardToPlay = findFirstPlayableCard(game);
@@ -44,16 +43,11 @@ public class AIFlip extends AIPlayer {
             
             // Gioca la carta
             game.playCard(card);
-            System.out.println("[" + this.name + "]" + " gioca " + card);
+            System.out.println(this.name + " gioca " + card);
 
             // Se la carta è un Jolly, l'IA deve anche scegliere un colore
-            if (card.getColor(game) == CardColor.WILD && card.getValue(game) != CardValue.WILD_DRAW_COLOR) {
+            if (card.getColor(game) == CardColor.WILD) {
                 CardColor chosenColor = chooseBestColor(game);
-                game.setColor(chosenColor); // Imposta il colore scelto
-            }
-
-            if (card.getValue(game) == CardValue.WILD_DRAW_COLOR) {
-                CardColor chosenColor = CardColor.PURPLE;
                 game.setColor(chosenColor); // Imposta il colore scelto
             }
             
@@ -71,13 +65,13 @@ public class AIFlip extends AIPlayer {
             game.playerInitiatesDraw();
             Card drawnCard = hand.get(hand.size() - 1); // L'ultima carta è quella pescata
 
-            System.out.println("[" + this.name + "]" + " NON ha carte, quindi pesca.");
+            System.out.println(this.name + " pesca una carta.");
 
             // 5. Controlla se la carta pescata è giocabile
             if (isMoveValid(drawnCard, game)) {
                 
                 game.playCard(drawnCard);
-                System.out.println("[" + this.name + "]" + " gioca " + drawnCard);
+                System.out.println(this.name + " gioca " + drawnCard + " dopo averla pescata.");
 
                 // Se è giocabile, la gioca immediatamente
                 if (drawnCard.getColor(game) == CardColor.WILD) {
@@ -96,36 +90,76 @@ public class AIFlip extends AIPlayer {
             }
             else{
                 // 6. Altrimenti, passa
-                System.out.println("[" + this.name + "]" + " passa il turno.");
+                System.out.println(this.name + " passa il turno.");
                 game.playerPassTurn();
             }
         }
     }
 
+    /**
+     * Logica per determinare se una carta è giocabile.
+     * @param game
+     * @return
+     */
+
     private boolean isMoveValid(Card card, Game game) {
-        Card topCard = game.getTopDiscardCard();
-        return card.canBePlayedOn(topCard, game);
+        Card topCard = game.getTopDiscardCard(); //
+        
+        // Determina il colore attivo. Se currentColor è impostato (da un Jolly),
+        // usa quello. Altrimenti, usa il colore della carta in cima.
+        CardColor activeColor = (game.getCurrentColor() != null) ? game.getCurrentColor() : topCard.getColor(game);
+
+        // 1. Regola Jolly Standard (WILD)
+        if (card.getValue(game) == CardValue.WILD) {
+            return true;
+        }
+
+        // 2. Regola Jolly +4 (WILD_DRAW_FOUR)
+        if (card.getValue(game) == CardValue.WILD_DRAW_FOUR) {
+            // Regola ufficiale: puoi giocarla solo se NON hai
+            // altre carte che corrispondono al COLORE ATTIVO.
+            for (Card cardInHand : game.getCurrentPlayer().getHand()) {
+                if (cardInHand.getColor(game) == activeColor) {
+                    return false; // Mossa illegale: hai un'altra carta giocabile
+                }
+            }
+            return true; // Mossa legale
+        }
+
+        // 3. Regole Standard (non-Jolly)
+        // La carta è valida se corrisponde al colore ATTIVO...
+        if (card.getColor(game) == activeColor) {
+            return true;
+        }
+        
+        // ...o se corrisponde al VALORE della carta in cima.
+        if (card.getValue(game) == topCard.getValue(game)) {
+            return true;
+        }
+
+        // Se nessuna regola è soddisfatta, la mossa non è valida
+        return false;
     }
 
     /**
-     * Trova la prima carta giocabile nella mano dell'IA.
-     * @param game L'istanza corrente del modello Game.
-     * @return Un Optional contenente la carta giocabile, o vuoto se nessuna è trovata.
+     * Logica di ricerca base: trova la prima carta valida.
+     * @param game Il modello Game per i controlli.
+     * @return Una carta giocabile, o Optional.empty() se non ce ne sono.
      */
     private Optional<Card> findFirstPlayableCard(Game game) {
-        for (Card card : hand) {
+        Card topCard = game.getTopDiscardCard();
+        CardColor currentColor = game.getCurrentColor(); 
+
+        for (Card card : this.hand) {
             if (isMoveValid(card, game)) {
                 return Optional.of(card);
             }
         }
-        return Optional.empty();
+        return Optional.empty(); // Nessuna carta trovata
     }
 
     /**
-     * Logica per scegliere il miglior colore quando si gioca un Jolly.
-     * Sceglie il colore che l'IA ha in maggior quantità.
-     * @param game L'istanza corrente del modello Game.
-     * @return Il colore scelto.
+     * Logica IA base per scegliere un colore (il colore più presente nella sua mano).
      */
     private CardColor chooseBestColor(Game game) {
         // Usiamo un EnumMap per contare i colori. È molto efficiente per le chiavi Enum.
@@ -158,6 +192,7 @@ public class AIFlip extends AIPlayer {
             }
         }
         
+        System.out.println(this.name + " sceglie " + bestColor);
         return bestColor;
     }
 }

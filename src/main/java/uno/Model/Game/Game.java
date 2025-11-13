@@ -4,7 +4,7 @@ import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Cards.Deck.Deck;
-import uno.Model.Player.Player;
+import uno.Model.Players.Player;
 import uno.View.GameModelObserver;
 
 import java.util.ArrayList;
@@ -103,12 +103,20 @@ public class Game {
         // Esegui effetto carta (polimorfismo)
         System.out.println("Svolgo l'effetto: " + card.getValue(this));
         System.out.println("La carta giocata è di classe: " + card.getClass().getSimpleName());
-        card.performEffect(this);
-        
-        
-        // Sposta la carta
-        player.playCard(card);
-        discardPile.addCard(card);
+
+        if(card.getValue(this) == CardValue.WILD_FORCED_SWAP){
+            // Sposta la carta
+            player.playCard(card);
+            discardPile.addCard(card);
+
+            card.performEffect(this);
+        } else {
+            card.performEffect(this);
+            
+            // Sposta la carta
+            player.playCard(card);
+            discardPile.addCard(card);
+        }
 
         // --- CONTROLLO VITTORIA ---
         // Controlla se il giocatore ha vinto DOPO aver giocato la carta
@@ -134,7 +142,7 @@ public class Game {
         // --- LOGICA DI AVANZAMENTO TURNO ---
         // Non passiamo il turno solo se stiamo aspettando una scelta di colore
         // (impostato da performEffect -> requestColorChoice).
-        if (this.currentState != GameState.WAITING_FOR_COLOR) {
+        if (this.currentState != GameState.WAITING_FOR_COLOR && this.currentState != GameState.WAITING_FOR_PLAYER) {
             this.turnManager.advanceTurn();
         }
         
@@ -335,8 +343,8 @@ public class Game {
         System.out.println("Giocatore saltato!");
     }
 
-    public void skipEveryone() {
-        this.turnManager.skipEveryone();
+    public void skipPlayers(int n) {
+        this.turnManager.skipPlayers(n);
         System.out.println("Giocatore saltato!");
     }
     
@@ -388,6 +396,12 @@ public class Game {
         notifyObservers();
     }
 
+    public void requestPlayerChoice() {
+        this.currentState = GameState.WAITING_FOR_PLAYER;
+        System.out.println("In attesa della scelta del giocatore...");
+        notifyObservers();
+    }
+
     public void setColor(CardColor color) {
         if (this.currentState != GameState.WAITING_FOR_COLOR) {
             return;
@@ -405,7 +419,39 @@ public class Game {
         this.currentState = GameState.RUNNING; 
         
         // Ora che il colore è stato scelto, passiamo il turno.
-        this.turnManager.advanceTurn();
+        //this.turnManager.advanceTurn();
+
+        notifyObservers();
+    }
+
+    public void choosenPlayer(Player player) {
+        if (this.currentState != GameState.WAITING_FOR_PLAYER) {
+            return;
+        }
+
+        Card playedCard = this.currentPlayedCard;
+
+        if(playedCard.getValue(this) == CardValue.WILD_FORCED_SWAP){
+            System.out.println("Scambio forzato con: " + player.getName());
+
+            Player currentPlayer = getCurrentPlayer();
+
+            // Scambia le mani
+            List<Card> tempHand = new ArrayList<>(currentPlayer.getHand());
+            currentPlayer.setHand(player.getHand());
+            player.setHand(tempHand);
+        }
+
+        if(playedCard.getValue(this) == CardValue.WILD_TARGETED_DRAW_TWO){
+            System.out.println(player.getName() + " deve pescare 2 carte.");
+            drawCardForPlayer(player);
+            drawCardForPlayer(player);
+        }
+
+        this.currentState = GameState.RUNNING;
+
+        // Avanza il turno
+        //this.turnManager.advanceTurn();
 
         notifyObservers();
     }

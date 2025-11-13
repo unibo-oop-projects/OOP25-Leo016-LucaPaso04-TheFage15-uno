@@ -98,7 +98,7 @@ public abstract class AbstractCard implements Card {
                 game.skipNextPlayer();
                 break;
             case SKIP_EVERYONE:
-                game.skipEveryone();
+                game.skipPlayers(4);
                 break;
             case REVERSE:
                 game.reversePlayOrder();
@@ -118,10 +118,7 @@ public abstract class AbstractCard implements Card {
             case FLIP:
                 game.flipTheWorld(this);
                 break;
-            case WILD, WILD_DARK:
-                game.requestColorChoice();
-                break;
-            case WILD_DRAW_COLOR:
+            case WILD, WILD_DARK, WILD_DRAW_COLOR:
                 game.requestColorChoice();
                 break;
             case WILD_DRAW_FOUR:
@@ -133,6 +130,29 @@ public abstract class AbstractCard implements Card {
                 game.makeNextPlayerDraw(2);
                 game.skipNextPlayer();
                 game.requestColorChoice();
+                break;
+            case WILD_FORCED_SWAP:
+                game.requestPlayerChoice();
+                break;
+            case WILD_REVERSE:
+                game.reversePlayOrder();
+                break;
+            case WILD_SKIP:
+                game.skipNextPlayer();
+                break;
+            case WILD_SKIP_TWO:
+                game.skipPlayers(3);
+                break;
+            case WILD_TARGETED_DRAW_TWO:
+                game.requestPlayerChoice();
+                break;
+            case WILD_DRAW_FOUR_ALLWILD:
+                game.makeNextPlayerDraw(4);
+                game.skipNextPlayer();
+                break;
+            case WILD_DRAW_TWO_ALLWILD:
+                game.makeNextPlayerDraw(2);
+                game.skipNextPlayer();
                 break;
             default:
                 break;

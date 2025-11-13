@@ -1,4 +1,4 @@
-package uno.Model.Player;
+package uno.Model.Players;
 
 import uno.Model.Cards.Card;
 import uno.Model.Game.Game;

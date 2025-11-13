@@ -2,7 +2,7 @@
 package uno.Model.Cards.Types;
 
 import uno.Model.Game.Game;
-import uno.Model.Player.Player;
+import uno.Model.Players.Player;
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardFace;

@@ -4,8 +4,8 @@ import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Game.Game;
 import uno.Model.Game.GameState;
-import uno.Model.Player.AIPlayer; // <-- IMPORTA
-import uno.Model.Player.Player;   // <-- IMPORTA
+import uno.Model.Players.AIPlayer;
+import uno.Model.Players.Player;
 import uno.View.GameFrame;
 import uno.View.Scenes.GameScene;
 import uno.View.Scenes.MenuScene;
@@ -197,5 +197,11 @@ public class GameController implements GameViewObserver, GameModelObserver {
         // interno e notificherà la View (che si aggiornerà di nuovo).
         
         gameModel.setColor(color);
+    }
+
+    @Override
+    public void onPlayerChosen(Player player) {
+        System.out.println("Giocatore scelto: " + player.getName());
+        gameModel.choosenPlayer(player);
     }
 }

@@ -2,6 +2,7 @@ package uno.Controller;
 
 import uno.Model.Cards.Card;
 import uno.Model.Cards.Attributes.CardColor;
+import uno.Model.Players.Player;
 
 /**
  * Interfaccia (Observer) che definisce le azioni che l'utente
@@ -36,6 +37,8 @@ public interface GameViewObserver {
      * Chiamato quando l'utente clicca il bottone "Passa".
      */
     void onPassTurn();
+
+    void onPlayerChosen(Player player);
 
     /**
      * Chiamato quando l'utente clicca su uno dei bottoni colore
