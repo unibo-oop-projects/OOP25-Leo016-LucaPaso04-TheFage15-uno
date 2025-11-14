@@ -53,6 +53,7 @@ public class AIAllWild extends AIPlayer {
                 // Tanto in All Wild il colore conta poco, ma serve per sbloccare lo stato.
                 game.setColor(CardColor.RED);
                 System.out.println(this.name + " ha impostato il colore a ROSSO.");
+                game.forcedAdvanceTurn();
             }
 
             if (game.getGameState() == GameState.WAITING_FOR_PLAYER) {
@@ -61,6 +62,7 @@ public class AIAllWild extends AIPlayer {
                 if (target != null) {
                     game.choosenPlayer(target); // Nota: usa il metodo con il typo 'choosen' presente in Game.java
                     System.out.println(this.name + " ha scelto come bersaglio: " + target.getName());
+                    game.forcedAdvanceTurn(); // Avanza il turno forzatamente dopo la scelta
                 }
             }
 
