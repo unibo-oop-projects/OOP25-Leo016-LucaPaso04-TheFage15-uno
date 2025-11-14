@@ -13,14 +13,4 @@ public class SkipEveryoneCard extends AbstractCard {
     public SkipEveryoneCard(CardFace lightSide, CardFace darkSide) {
         super(lightSide, darkSide);
     }
-
-    /**
-     * Esegue l'effetto "salta turno" modificando lo stato del gioco.
-     */
-    @Override
-    public void performEffect(Game game) {
-        CardValue activeValue = this.getValue(game);
-        // Chiama il centro di controllo per eseguire l'azione corretta
-        dispatchBasicEffect(game, activeValue);
-    }
 }

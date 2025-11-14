@@ -18,14 +18,4 @@ public class DrawTwoCard extends AbstractCard {
     public DrawTwoCard(CardFace lightSide, CardFace darkSide) {
         super(lightSide, darkSide);
     }
-
-    /**
-     * Esegue l'effetto "pesca due" modificando lo stato del gioco.
-     */
-    @Override
-    public void performEffect(Game game) {
-        CardValue activeValue = this.getValue(game);
-        // Chiama il centro di controllo per eseguire l'azione corretta
-        dispatchBasicEffect(game, activeValue);
-    }
 }

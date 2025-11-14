@@ -21,15 +21,6 @@ public class WildDrawTwoCard extends AbstractCard {
     }
 
     /**
-     * Esegue l'effetto "pesca quattro" e "cambia colore".
-     */
-    @Override
-    public void performEffect(Game game) {
-        CardValue activeValue = this.getValue(game);
-        dispatchBasicEffect(game, activeValue);
-    }
-
-    /**
      * Sovrascrive la regola base.
      * La logica complessa del "non puoi giocarla se hai altre carte"
      * viene gestita dal Controller/Game prima di chiamare questo metodo.

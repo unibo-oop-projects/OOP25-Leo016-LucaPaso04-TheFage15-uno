@@ -23,10 +23,4 @@ public class NumberedCard extends AbstractCard {
     public NumberedCard(CardFace lightSide, CardFace darkSide) {
         super(lightSide, darkSide);
     }
-
-    @Override
-    public void performEffect(Game game) {
-        CardValue activeValue = this.getValue(game);
-        dispatchBasicEffect(game, activeValue);
-    }
 }

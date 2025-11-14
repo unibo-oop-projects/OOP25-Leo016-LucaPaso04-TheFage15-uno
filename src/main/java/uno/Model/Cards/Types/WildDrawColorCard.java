@@ -18,15 +18,6 @@ public class WildDrawColorCard extends AbstractCard {
     }
 
     /**
-     * Esegue l'effetto "cambia colore"
-     */
-    @Override
-    public void performEffect(Game game) {
-        CardValue activeValue = this.getValue(game);
-        dispatchBasicEffect(game, activeValue);
-    }
-
-    /**
      * Sovrascrive la regola base.
      */
     @Override

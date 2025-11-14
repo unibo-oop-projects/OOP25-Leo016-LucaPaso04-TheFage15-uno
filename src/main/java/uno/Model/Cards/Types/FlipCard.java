@@ -13,13 +13,4 @@ public class FlipCard extends AbstractCard {
     public FlipCard(CardFace lightSide, CardFace darkSide) {
         super(lightSide, darkSide);
     }
-
-    /**
-     * Quando giocata, dice al Game di flippare tutto.
-     */
-    @Override
-    public void performEffect(Game game) {
-        CardValue activeValue = this.getValue(game);
-        dispatchBasicEffect(game, activeValue);
-    }
 }

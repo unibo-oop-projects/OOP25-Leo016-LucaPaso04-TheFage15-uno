@@ -83,7 +83,6 @@ public abstract class AbstractCard implements Card {
         CardValue activeValue = this.getValue(game);
         // Chiama il centro di controllo per eseguire l'azione corretta
         dispatchBasicEffect(game, activeValue);
-        //TODO: Tutte le carte usano lo stesso codice, sostituisci i metodi nelle varie classi
     }
 
     /**
