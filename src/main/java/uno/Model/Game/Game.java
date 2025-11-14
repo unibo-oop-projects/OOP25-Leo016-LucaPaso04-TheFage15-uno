@@ -60,7 +60,7 @@ public class Game {
         this.observers.add(observer);
     }
 
-    private void notifyObservers() {
+    public void notifyObservers() {
         for (GameModelObserver obs : observers) {
             obs.onGameUpdate();
         }
@@ -121,16 +121,6 @@ public class Game {
         // --- CONTROLLO VITTORIA ---
         // Controlla se il giocatore ha vinto DOPO aver giocato la carta
         if (player.hasWon()) {
-
-            //Controlla che il giocatore abbia effettivamente chiamato UNO
-            if (!player.getHasCalledUno()) {
-                // Penalità: pesca 2 carte
-                drawCardForPlayer(player);
-                drawCardForPlayer(player);
-                notifyObservers(); // Notifica la View per mostrare le nuove carte
-                throw new IllegalStateException("Non hai chiamato UNO! Penalità applicata: hai pescato 2 carte.");
-            }
-
             this.currentState = GameState.GAME_OVER;
             this.winner = player;
             System.out.println("PARTITA FINITA! Il vincitore è " + this.winner.getName());
@@ -143,7 +133,7 @@ public class Game {
         // Non passiamo il turno solo se stiamo aspettando una scelta di colore
         // (impostato da performEffect -> requestColorChoice).
         if (this.currentState != GameState.WAITING_FOR_COLOR && this.currentState != GameState.WAITING_FOR_PLAYER) {
-            this.turnManager.advanceTurn();
+            this.turnManager.advanceTurn(this);
         }
         
         notifyObservers();
@@ -232,7 +222,7 @@ public class Game {
 
         // Se sei qui, hai pescato e hai scelto di passare
         System.out.println(getCurrentPlayer().getName() + " passa il turno.");
-        turnManager.advanceTurn(); // Avanza al prossimo giocatore
+        turnManager.advanceTurn(this); // Avanza al prossimo giocatore
         notifyObservers();
     }
     
@@ -478,12 +468,12 @@ public class Game {
 
         // Dopo aver trovato la carta, torna allo stato di gioco normale
         this.currentState = GameState.RUNNING;
-        this.turnManager.advanceTurn();
+        this.turnManager.advanceTurn(this);
         notifyObservers();
     }
 
         public void AIAdvanceTurn() {
-        this.turnManager.advanceTurn();
+        this.turnManager.advanceTurn(this);
         notifyObservers(); 
     }
 }

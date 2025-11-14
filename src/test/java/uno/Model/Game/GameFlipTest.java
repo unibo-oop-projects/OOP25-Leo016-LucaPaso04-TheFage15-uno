@@ -14,14 +14,12 @@ import uno.Model.Cards.Attributes.CardValue;
 import uno.Model.Cards.Deck.Deck;
 import uno.Model.Cards.Deck.FlipDeck;
 import uno.Model.Cards.Types.NumberedCard;
-import uno.Model.Cards.Types.WildCard;
 import uno.Model.Players.Player;
 import uno.Model.Cards.Attributes.CardFace;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Classe di test (nello stile di arcaym) per la logica di UNO Flip.

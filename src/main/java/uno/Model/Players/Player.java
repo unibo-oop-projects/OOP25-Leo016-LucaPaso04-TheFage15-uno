@@ -71,6 +71,14 @@ public class Player {
         return this.hand.isEmpty();
     }
 
+    public void unoPenalty(Game game) {
+        // Penalità: pesca 2 carte
+        game.drawCardForPlayer(this);
+        game.drawCardForPlayer(this);
+
+        game.notifyObservers();
+    }
+
     /**
      * Verifica se il giocatore ha chiamato UNO.
      * La classe Game userà questo metodo per decidere

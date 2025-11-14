@@ -11,6 +11,7 @@ import uno.View.Scenes.GameScene;
 import uno.View.Scenes.MenuScene;
 import uno.View.GameModelObserver; // <-- IMPORTA
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.Timer; // <-- IMPORTA PER IL RITARDO
 import java.awt.event.ActionEvent; // <-- IMPORTA
@@ -34,6 +35,35 @@ public class GameController implements GameViewObserver, GameModelObserver {
         this.mainFrame = mainFrame;
 
         this.gameModel.addObserver(this);
+    }
+
+    public void showStartingPlayerPopupAndStartGame() {
+        // 1. Otteniamo il giocatore che inizia (scelto a caso dal TurnManager)
+        Player startingPlayer = gameModel.getCurrentPlayer();
+        String msg = "Inizia: " + startingPlayer.getName();
+
+        // 2. Creiamo il pannello del messaggio
+        JOptionPane pane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE);
+        
+        // 3. Creiamo il Dialog (modale = blocca il codice)
+        JDialog dialog = pane.createDialog(gameScene, "Inizio Partita");
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // Impedisce la chiusura manuale
+        
+        // 4. Creiamo un Thread per chiudere il dialog dopo 3 secondi
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000); // Aspetta 3 secondi
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            dialog.dispose(); // Chiude il dialog e sblocca il codice qui sotto
+        }).start();
+
+        // 5. Mostriamo il dialog. Il codice SI FERMA QUI finché il dialog non si chiude.
+        dialog.setVisible(true);
+        
+        // 6. ORA che il popup è sparito, facciamo partire il gioco
+        onGameUpdate();
     }
 
     /**
@@ -142,7 +172,7 @@ public class GameController implements GameViewObserver, GameModelObserver {
     public void onCallUno() {
         System.out.println("L'utente clicca 'UNO!'");
         try {
-            gameModel.callUno(gameModel.getCurrentPlayer());
+            gameModel.callUno(gameModel.getPlayers().getFirst());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(gameScene, 
                 e.getMessage(), // Messaggio d'errore (es. "Non puoi chiamare UNO ora")

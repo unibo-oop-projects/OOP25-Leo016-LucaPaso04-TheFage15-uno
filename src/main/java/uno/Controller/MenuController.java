@@ -68,7 +68,7 @@ public class MenuController implements MenuObserver {
         // 7. Mostra la nuova scena
         frame.showScene(gameScene);
 
-        gameController.onGameUpdate();
+        gameController.showStartingPlayerPopupAndStartGame();
     }
 
     @Override
@@ -111,7 +111,7 @@ public class MenuController implements MenuObserver {
         // 7. Mostra la nuova scena
         frame.showScene(gameScene);
 
-        gameController.onGameUpdate();
+        gameController.showStartingPlayerPopupAndStartGame();
     }
 
 
@@ -155,7 +155,7 @@ public class MenuController implements MenuObserver {
         // 7. Mostra la nuova scena
         frame.showScene(gameScene);
 
-        gameController.onGameUpdate();
+        gameController.showStartingPlayerPopupAndStartGame();
     }
 
     @Override

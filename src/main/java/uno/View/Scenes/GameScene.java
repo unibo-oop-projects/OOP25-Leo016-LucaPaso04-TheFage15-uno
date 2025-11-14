@@ -3,6 +3,7 @@ package uno.View.Scenes;
 import uno.Model.Cards.Card;
 import uno.Model.Game.Game;
 import uno.Model.Game.GameState;
+import uno.Model.Players.AIPlayer;
 import uno.Model.Players.Player;
 import uno.Model.Cards.Attributes.CardColor;
 import uno.Model.Cards.Attributes.CardValue;
@@ -35,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import javax.swing.Box;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -65,6 +67,7 @@ public class GameScene extends JPanel implements GameModelObserver {
     private static final Font BOLD_FONT = new Font("Arial", Font.BOLD, 14);
     private static final Font NORMAL_FONT = new Font("Arial", Font.PLAIN, 12);
     private static final Border HIGHLIGHT_BORDER = BorderFactory.createLineBorder(Color.ORANGE, 3);
+    private static final Border WARNING_BORDER = BorderFactory.createLineBorder(Color.RED, 3);
     private static final Border NORMAL_BORDER = BorderFactory.createEmptyBorder(3, 3, 3, 3); // Spessore per allineamento
 
     private final Game gameModel;
@@ -156,9 +159,14 @@ public class GameScene extends JPanel implements GameModelObserver {
      * Abilita o disabilita tutti i controlli di input umano.
      */
     public void setHumanInputEnabled(boolean enabled) {
-        this.unoButton.setEnabled(enabled);
+        // --- LOGICA MODIFICATA PER PULSANTE UNO ---
+        // Il pulsante UNO deve essere disattivato SOLO se il gioco è in
+        // WAITING_FOR_COLOR o WAITING_FOR_PLAYER.
+        GameState currentState = gameModel.getGameState();
+        boolean shouldDisableUno = (currentState == GameState.WAITING_FOR_COLOR || currentState == GameState.WAITING_FOR_PLAYER);
+        this.unoButton.setEnabled(!shouldDisableUno);
+        // --- FINE MODIFICA ---
         
-        boolean isHumanTurn = gameModel.getCurrentPlayer().getClass() == Player.class;
         boolean hasDrawn = gameModel.hasCurrentPlayerDrawn(gameModel.getCurrentPlayer());
         // Il bottone Pesca è attivo solo se è il tuo turno E non hai ancora pescato
         this.drawDeckButton.setEnabled(enabled && !hasDrawn);
@@ -171,8 +179,7 @@ public class GameScene extends JPanel implements GameModelObserver {
         // una carta non valida.
         for (Component comp : playerHandPanel.getComponents()) {
             if (comp instanceof JButton) {
-                // Rimuoviamo "!hasDrawn". Le carte sono sempre giocabili
-                // se è il turno dell'umano.
+                // Le carte in mano sono abilitate/disabilitate in base al parametro 'enabled'
                 comp.setEnabled(enabled); 
             }
         }
@@ -303,7 +310,17 @@ public class GameScene extends JPanel implements GameModelObserver {
                 discardPileCard.setText("<html><div style='text-align: center;'>" + topCard.getValue(gameModel) + "<br>" + topCard.getColor(gameModel) + "</div></html>");
             }
 
-            discardPileCard.setBorder(BorderFactory.createLineBorder(convertCardColor(activeColor), 4));
+            // --- INIZIO NUOVA LOGICA BORDER ---
+            Color color = convertCardColor(activeColor);
+            
+            // 1. Crea il bordo interno
+            Border innerBorder = BorderFactory.createLineBorder(BACKGROUND_COLOR, 2);
+            
+            // 2. Crea il bordo esterno
+            Border outerBorder = BorderFactory.createLineBorder(color, 5);
+            
+            // 3. Combina i due bordi (OuterBorder attorno a InnerBorder)
+            discardPileCard.setBorder(new CompoundBorder(outerBorder, innerBorder));
         }
 
         // --- Aggiornamento Mano Umano ---
@@ -405,9 +422,12 @@ public class GameScene extends JPanel implements GameModelObserver {
     private void updateOpponentPanel(JPanel panel, JLabel label, Player ai) {
         label.setText(ai.getHandSize() + " carte");
         if (gameModel.getCurrentPlayer() == ai) {
+            Color borderColor = ai.getHandSize() <= 1 ? Color.RED : Color.ORANGE;
+            Border border = ai.getHandSize() <= 1 ? WARNING_BORDER : HIGHLIGHT_BORDER;
+
             panel.setBorder(BorderFactory.createTitledBorder(
-                HIGHLIGHT_BORDER, ai.getName(),
-                TitledBorder.CENTER, TitledBorder.TOP, BOLD_FONT, Color.ORANGE
+                border, ai.getName(),
+                TitledBorder.CENTER, TitledBorder.TOP, BOLD_FONT, borderColor
             ));
         } else {
             panel.setBorder(BorderFactory.createTitledBorder(
@@ -539,7 +559,7 @@ public class GameScene extends JPanel implements GameModelObserver {
 
         // 7. UNO BUTTON: Posizione (5, 2) - Basso a Destra
         // Usiamo l'ultima colonna (5) per l'allineamento a destra.
-        gbc.gridx = 3; 
+        gbc.gridx = 5; 
         gbc.gridy = 2;
         gbc.weightx = 0.0;
         gbc.weighty = 1.0; // IMPORTANTE: Spinge il bottone verso il basso

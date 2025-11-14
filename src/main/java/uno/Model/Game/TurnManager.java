@@ -1,6 +1,7 @@
 package uno.Model.Game;
 
 import java.util.List;
+import java.util.Random;
 
 import uno.Model.Players.Player;
 
@@ -23,7 +24,10 @@ public class TurnManager {
      */
     public TurnManager(List<Player> players) {
         this.players = players;
-        this.currentPlayerIndex = 0; // Inizia sempre dal primo giocatore
+
+        Random rand = new Random();
+        this.currentPlayerIndex = rand.nextInt(players.size());
+
         this.isClockwise = true;
         this.skipNext = false;
         this.hasDrawnThisTurn = false;
@@ -42,7 +46,7 @@ public class TurnManager {
      * Calcola e passa al giocatore successivo.
      * Applica qualsiasi effetto "salta" in sospeso.
      */
-    public void advanceTurn() {
+    public void advanceTurn(Game game) {
         int N = players.size();
     
         // 1. Calcola lo step: N posizioni (salta tutti) o 1/2 (skip singolo)
@@ -67,7 +71,18 @@ public class TurnManager {
         currentPlayerIndex = (nextIndex % N + N) % N; 
         System.out.println("Ora tocca al giocatore: " + currentPlayerIndex);
 
-        // TODO: Gestire logica di reset Uno!
+        checkAndApplyStartTurnPenalty(game);
+    }
+
+    public void checkAndApplyStartTurnPenalty(Game game){
+        Player player = getCurrentPlayer();
+
+        if (player.getHandSize() == 1 && !player.getHasCalledUno()) {
+            player.unoPenalty(game);
+            throw new IllegalStateException("Non hai chiamato UNO! Penalità assegnata");
+        }
+
+        player.resetUnoStatus();
     }
 
     /**
