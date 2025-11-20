@@ -46,6 +46,11 @@ public class PlayerChooserPanel extends JPanel implements ActionListener {
         
         // Crea un pulsante per ogni avversario
         for (Player opponent : opponents) {
+
+            if (opponent.getClass().equals(Player.class)) {
+                continue; 
+            }
+
             JButton button = createStyledButton(opponent.getName()); // Usa il nome del giocatore
             button.setActionCommand(opponent.getName()); // Usa il nome come identificatore
             button.addActionListener(this);

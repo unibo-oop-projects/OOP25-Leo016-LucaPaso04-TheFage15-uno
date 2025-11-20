@@ -107,10 +107,23 @@ public class GameScene extends JPanel implements GameModelObserver {
         add(eastAIPanel, BorderLayout.EAST);
         add(centerPanel, BorderLayout.CENTER);
         
-        // Pannello Sud (Mano Umano + Bottone UNO)
+        // Pannello Sud (Mano Umano + Bottone UNO) con ScrollBar orizzontale
         JPanel southPanel = new JPanel(new BorderLayout(10, 0));
         southPanel.setOpaque(false);
-        southPanel.add(new JScrollPane(playerHandPanel), BorderLayout.CENTER);
+
+        // Configurazione avanzata dello ScrollPane
+        JScrollPane scrollPane = new JScrollPane(playerHandPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); // Niente scroll verticale
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); // Scroll orizzontale se serve
+        scrollPane.setBorder(null); // Rimuovi i bordi brutti di default
+        scrollPane.getViewport().setOpaque(false); // Rendi lo sfondo trasparente
+        scrollPane.setOpaque(false);
+        
+        // Impostiamo un'altezza preferita per l'INTERA zona bassa (scroll + carte)
+        // 160px è sufficiente per contenere le carte (altezza 120) + bordi + scrollbar
+        scrollPane.setPreferredSize(new Dimension(800, 180));
+        
+        southPanel.add(scrollPane, BorderLayout.CENTER);
         add(southPanel, BorderLayout.SOUTH);
 
         // --- Collegamento Azioni -> Controller ---
@@ -312,12 +325,24 @@ public class GameScene extends JPanel implements GameModelObserver {
         // --- Aggiornamento Mano Umano ---
         playerHandPanel.removeAll(); 
         Player humanPlayer = gameModel.getPlayers().get(0); 
+
+        // Configurazione per inserire le carte in riga
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0; // Inizia dalla prima colonna
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 5, 0, 5); // Spazio orizzontale tra le carte (gap)
+        gbc.anchor = GridBagConstraints.CENTER; // Centra verticalmente
+
         for (Card card : humanPlayer.getHand()) {
             JButton cardButton = createCardButton(card);
             cardButton.addActionListener(e -> {
                 if (controllerObserver != null) { controllerObserver.onPlayCard(card); }
             });
-            playerHandPanel.add(cardButton);
+            
+            // Aggiungi il bottone con i vincoli (constraints)
+            playerHandPanel.add(cardButton, gbc);
+            
+            gbc.gridx++; // Sposta il cursore alla prossima colonna per la carta successiva
         }
 
         setHumanInputEnabled(isHumanTurn && gameModel.getGameState() == GameState.RUNNING);
@@ -557,14 +582,15 @@ public class GameScene extends JPanel implements GameModelObserver {
     }
 
     private JPanel createPlayerHandPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        JPanel panel = new JPanel(new GridBagLayout()); 
         panel.setBackground(PANEL_COLOR);
+
         TitledBorder border = BorderFactory.createTitledBorder(
             BorderFactory.createEtchedBorder(), "La tua Mano",
             TitledBorder.CENTER, TitledBorder.TOP, BOLD_FONT, TEXT_COLOR
         );
+
         panel.setBorder(border);
-        panel.setPreferredSize(new Dimension(100, 150)); // Altezza per le carte
         return panel;
     }
 
