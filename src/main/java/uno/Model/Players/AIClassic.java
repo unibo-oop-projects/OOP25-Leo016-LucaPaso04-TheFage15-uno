@@ -1,11 +1,11 @@
-package uno.Model.Players;
-
-import uno.Model.Cards.Card;
-import uno.Model.Game.Game;
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Attributes.CardValue;
+package uno.model.players;
 
 import java.util.*;
+
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.game.Game;
 
 /**
  * Implementazione migliorata di una IA di livello "classico".

@@ -1,0 +1,7 @@
+aggiungi un qualcosa per far capire l'ultima giocata anche per l'umano
+aggiungi box per il colore migliore
+
+Dialoghi nel Controller: In GameController.java, vengono chiamati JOptionPane.showMessageDialog. In un MVC purissimo, il Controller non dovrebbe generare UI; dovrebbe dire alla View "mostra un errore" e la View dovrebbe occuparsi di come mostrarlo (popup, testo rosso, ecc.). Tuttavia, con Swing, fare questo nel Controller è una pratica molto comune e pragmatica.
+
+Stampe su Console: Ci sono molti System.out.println nel Model (Game.java). Idealmente, il Model non dovrebbe stampare nulla su console (è una forma di View). Dovrebbe usare il Logger che stiamo implementando.
+

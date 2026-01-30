@@ -1,30 +1,42 @@
-package uno.Controller;
+package uno.controller.impl;
 
-import uno.Model.Cards.Deck.*;
-import uno.Model.Game.Game;
-import uno.Model.Game.GameSetup; // <-- IMPORTA
-import uno.Model.Players.AIAllWild;
-import uno.Model.Players.AIClassic;
-import uno.Model.Players.AIFlip;
-import uno.Model.Players.Player;
-import uno.View.GameFrame;
-import uno.View.Scenes.GameScene;
-import java.util.ArrayList; // <-- IMPORTA
-import java.util.List;     // <-- IMPORTA
+import uno.controller.api.MenuController;
+import uno.model.cards.deck.AllWildDeck;
+import uno.model.cards.deck.FlipDeck;
+import uno.model.cards.deck.StandardDeck;
+import uno.model.game.Game;
+import uno.model.game.GameSetup;
+import uno.model.players.AIAllWild;
+import uno.model.players.AIClassic;
+import uno.model.players.AIFlip;
+import uno.model.players.Player;
+import uno.view.GameFrame;
+import uno.view.scenes.GameScene;
+import uno.view.scenes.RulesScene;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Controller che gestisce la logica per la schermata del menu.
- * Implementa l'interfaccia MenuObserver.
+ * Concrete implementation of the MenuController.
+ * It manages the transitions from the Menu Scene to the Game Scene based on user selection.
  */
-public class MenuController implements MenuObserver {
+public class MenuControllerImpl implements MenuController {
 
     private final GameFrame frame;
     private final boolean isAllWild = true;
 
-    public MenuController(GameFrame frame) {
+    /**
+     * Constructor for MenuControllerImpl.
+     * @param frame
+     */
+    public MenuControllerImpl(final GameFrame frame) {
         this.frame = frame;
     }
 
+    /** 
+     * Handles the action of starting a Classic game.
+    */
     @Override
     public void onStartClassicGame() {
         System.out.println("Avvio modalità classica...");
@@ -32,7 +44,7 @@ public class MenuController implements MenuObserver {
         // --- IMPOSTAZIONE DELLA PARTITA ---
 
         // 1. Crea i giocatori
-        List<Player> players = new ArrayList<>();
+        final List<Player> players = new ArrayList<>();
         players.add(new Player("Giocatore 1")); // Giocatore umano
         players.add(new AIClassic("IA-1")); // Avversario
         players.add(new AIClassic("IA-2"));
@@ -40,12 +52,12 @@ public class MenuController implements MenuObserver {
         // puoi aggiungere altri giocatori qui...
 
         // 2. Crea il Model (Mazzo e Partita)
-        StandardDeck deck = new StandardDeck();
-        Game gameModel = new Game(deck, players, "CLASSIC");
+        final StandardDeck deck = new StandardDeck();
+        final Game gameModel = new Game(deck, players, "CLASSIC");
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.
-        GameSetup setup = new GameSetup(
+        final GameSetup setup = new GameSetup(
             gameModel, 
             deck, 
             gameModel.getDiscardPile(), 
@@ -54,20 +66,23 @@ public class MenuController implements MenuObserver {
         setup.setupNewGame(!isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
-        GameScene gameScene = new GameScene(gameModel);
+        final GameScene gameScene = new GameScene(gameModel);
 
         // 5. Crea il Controller del Gioco
-        GameController gameController = new GameController(gameModel, gameScene, frame);
-        
+        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame);
+
         // 6. Collega la Scena al suo Controller
         gameScene.setObserver(gameController);
-        
+
         // 7. Mostra la nuova scena
         frame.showScene(gameScene);
 
         gameController.showStartingPlayerPopupAndStartGame();
     }
 
+    /** 
+     * Handles the action of starting a Flip game.
+    */
     @Override
     public void onStartFlipGame() {
         System.out.println("Avvio modalità flip...");
@@ -75,7 +90,7 @@ public class MenuController implements MenuObserver {
         // --- IMPOSTAZIONE DELLA PARTITA ---
 
         // 1. Crea i giocatori
-        List<Player> players = new ArrayList<>();
+        final List<Player> players = new ArrayList<>();
         players.add(new Player("Giocatore 1")); // Giocatore umano
         players.add(new AIFlip("IA-1")); // Avversario
         players.add(new AIFlip("IA-2"));
@@ -83,12 +98,12 @@ public class MenuController implements MenuObserver {
         // puoi aggiungere altri giocatori qui...
 
         // 2. Crea il Model (Mazzo e Partita)
-        FlipDeck deck = new FlipDeck();
-        Game gameModel = new Game(deck, players, "FLIP");
+        final FlipDeck deck = new FlipDeck();
+        final Game gameModel = new Game(deck, players, "FLIP");
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.
-        GameSetup setup = new GameSetup(
+        final GameSetup setup = new GameSetup(
             gameModel, 
             deck, 
             gameModel.getDiscardPile(), 
@@ -97,14 +112,14 @@ public class MenuController implements MenuObserver {
         setup.setupNewGame(!isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
-        GameScene gameScene = new GameScene(gameModel);
+        final GameScene gameScene = new GameScene(gameModel);
 
         // 5. Crea il Controller del Gioco
-        GameController gameController = new GameController(gameModel, gameScene, frame);
-        
+        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame);
+
         // 6. Collega la Scena al suo Controller
         gameScene.setObserver(gameController);
-        
+
         // 7. Mostra la nuova scena
         frame.showScene(gameScene);
 
@@ -112,14 +127,16 @@ public class MenuController implements MenuObserver {
     }
 
 
-    //TO DO: Implementare modalità All Wild
+    /** 
+     * Handles the action of starting an All Wild game.
+    */
     @Override
     public void onStartAllWildGame() {
         System.out.println("Avvio modalità All Wild...");
         // --- IMPOSTAZIONE DELLA PARTITA ---
 
         // 1. Crea i giocatori
-        List<Player> players = new ArrayList<>();
+        final List<Player> players = new ArrayList<>();
         players.add(new Player("Giocatore 1")); // Giocatore umano
         players.add(new AIAllWild("IA-1")); // Avversario
         players.add(new AIAllWild("IA-2"));
@@ -127,12 +144,12 @@ public class MenuController implements MenuObserver {
         // puoi aggiungere altri giocatori qui...
 
         // 2. Crea il Model (Mazzo e Partita)
-        AllWildDeck deck = new AllWildDeck();
-        Game gameModel = new Game(deck, players, "ALL_WILD");
+        final AllWildDeck deck = new AllWildDeck();
+        final Game gameModel = new Game(deck, players, "ALL_WILD");
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.
-        GameSetup setup = new GameSetup(
+        final GameSetup setup = new GameSetup(
             gameModel, 
             deck, 
             gameModel.getDiscardPile(), 
@@ -141,23 +158,35 @@ public class MenuController implements MenuObserver {
         setup.setupNewGame(isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
-        GameScene gameScene = new GameScene(gameModel);
+        final GameScene gameScene = new GameScene(gameModel);
 
         // 5. Crea il Controller del Gioco
-        GameController gameController = new GameController(gameModel, gameScene, frame);
-        
+        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame);
+
         // 6. Collega la Scena al suo Controller
         gameScene.setObserver(gameController);
-        
+
         // 7. Mostra la nuova scena
         frame.showScene(gameScene);
 
         gameController.showStartingPlayerPopupAndStartGame();
     }
 
+    /** 
+     * Handles the action of quitting the application.
+    */
     @Override
     public void onQuit() {
         System.out.println("Uscita dall'applicazione.");
         System.exit(0);
+    }
+
+    /** 
+     * Handles the action of opening the rules scene.
+    */
+    @Override
+    public void onOpenRules() {
+        final RulesScene rulesScene = new RulesScene();
+        frame.showScene(rulesScene);
     }
 }

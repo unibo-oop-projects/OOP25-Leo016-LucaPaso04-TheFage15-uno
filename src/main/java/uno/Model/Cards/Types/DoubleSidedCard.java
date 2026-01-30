@@ -1,10 +1,10 @@
-package uno.Model.Cards.Types;
+package uno.model.cards.types;
 
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Cards.Behaviors.CardSideBehavior;
-import uno.Model.Game.Game;
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.cards.behaviors.CardSideBehavior;
+import uno.model.game.Game;
 
 public class DoubleSidedCard implements Card {
 

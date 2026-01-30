@@ -1,9 +1,9 @@
-package uno.Model.Cards.Deck;
+package uno.model.cards.deck;
 
-import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Types.DoubleSidedCard; // La nuova carta unica
-import uno.Model.Cards.Behaviors.*; // Importa tutti i comportamenti
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardValue;
+import uno.model.cards.behaviors.*;
+import uno.model.cards.types.DoubleSidedCard;
 
 /**
  * Rappresenta il mazzo per la modalità "All Wild" (Tutto Jolly).

@@ -1,12 +1,12 @@
-package uno.Model.Game;
+package uno.model.game;
 
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Cards.Deck.Deck;
-import uno.Model.Players.Player;
-import uno.Model.Utils.GameLogger;
-import uno.View.GameModelObserver;
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.cards.deck.Deck;
+import uno.model.players.Player;
+import uno.model.utils.GameLogger;
+import uno.view.GameModelObserver;
 
 import java.util.ArrayList;
 import java.util.List;

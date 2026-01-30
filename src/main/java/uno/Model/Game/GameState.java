@@ -1,4 +1,4 @@
-package uno.Model.Game;
+package uno.model.game;
 
 /**
  * Rappresenta i possibili stati in cui la partita si può trovare.

@@ -1,11 +1,11 @@
-package uno.Model.Cards.Deck;
+package uno.model.cards.deck;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import uno.Model.Cards.Card;
+import uno.model.cards.Card;
 
 /**
  * Classe astratta che rappresenta un mazzo di carte generico.

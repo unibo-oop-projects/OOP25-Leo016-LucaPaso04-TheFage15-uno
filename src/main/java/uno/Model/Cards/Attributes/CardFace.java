@@ -1,4 +1,4 @@
-package uno.Model.Cards.Attributes;
+package uno.model.cards.attributes;
 
 public record CardFace(CardColor color, CardValue value) {
 }

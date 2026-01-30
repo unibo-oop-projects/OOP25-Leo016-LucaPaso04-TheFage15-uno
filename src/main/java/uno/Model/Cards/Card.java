@@ -1,9 +1,9 @@
 // Percorso: src/main/java/uno/Model/Card.java
-package uno.Model.Cards;
+package uno.model.cards;
 
-import uno.Model.Game.Game;
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Attributes.CardValue;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.game.Game;
 
 /**
  * Interfaccia che definisce il contratto per qualsiasi carta da gioco Uno.

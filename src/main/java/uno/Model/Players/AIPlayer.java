@@ -1,6 +1,6 @@
-package uno.Model.Players;
+package uno.model.players;
 
-import uno.Model.Cards.Card;
+import uno.model.cards.Card;
 
 
 public abstract class AIPlayer extends Player {

@@ -1,12 +1,12 @@
-package uno.Model.Game;
-
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Deck.Deck;
-import uno.Model.Players.Player;
+package uno.model.game;
 
 import java.util.List;
+
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.cards.deck.Deck;
+import uno.model.players.Player;
 
 /**
  * Classe di utilità responsabile della logica di 

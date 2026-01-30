@@ -1,9 +1,9 @@
-package uno.Model.Game;
+package uno.model.game;
 
 import java.util.List;
 import java.util.Random;
 
-import uno.Model.Players.Player;
+import uno.model.players.Player;
 
 /**
  * Gestisce la logica di avanzamento dei turni, inclusa la direzione

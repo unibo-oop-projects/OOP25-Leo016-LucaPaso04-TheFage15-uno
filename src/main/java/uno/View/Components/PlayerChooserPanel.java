@@ -1,7 +1,7 @@
-package uno.View.Components;
+package uno.view.components;
 
-import uno.Controller.GameViewObserver;
-import uno.Model.Players.Player;
+import uno.controller.api.GameViewObserver;
+import uno.model.players.Player;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

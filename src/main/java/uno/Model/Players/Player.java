@@ -1,10 +1,11 @@
 // Percorso: src/main/java/uno/Model/Player/Player.java
-package uno.Model.Players;
+package uno.model.players;
 
-import uno.Model.Cards.Card;
-import uno.Model.Game.Game;
 import java.util.ArrayList;
 import java.util.List;
+
+import uno.model.cards.Card;
+import uno.model.game.Game;
 
 /**
  * Rappresenta un giocatore. È la classe base per tutti i tipi di giocatori.

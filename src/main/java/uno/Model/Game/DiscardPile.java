@@ -1,10 +1,10 @@
-package uno.Model.Game;
-
-import uno.Model.Cards.Card;
+package uno.model.game;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import uno.model.cards.Card;
 
 /**
  * Rappresenta la pila degli scarti nel gioco UNO.

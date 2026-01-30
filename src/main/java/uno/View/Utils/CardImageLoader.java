@@ -1,4 +1,4 @@
-package uno.View.Utils;
+package uno.view.utils;
 
 import javax.swing.ImageIcon;
 import java.awt.Image;

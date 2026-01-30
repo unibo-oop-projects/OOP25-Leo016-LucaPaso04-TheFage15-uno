@@ -1,8 +1,8 @@
-package uno.Controller;
+package uno.controller.api;
 
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Players.Player;
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.players.Player;
 
 /**
  * Interfaccia (Observer) che definisce le azioni che l'utente
@@ -38,6 +38,12 @@ public interface GameViewObserver {
      */
     void onPassTurn();
 
+    /**
+     * Chiamato quando l'utente clicca su uno dei bottoni giocatore
+     * dopo aver giocato una carta che richiede di scegliere un giocatore
+     * (es. Asso).
+     * @param player Il giocatore scelto.
+     */
     void onPlayerChosen(Player player);
 
     /**

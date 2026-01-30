@@ -1,4 +1,4 @@
-package uno.Controller;
+package uno.controller.api;
 
 /**
  * Interfaccia (Observer) che definisce le azioni che l'utente
@@ -23,5 +23,13 @@ public interface MenuObserver {
      */
     void onQuit();
 
+    /**
+     * Chiamato quando l'utente clicca "Avvia Modalità Tutti Jolly".
+     */
     void onStartAllWildGame();
+
+    /**
+     * Chiamato quando l'utente clicca "Regole".
+     */
+    void onOpenRules();
 }

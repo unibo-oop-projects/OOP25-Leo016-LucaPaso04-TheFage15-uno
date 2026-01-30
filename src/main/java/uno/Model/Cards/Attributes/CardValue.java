@@ -1,4 +1,4 @@
-package uno.Model.Cards.Attributes;
+package uno.model.cards.attributes;
 
 public enum CardValue {
     // Carte Numerate

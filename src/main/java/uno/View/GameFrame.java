@@ -1,4 +1,4 @@
-package uno.View;
+package uno.view;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;

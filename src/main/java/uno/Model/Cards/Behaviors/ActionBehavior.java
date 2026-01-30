@@ -1,8 +1,8 @@
-package uno.Model.Cards.Behaviors;
+package uno.model.cards.behaviors;
 
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Game.Game;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.game.Game;
 
 public class ActionBehavior implements CardSideBehavior {
     private final CardColor color;

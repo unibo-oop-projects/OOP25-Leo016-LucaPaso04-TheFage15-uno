@@ -1,7 +1,7 @@
-package uno.View.Components;
+package uno.view.components;
 
-import uno.Controller.GameViewObserver;
-import uno.Model.Cards.Attributes.CardColor;
+import uno.controller.api.GameViewObserver;
+import uno.model.cards.attributes.CardColor;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

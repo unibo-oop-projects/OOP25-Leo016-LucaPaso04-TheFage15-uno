@@ -1,13 +1,13 @@
-package uno.Model.Cards.Deck;
-
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Types.DoubleSidedCard; // <-- Usiamo SOLO questa!
-import uno.Model.Cards.Behaviors.*; // Importa i comportamenti
+package uno.model.cards.deck;
 
 import java.util.Arrays;
 import java.util.List;
+
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.cards.behaviors.*;
+import uno.model.cards.types.DoubleSidedCard;
 
 public class StandardDeck extends Deck<Card> {
 

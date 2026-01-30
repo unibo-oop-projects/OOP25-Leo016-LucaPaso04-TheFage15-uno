@@ -1,13 +1,13 @@
-package uno.Model.Players;
-
-import uno.Model.Cards.Card;
-import uno.Model.Game.Game;
-import uno.Model.Game.GameState; // Importante per controllare lo stato
-import uno.Model.Cards.Attributes.CardValue;
+package uno.model.players;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardValue;
+import uno.model.game.Game;
+import uno.model.game.GameState;
 
 public class AIAllWild extends AIPlayer {
 

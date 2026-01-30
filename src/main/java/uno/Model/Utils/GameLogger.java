@@ -1,4 +1,4 @@
-package uno.Model.Utils;
+package uno.model.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -1,11 +1,4 @@
-package uno.Model.Cards.Deck;
-
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Model.Cards.Attributes.CardFace;
-import uno.Model.Cards.Attributes.CardValue;
-import uno.Model.Cards.Behaviors.*;
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Types.DoubleSidedCard;
+package uno.model.cards.deck;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +7,13 @@ import java.io.Reader;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardFace;
+import uno.model.cards.attributes.CardValue;
+import uno.model.cards.behaviors.*;
+import uno.model.cards.types.DoubleSidedCard;
 
 /**
  * Rappresenta un mazzo di UNO classico da 108 carte.

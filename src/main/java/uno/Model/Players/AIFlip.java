@@ -1,13 +1,13 @@
-package uno.Model.Players;
-
-import uno.Model.Cards.Card;
-import uno.Model.Game.Game;
-import uno.Model.Cards.Attributes.CardColor; // Importa CardColor
-import uno.Model.Cards.Attributes.CardValue;
+package uno.model.players;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional; // Importa Optional
+
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.cards.attributes.CardValue;
+import uno.model.game.Game;
 
 /**
  * Implementazione di una IA di livello "classico" o base.

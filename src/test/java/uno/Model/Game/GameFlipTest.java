@@ -3,12 +3,12 @@ package uno.Model.Game;
 // Import di JUnit
 import org.junit.jupiter.api.BeforeEach;
 
-// Import delle tue classi
-import uno.Model.Cards.Card;
-import uno.Model.Cards.Deck.Deck;
-import uno.Model.Cards.Deck.FlipDeck;
-import uno.Model.Players.Player;
-
+import uno.model.cards.Card;
+import uno.model.cards.deck.Deck;
+import uno.model.cards.deck.FlipDeck;
+import uno.model.game.Game;
+import uno.model.game.GameSetup;
+import uno.model.players.Player;
 
 import java.util.ArrayList;
 import java.util.List;

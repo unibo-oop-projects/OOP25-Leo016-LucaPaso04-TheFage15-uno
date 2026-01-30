@@ -1,15 +1,15 @@
-package uno.View.Scenes;
+package uno.view.scenes;
 
-import uno.Model.Cards.Card;
-import uno.Model.Game.Game;
-import uno.Model.Game.GameState;
-import uno.Model.Players.Player;
-import uno.Model.Cards.Attributes.CardColor;
-import uno.Controller.GameViewObserver;
-import uno.View.GameModelObserver;
-import uno.View.Components.ColorChooserPanel;
-import uno.View.Utils.CardImageLoader;
-import uno.View.Components.PlayerChooserPanel;
+import uno.controller.api.GameViewObserver;
+import uno.model.cards.Card;
+import uno.model.cards.attributes.CardColor;
+import uno.model.game.Game;
+import uno.model.game.GameState;
+import uno.model.players.Player;
+import uno.view.GameModelObserver;
+import uno.view.components.ColorChooserPanel;
+import uno.view.components.PlayerChooserPanel;
+import uno.view.utils.CardImageLoader;
 
 import javax.swing.ImageIcon;
 

@@ -1,8 +1,8 @@
 package uno;
 
-import uno.Controller.MenuController;
-import uno.View.GameFrame;
-import uno.View.Scenes.MenuScene;
+import uno.controller.impl.MenuControllerImpl;
+import uno.view.GameFrame;
+import uno.view.scenes.MenuScene;
 
 import javax.swing.SwingUtilities;
 
@@ -27,7 +27,7 @@ public final class Main {
             GameFrame frame = new GameFrame("UNO");
 
             // 2. Crea il Controller del Menu e passagli la finestra
-            MenuController menuController = new MenuController(frame);
+            MenuControllerImpl menuController = new MenuControllerImpl(frame);
 
             // 3. Crea la Scena del Menu (View)
             MenuScene menuScene = new MenuScene();
