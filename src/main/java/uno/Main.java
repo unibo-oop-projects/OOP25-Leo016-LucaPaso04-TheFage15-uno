@@ -1,44 +1,35 @@
 package uno;
 
 import uno.controller.impl.MenuControllerImpl;
-import uno.view.GameFrame;
-import uno.view.scenes.MenuScene;
+import uno.view.impl.GameFrameImpl;
+import uno.view.scenes.impl.MenuSceneImpl;
 
 import javax.swing.SwingUtilities;
 
 /**
- * Classe principale che avvia l'applicazione UNO.
+ * Entry point of the UNO application.
  */
 public final class Main {
 
     private Main() {
+        // Prevent instantiation
     }
 
     /**
-     * Entry point dell'applicazione.
-     * @param args argomenti da riga di comando (non usati).
+     * Main method to launch the UNO application.
+     * @param args command line arguments
      */
     public static void main(final String[] args) {
-        
-        // Avvia l'interfaccia grafica sul thread corretto (EDT)
+
         SwingUtilities.invokeLater(() -> {
-            
-            // 1. Crea la finestra principale (View)
-            GameFrame frame = new GameFrame("UNO");
 
-            // 2. Crea il Controller del Menu e passagli la finestra
-            MenuControllerImpl menuController = new MenuControllerImpl(frame);
+            final GameFrameImpl frame = new GameFrameImpl("UNO");
+            final MenuControllerImpl menuController = new MenuControllerImpl(frame);
+            final MenuSceneImpl menuScene = new MenuSceneImpl();
 
-            // 3. Crea la Scena del Menu (View)
-            MenuScene menuScene = new MenuScene();
-
-            // 4. Collega la Scena al suo Controller (Observer)
             menuScene.setObserver(menuController);
-
-            // 5. Mostra la scena del menu all'avvio
             frame.showScene(menuScene);
-            
-            // 6. Rendi visibile la finestra
+
             frame.setVisible(true);
         });
     }

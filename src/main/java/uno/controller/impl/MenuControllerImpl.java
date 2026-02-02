@@ -1,18 +1,27 @@
 package uno.controller.impl;
 
 import uno.controller.api.MenuController;
-import uno.model.cards.deck.AllWildDeck;
-import uno.model.cards.deck.FlipDeck;
-import uno.model.cards.deck.StandardDeck;
-import uno.model.game.Game;
-import uno.model.game.GameSetup;
-import uno.model.players.AIAllWild;
-import uno.model.players.AIClassic;
-import uno.model.players.AIFlip;
-import uno.model.players.Player;
-import uno.view.GameFrame;
-import uno.view.scenes.GameScene;
-import uno.view.scenes.RulesScene;
+import uno.model.cards.deck.impl.AllWildDeck;
+import uno.model.cards.deck.impl.FlipDeck;
+import uno.model.cards.deck.impl.StandardDeck;
+import uno.model.game.impl.GameImpl;
+import uno.model.game.impl.GameSetupImpl;
+import uno.model.players.api.Player;
+import uno.model.players.impl.AIAllWild;
+import uno.model.players.impl.AIClassic;
+import uno.model.players.impl.AIFlip;
+import uno.model.players.impl.HumanPlayer;
+import uno.model.utils.api.GameLogger;
+import uno.model.utils.impl.GameLoggerImpl;
+import uno.view.scenes.impl.GameSceneImpl;
+import uno.view.scenes.impl.RulesSceneImpl;
+import uno.model.cards.deck.api.Deck;
+import uno.model.cards.types.api.Card;
+import uno.model.game.api.Game;
+import uno.model.game.api.GameSetup;
+import uno.controller.api.GameController;
+import uno.view.scenes.api.GameScene;
+import uno.view.api.GameFrame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +54,7 @@ public class MenuControllerImpl implements MenuController {
 
         // 1. Crea i giocatori
         final List<Player> players = new ArrayList<>();
-        players.add(new Player("Giocatore 1")); // Giocatore umano
+        players.add(new HumanPlayer("Giocatore 1")); // Giocatore umano
         players.add(new AIClassic("IA-1")); // Avversario
         players.add(new AIClassic("IA-2"));
         players.add(new AIClassic("IA-3"));
@@ -53,23 +62,24 @@ public class MenuControllerImpl implements MenuController {
 
         // 2. Crea il Model (Mazzo e Partita)
         final StandardDeck deck = new StandardDeck();
-        final Game gameModel = new Game(deck, players, "CLASSIC");
+        final GameLogger logger = new GameLoggerImpl(String.valueOf(System.currentTimeMillis()));
+        final GameImpl gameModel = new GameImpl(deck, players, "CLASSIC", logger);
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.
-        final GameSetup setup = new GameSetup(
+        final GameSetupImpl setup = new GameSetupImpl(
             gameModel, 
             deck, 
             gameModel.getDiscardPile(), 
             players
         );
-        setup.setupNewGame(!isAllWild);
+        setup.initializeGame(!isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
-        final GameScene gameScene = new GameScene(gameModel);
+        final GameSceneImpl gameScene = new GameSceneImpl(gameModel);
 
         // 5. Crea il Controller del Gioco
-        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame);
+        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame, logger);
 
         // 6. Collega la Scena al suo Controller
         gameScene.setObserver(gameController);
@@ -91,37 +101,38 @@ public class MenuControllerImpl implements MenuController {
 
         // 1. Crea i giocatori
         final List<Player> players = new ArrayList<>();
-        players.add(new Player("Giocatore 1")); // Giocatore umano
+        players.add(new HumanPlayer("Giocatore 1")); // Giocatore umano
         players.add(new AIFlip("IA-1")); // Avversario
         players.add(new AIFlip("IA-2"));
         players.add(new AIFlip("IA-3"));
         // puoi aggiungere altri giocatori qui...
 
         // 2. Crea il Model (Mazzo e Partita)
-        final FlipDeck deck = new FlipDeck();
-        final Game gameModel = new Game(deck, players, "FLIP");
+        final Deck<Card> deck = new FlipDeck();
+        final GameLogger logger = new GameLoggerImpl(String.valueOf(System.currentTimeMillis()));
+        final Game gameModel = new GameImpl(deck, players, "FLIP", logger);
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.
-        final GameSetup setup = new GameSetup(
+        final GameSetup setup = new GameSetupImpl(
             gameModel, 
             deck, 
             gameModel.getDiscardPile(), 
             players
         );
-        setup.setupNewGame(!isAllWild);
+        setup.initializeGame(!isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
-        final GameScene gameScene = new GameScene(gameModel);
+        final GameScene gameScene = new GameSceneImpl(gameModel);
 
         // 5. Crea il Controller del Gioco
-        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame);
+        final GameController gameController = new GameControllerImpl(gameModel, gameScene, frame, logger);
 
         // 6. Collega la Scena al suo Controller
         gameScene.setObserver(gameController);
 
         // 7. Mostra la nuova scena
-        frame.showScene(gameScene);
+        frame.showScene((javax.swing.JPanel) gameScene);
 
         gameController.showStartingPlayerPopupAndStartGame();
     }
@@ -137,7 +148,7 @@ public class MenuControllerImpl implements MenuController {
 
         // 1. Crea i giocatori
         final List<Player> players = new ArrayList<>();
-        players.add(new Player("Giocatore 1")); // Giocatore umano
+        players.add(new HumanPlayer("Giocatore 1")); // Giocatore umano
         players.add(new AIAllWild("IA-1")); // Avversario
         players.add(new AIAllWild("IA-2"));
         players.add(new AIAllWild("IA-3"));
@@ -145,23 +156,24 @@ public class MenuControllerImpl implements MenuController {
 
         // 2. Crea il Model (Mazzo e Partita)
         final AllWildDeck deck = new AllWildDeck();
-        final Game gameModel = new Game(deck, players, "ALL_WILD");
+        final GameLogger logger = new GameLoggerImpl(String.valueOf(System.currentTimeMillis()));
+        final GameImpl gameModel = new GameImpl(deck, players, "ALL_WILD", logger);
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.
-        final GameSetup setup = new GameSetup(
+        final GameSetupImpl setup = new GameSetupImpl(
             gameModel, 
             deck, 
             gameModel.getDiscardPile(), 
             players
         );
-        setup.setupNewGame(isAllWild);
+        setup.initializeGame(isAllWild);
 
         // 4. Crea la View del Gioco (GameScene)
-        final GameScene gameScene = new GameScene(gameModel);
+        final GameSceneImpl gameScene = new GameSceneImpl(gameModel);
 
         // 5. Crea il Controller del Gioco
-        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame);
+        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame, logger);
 
         // 6. Collega la Scena al suo Controller
         gameScene.setObserver(gameController);
@@ -186,7 +198,7 @@ public class MenuControllerImpl implements MenuController {
     */
     @Override
     public void onOpenRules() {
-        final RulesScene rulesScene = new RulesScene();
+        final RulesSceneImpl rulesScene = new RulesSceneImpl();
         frame.showScene(rulesScene);
     }
 }

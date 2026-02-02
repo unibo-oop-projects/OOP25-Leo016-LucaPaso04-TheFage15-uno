@@ -1,9 +1,11 @@
 package uno.controller.api;
 
-import uno.model.cards.Card;
+import java.util.Optional;
+
 import uno.model.cards.attributes.CardColor;
-import uno.model.players.Player;
-import uno.view.GameModelObserver;
+import uno.model.cards.types.api.Card;
+import uno.model.players.api.Player;
+import uno.view.api.GameModelObserver;
 
 /**
  * Interface defining the operations for controlling a Uno! game session.
@@ -23,7 +25,7 @@ public interface GameController extends GameViewObserver, GameModelObserver {
      * @param card The card the player intends to play.
      */
     @Override
-    void onPlayCard(Card card);
+    void onPlayCard(Optional<Card> card);
 
     /**
      * Handles the request to draw a card from the deck.

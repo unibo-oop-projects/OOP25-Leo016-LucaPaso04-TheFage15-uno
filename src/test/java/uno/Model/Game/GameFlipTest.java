@@ -3,12 +3,13 @@ package uno.Model.Game;
 // Import di JUnit
 import org.junit.jupiter.api.BeforeEach;
 
-import uno.model.cards.Card;
-import uno.model.cards.deck.Deck;
-import uno.model.cards.deck.FlipDeck;
-import uno.model.game.Game;
-import uno.model.game.GameSetup;
-import uno.model.players.Player;
+import uno.model.cards.deck.impl.DeckImpl;
+import uno.model.cards.deck.impl.FlipDeck;
+import uno.model.cards.types.api.Card;
+import uno.model.game.impl.GameImpl;
+import uno.model.game.impl.GameSetupImpl;
+import uno.model.players.api.Player;
+import uno.model.players.impl.HumanPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,9 @@ import java.util.List;
  */
 class GameFlipTest {
 
-    private Game game;
-    private GameSetup gameSetup;
-    private Deck<Card> flipDeck;
+    private GameImpl game;
+    private GameSetupImpl gameSetup;
+    private DeckImpl<Card> flipDeck;
     private Player player1;
     private List<Player> players;
 
@@ -32,23 +33,23 @@ class GameFlipTest {
     @BeforeEach
     void setUp() {
         // ARRANGE (Prepara)
-        player1 = new Player("Test Player");
+        player1 = new HumanPlayer("Test Player");
         players = new ArrayList<>(List.of(player1));
         flipDeck = new FlipDeck();
         
         // Il costruttore di Game popola le mappe
-        game = new Game(flipDeck, players, "FLIP");
+        //game = new GameImpl(flipDeck, players, "FLIP");
         
         // Prepara il setup del gioco
-        gameSetup = new GameSetup(game, flipDeck, game.getDiscardPile(), players);
+        gameSetup = new GameSetupImpl(game, flipDeck, game.getDiscardPile(), players);
         
         // Esegui il setup: distribuisce le carte, mette la prima carta sullo scarto.
         // Se questa chiamata non mette una carta sulla discardPile, la riga sotto la risolve.
-        gameSetup.setupNewGame(false);
+        gameSetup.initializeGame(false);
 
         if (game.getDiscardPile().isEmpty()) {
             // Forza l'aggiunta di una carta se per qualche motivo non c'è
-            game.getDiscardPile().addCard(flipDeck.drawCard());
+            //game.getDiscardPile().addCard(flipDeck.drawCard());
         }
     }
 
