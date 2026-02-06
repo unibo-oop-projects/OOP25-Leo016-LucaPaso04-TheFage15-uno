@@ -32,4 +32,17 @@ public interface MenuObserver {
      * Chiamato quando l'utente clicca "Regole".
      */
     void onOpenRules();
+
+    /**
+     * Chiamato quando l'utente salva le regole personalizzate.
+     * 
+     * @param rules Le nuove regole impostate.
+     */
+    void onSaveRules(uno.model.game.api.GameRules rules);
+
+    /**
+     * Chiamato quando l'utente vuole tornare al menu principale dalla schermata
+     * regole.
+     */
+    void onBackToMenu();
 }

@@ -5,10 +5,11 @@ import uno.model.cards.attributes.CardValue;
 import uno.model.cards.deck.api.Deck;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.Game;
+import uno.model.game.api.GameRules;
 import uno.model.game.api.GameState;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
-import uno.view.api.GameModelObserver;
+import uno.model.api.GameModelObserver;
 import uno.model.game.api.DiscardPile;
 import uno.model.game.api.TurnManager;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,32 +44,50 @@ public class GameImpl implements Game {
     private Card currentPlayedCard;
 
     private final GameLogger logger;
+    private final GameRules rules;
 
     private boolean isDarkSide;
 
     /**
-     * Constructor for GameImpl.
+     * Constructor for GameImpl with default rules.
      * 
      * @param deck     deck of cards
      * @param players  list of players
      * @param gameMode game mode
      * @param logger   logger
      */
+    public GameImpl(final Deck<Card> deck, final List<AbstractPlayer> players, final String gameMode,
+            final GameLogger logger) {
+        this(deck, players, gameMode, logger, GameRulesImpl.defaultRules());
+    }
+
+    /**
+     * Constructor for GameImpl with custom rules.
+     * 
+     * @param deck     deck of cards
+     * @param players  list of players
+     * @param gameMode game mode
+     * @param logger   logger
+     * @param rules    game rules
+     */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public GameImpl(final Deck<Card> deck, final List<AbstractPlayer> players, final String gameMode, final GameLogger logger) {
+    public GameImpl(final Deck<Card> deck, final List<AbstractPlayer> players, final String gameMode,
+            final GameLogger logger, final GameRules rules) {
         this.drawDeck = deck;
         this.players = new ArrayList<>(players);
         this.logger = logger;
+        this.rules = rules;
         this.winner = null;
         this.discardPile = new DiscardPileImpl();
 
-        this.turnManager = new TurnManagerImpl(players);
+        this.turnManager = new TurnManagerImpl(players, rules);
 
         this.currentState = GameState.RUNNING;
         this.currentColor = Optional.empty();
         this.currentPlayedCard = null;
 
-        logger.logAction(LOGGER_PLAYER_NAME, "GAME_START", gameMode, "Players: " + players.size());
+        logger.logAction(LOGGER_PLAYER_NAME, "GAME_START", gameMode,
+                "Players: " + players.size() + ". Rules: " + rules);
     }
 
     /**
@@ -102,6 +121,15 @@ public class GameImpl implements Game {
         }
 
         final AbstractPlayer player = getCurrentPlayer();
+
+        // New Rule: Skip After Draw
+        // If enabled, and the player has drawn this turn, they cannot play immediately.
+        // The rule description says: "If ENABLED, a player cannot play a card
+        // immediately after drawing it."
+        if (rules.isSkipAfterDrawEnabled() && hasCurrentPlayerDrawn(player)) {
+            throw new IllegalStateException("Regola: Skip After Draw. Hai pescato, quindi devi passare il turno.");
+        }
+
         // 2. Controlla se il giocatore ha la carta
         if (!player.getHand().contains(card)) {
             throw new IllegalStateException("Il giocatore non ha questa carta!");
@@ -237,6 +265,7 @@ public class GameImpl implements Game {
         }
 
         // Puoi passare solo se hai pescato (perché non avevi mosse)
+        // Oppure se hai pescato e la regola "Skip After Draw" è attiva.
         if (!hasCurrentPlayerDrawn(getCurrentPlayer())) {
             // Potresti avere una mossa, quindi non puoi passare
             if (playerHasPlayableCard(getCurrentPlayer())) {
@@ -262,6 +291,15 @@ public class GameImpl implements Game {
     @Override
     public void drawCardForPlayer(final AbstractPlayer player) {
         if (drawDeck.isEmpty()) {
+
+            // Regola: Mandatory Pass / No Reshuffle
+            if (rules.isMandatoryPassEnabled()) {
+                logger.logAction(LOGGER_PLAYER_NAME, "DECK_EMPTY", CARD_DETAIL, "No Reshuffle Rule Active. Game Ends.");
+                this.currentState = GameState.GAME_OVER;
+                notifyObservers();
+                return;
+            }
+
             final List<Card> cardsToReshuffle = discardPile.takeAllExceptTop();
 
             if (cardsToReshuffle.isEmpty()) {
@@ -288,11 +326,27 @@ public class GameImpl implements Game {
      */
     @Override
     public void callUno(final AbstractPlayer player) {
+
+        // Rule: UNO Penalty
+        // If disabled, players don't need to call UNO.
+        if (!rules.isUnoPenaltyEnabled()) {
+            // Se la penalità è disabilitata, non facciamo nulla se il giocatore tenta di
+            // chiamare UNO.
+            // Ma se lo chiama quando ha 1 carta, va bene e lo logghiamo come successo.
+            // Se sbaglia, tecnicamente non dovrebbe succedere nulla se la regola è "No
+            // Penalty".
+            // Tuttavia, permettiamo comunque di chiamarlo correttamente.
+            if (player.getHandSize() == 1) {
+                player.hasCalledUno();
+                logger.logAction(player.getName(), "CALL_UNO_SUCCESS", CARD_DETAIL, "HandSize: 1");
+            }
+            return;
+        }
+
         if (player.getHandSize() == 1) {
             player.hasCalledUno();
             logger.logAction(player.getName(), "CALL_UNO_SUCCESS", CARD_DETAIL, "HandSize: 1");
         } else {
-
             logger.logAction(player.getName(), "CALL_UNO_FAILED",
                     CARD_DETAIL, "Initial HandSize: " + player.getHandSize() + ". Penalty: Draw 2.");
 
@@ -586,5 +640,13 @@ public class GameImpl implements Game {
     @Override
     public void logSystemAction(final String actionType, final String cardDetails, final String extraInfo) {
         this.logger.logAction(LOGGER_PLAYER_NAME, actionType, cardDetails, extraInfo);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GameRules getRules() {
+        return this.rules;
     }
 }

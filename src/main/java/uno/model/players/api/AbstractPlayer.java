@@ -42,8 +42,8 @@ public abstract class AbstractPlayer {
      * 
      * @return The name of the player.
      */
-    public String getName() { 
-        return name; 
+    public String getName() {
+        return name;
     }
 
     /**
@@ -51,8 +51,8 @@ public abstract class AbstractPlayer {
      * 
      * @return A list of Card representing the player's hand.
      */
-    public List<Optional<Card>> getHand() { 
-        return new ArrayList<>(hand); 
+    public List<Optional<Card>> getHand() {
+        return new ArrayList<>(hand);
     }
 
     /**
@@ -60,8 +60,8 @@ public abstract class AbstractPlayer {
      * 
      * @return The number of cards in hand.
      */
-    public int getHandSize() { 
-        return hand.size(); 
+    public int getHandSize() {
+        return hand.size();
     }
 
     /**
@@ -81,9 +81,10 @@ public abstract class AbstractPlayer {
      */
     public void addCardToHand(final Card card) {
         this.hand.add(Optional.of(card));
-        // Reset UNO status if they draw cards (they are safe now or need to call it again later)
-        if (hand.size() > 1) { 
-            this.hasCalledUno = false; 
+        // Reset UNO status if they draw cards (they are safe now or need to call it
+        // again later)
+        if (hand.size() > 1) {
+            this.hasCalledUno = false;
         }
     }
 
@@ -137,5 +138,14 @@ public abstract class AbstractPlayer {
      */
     public void resetUnoStatus() {
         this.hasCalledUno = false;
+    }
+
+    /**
+     * Explicitly sets the UNO call status (TESTING ONLY).
+     * 
+     * @param status The new status.
+     */
+    public void setHasCalledUno(final boolean status) {
+        this.hasCalledUno = status;
     }
 }

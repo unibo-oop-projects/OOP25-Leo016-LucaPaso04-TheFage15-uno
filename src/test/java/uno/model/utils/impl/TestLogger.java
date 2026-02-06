@@ -9,7 +9,7 @@ import uno.model.utils.api.GameLogger;
 public class TestLogger implements GameLogger {
 
     @Override
-    public void logAction(String playerName, String actionType, String cardDetails, String extraInfo) {
+    public void logAction(final String playerName, final String actionType, final String cardDetails, final String extraInfo) {
         // No-op for tests.
         // Uncomment the line below if you want to see logs in the console during tests.
         // System.out.println(String.format("[%s] %s: %s (%s) - %s", playerName,
@@ -17,7 +17,7 @@ public class TestLogger implements GameLogger {
     }
 
     @Override
-    public void logError(String context, Exception e) {
+    public void logError(final String context, final Exception e) {
         // No-op or print to stderr
         // System.err.println("ERROR in " + context + ": " + e.getMessage());
     }

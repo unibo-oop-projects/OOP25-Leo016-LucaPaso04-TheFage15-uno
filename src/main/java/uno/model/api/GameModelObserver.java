@@ -1,4 +1,4 @@
-package uno.view.api;
+package uno.model.api;
 
 /**
  * Interfaccia (Observer) che permette al Modello (Game)

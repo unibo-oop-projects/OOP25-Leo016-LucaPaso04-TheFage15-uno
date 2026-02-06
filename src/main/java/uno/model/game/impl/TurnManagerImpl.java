@@ -3,6 +3,7 @@ package uno.model.game.impl;
 import uno.model.game.api.Game;
 import uno.model.game.api.TurnManager;
 import uno.model.players.api.AbstractPlayer;
+import uno.model.game.api.GameRules;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +17,30 @@ public class TurnManagerImpl implements TurnManager {
     private static final Random RANDOM = new Random();
 
     private final List<AbstractPlayer> players;
+    private final GameRules rules;
     private int currentPlayerIndex;
     private boolean isClockwise; // true = Clockwise, false = Counter-Clockwise
     private boolean hasDrawnThisTurn;
     private int skipSize; // How many players to jump over (0 = normal turn)
 
     /**
-     * Initializes the turn manager.
+     * Initializes the turn manager with default rules.
      * 
      * @param players The list of participants.
      */
     public TurnManagerImpl(final List<AbstractPlayer> players) {
+        this(players, GameRulesImpl.defaultRules());
+    }
+
+    /**
+     * Initializes the turn manager with custom rules.
+     * 
+     * @param players The list of participants.
+     * @param rules   The game rules.
+     */
+    public TurnManagerImpl(final List<AbstractPlayer> players, final GameRules rules) {
         this.players = new ArrayList<>(players);
+        this.rules = rules;
 
         // Randomly choose the starting player
         this.currentPlayerIndex = RANDOM.nextInt(players.size());
@@ -81,6 +94,11 @@ public class TurnManagerImpl implements TurnManager {
      * @param game The current game instance.
      */
     private void checkAndApplyStartTurnPenalty(final Game game) {
+        // If UNO Penalty is disabled, skip this check completely.
+        if (!rules.isUnoPenaltyEnabled()) {
+            return;
+        }
+
         final AbstractPlayer player = getCurrentPlayer();
 
         // If player starts turn with 1 card and didn't call UNO -> Penalty

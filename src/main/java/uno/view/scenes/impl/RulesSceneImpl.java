@@ -1,26 +1,22 @@
 package uno.view.scenes.impl;
 
 import uno.controller.api.MenuObserver;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
+import uno.view.components.api.StyledButton;
+import uno.view.components.impl.StyledButtonImpl;
 import uno.view.scenes.api.RulesScene;
+import uno.view.style.UnoTheme;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.border.EmptyBorder;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Dimension;
-//import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.GridBagLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
 import java.util.Optional;
 
@@ -33,28 +29,12 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
 
     private static final long serialVersionUID = 1L;
 
-    // Color Palette (Consistent with MenuScene)
-    private static final Color BACKGROUND_COLOR = new Color(30, 30, 30);
-    private static final Color TEXT_COLOR = Color.WHITE;
-    private static final Color DESC_COLOR = new Color(180, 180, 180); // Light gray for descriptions
-    private static final Color BUTTON_COLOR = new Color(211, 47, 47);
-    private static final Color BUTTON_TEXT_COLOR = Color.WHITE;
-    private static final EmptyBorder PADDING_BORDER = new EmptyBorder(20, 40, 20, 40);
-    private static final int TITLE_FONT_SIZE = 48;
     private static final Dimension RIGID_AREA_1 = new Dimension(0, 40);
     private static final Dimension RIGID_AREA_2 = new Dimension(0, 20);
     private static final Dimension RIGID_AREA_3 = new Dimension(0, 50);
     private static final Dimension PANEL_DIMENSION = new Dimension(600, 80);
-    private static final Color PANEL_COLOR = new Color(80, 80, 80);
-    private static final int LBL_TITLE_FONT_SIZE = 18;
-    private static final int BUTTON_FONT_SIZE = 18;
-    private static final int LBL_DESC_FONT_SIZE = 12;
     private static final Dimension TEXT_PANEL_RIGID_AREA = new Dimension(0, 5);
-    private static final Color BUTTON_OVER_COLOR = new Color(255, 82, 82);
-    private static final int ARC = 20;
-    private static final Dimension BUTTON_DIMENSION = new Dimension(350, 60);
-    private static final EmptyBorder BUTTON_BORDER = new EmptyBorder(10, 20, 10, 20);
-    private static final String FONT = "Helvetica Neue";
+    private static final float FONT_SIZE = 12f;
     private static final String CHECKBOX = "checkbox";
 
     // Input components
@@ -66,21 +46,23 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
 
     /**
      * Constructs the RulesSceneImpl panel with all GUI components.
+     * 
+     * @param currentRules The current game rules to display.
      */
-    public RulesSceneImpl() {
+    public RulesSceneImpl(final GameRules currentRules) {
         super(new GridBagLayout());
-        setBackground(BACKGROUND_COLOR);
+        setBackground(UnoTheme.BACKGROUND_COLOR);
 
         final JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setOpaque(false);
-        contentPanel.setBorder(PADDING_BORDER);
+        contentPanel.setBorder(UnoTheme.PADDING_BORDER);
 
         // 1. Title
         final JLabel title = new JLabel("House Rules");
-        title.setFont(new Font(FONT, Font.BOLD, TITLE_FONT_SIZE));
-        title.setForeground(TEXT_COLOR);
-        // title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setFont(UnoTheme.SUBTITLE_FONT);
+        title.setForeground(UnoTheme.TEXT_COLOR);
+        title.setAlignmentX(CENTER_ALIGNMENT);
 
         // 2. Create Rule Panels
 
@@ -88,30 +70,35 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
         final JPanel rule1 = createRulePanel(
                 "UNO Penalty",
                 "If DISABLED, players are not required to shout 'UNO!' when holding one card.",
-                true);
+                currentRules.isUnoPenaltyEnabled());
         unoPenaltyCheck = (JCheckBox) rule1.getClientProperty(CHECKBOX);
 
-        // Rule 2: Skip after Draw (Default: Off)
+        // Rule 2: Skip After Draw (Default: Off)
         final JPanel rule2 = createRulePanel(
                 "Skip After Draw",
                 "If ENABLED, a player cannot play a card immediately after drawing it.",
-                false);
+                currentRules.isSkipAfterDrawEnabled());
         skipAfterDrawCheck = (JCheckBox) rule2.getClientProperty(CHECKBOX);
 
         // Rule 3: Mandatory Pass / No Reshuffle (Default: Off)
         final JPanel rule3 = createRulePanel(
                 "No Reshuffle (Hardcore)",
                 "If the draw deck is empty, the game ends in a draw (discard pile is not reshuffled).",
-                false);
+                currentRules.isMandatoryPassEnabled());
         mandatoryPassCheck = (JCheckBox) rule3.getClientProperty(CHECKBOX);
 
         // 3. "Save and Back" Button
-        final JButton backButton = createStyledButton("Save & Back to Menu");
+        final StyledButton backButton = new StyledButtonImpl("Save & Back to Menu");
         backButton.setMnemonic(KeyEvent.VK_B);
 
         backButton.addActionListener(e -> {
-            if (observer != null) {
-                throw new IllegalAccessError("as");
+            if (observer.isPresent()) {
+                final GameRules newRules = new GameRulesImpl(
+                        unoPenaltyCheck.isSelected(),
+                        skipAfterDrawCheck.isSelected(),
+                        mandatoryPassCheck.isSelected());
+                observer.get().onSaveRules(newRules);
+                observer.get().onBackToMenu();
             }
         });
 
@@ -124,7 +111,7 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
         contentPanel.add(Box.createRigidArea(RIGID_AREA_2));
         contentPanel.add(rule3);
         contentPanel.add(Box.createRigidArea(RIGID_AREA_3));
-        contentPanel.add(backButton);
+        contentPanel.add(backButton.getComponent());
 
         add(contentPanel);
     }
@@ -179,7 +166,7 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
         panel.setOpaque(false);
         panel.setMaximumSize(PANEL_DIMENSION);
         panel.setPreferredSize(PANEL_DIMENSION);
-        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, PANEL_COLOR)); // Separator line
+        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, UnoTheme.PANEL_COLOR)); // Separator line using
 
         // Left Side: Text
         final JPanel textPanel = new JPanel();
@@ -187,12 +174,17 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
         textPanel.setOpaque(false);
 
         final JLabel lblTitle = new JLabel(titleText);
-        lblTitle.setFont(new Font(FONT, Font.BOLD, LBL_TITLE_FONT_SIZE));
-        lblTitle.setForeground(TEXT_COLOR);
+        lblTitle.setFont(UnoTheme.BUTTON_FONT); // Using BUTTON_FONT (18 Bold) as it matches ~18px title
+        lblTitle.setForeground(UnoTheme.TEXT_COLOR);
 
         final JLabel lblDesc = new JLabel("<html><body style='width: 450px'>" + descText + "</body></html>");
-        lblDesc.setFont(new Font(FONT, Font.PLAIN, LBL_DESC_FONT_SIZE));
-        lblDesc.setForeground(DESC_COLOR);
+        // We probably need a small font for description, TEXT_FONT is 14, previous was
+        // 12.
+        // I'll stick to TEXT_FONT (14) for better readability or create a SMALL_FONT in
+        // theme later.
+        // For now allowing 14 is likely fine, or I can derive.
+        lblDesc.setFont(UnoTheme.TEXT_FONT.deriveFont(FONT_SIZE));
+        lblDesc.setForeground(UnoTheme.DESC_COLOR);
 
         textPanel.add(lblTitle);
         textPanel.add(Box.createRigidArea(TEXT_PANEL_RIGID_AREA));
@@ -210,40 +202,5 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
         panel.add(checkBox, BorderLayout.EAST);
 
         return panel;
-    }
-
-    /**
-     * Creates a styled button consistent with MenuScene.
-     * 
-     * @param text The button text.
-     * @return The styled JButton.
-     */
-    private JButton createStyledButton(final String text) {
-        final JButton button = new JButton(text) {
-            @Override
-            protected void paintComponent(final Graphics g) {
-                final Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                if (getModel().isRollover()) {
-                    g2.setColor(BUTTON_OVER_COLOR);
-                } else {
-                    g2.setColor(BUTTON_COLOR);
-                }
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), ARC, ARC);
-                super.paintComponent(g);
-                g2.dispose();
-            }
-        };
-        button.setFont(new Font(FONT, Font.BOLD, BUTTON_FONT_SIZE));
-        button.setForeground(BUTTON_TEXT_COLOR);
-        // button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(BUTTON_DIMENSION);
-        button.setPreferredSize(BUTTON_DIMENSION);
-        button.setBorder(BUTTON_BORDER);
-        button.setFocusPainted(false);
-        button.setContentAreaFilled(false);
-        button.setOpaque(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return button;
     }
 }

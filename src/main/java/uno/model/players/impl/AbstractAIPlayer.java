@@ -28,7 +28,8 @@ public abstract class AbstractAIPlayer extends AbstractPlayer {
      */
     @Override
     public void takeTurn(final Game game) {
-        // 1. Simulate "thinking" time (optional, handled by Thread/Timer in Controller usually)
+        // 1. Simulate "thinking" time (optional, handled by Thread/Timer in Controller
+        // usually)
 
         if (!game.getCurrentPlayer().equals(this)) {
             return;
@@ -57,18 +58,24 @@ public abstract class AbstractAIPlayer extends AbstractPlayer {
                 // if (isValid(drawnCard)) game.playCard(drawnCard);
                 // else game.playerPassTurn();
 
-                // For simplicity, let's assume the Controller calls AI again 
-                // or handles the post-draw logic. 
+                // For simplicity, let's assume the Controller calls AI again
+                // or handles the post-draw logic.
                 // If you need to handle it here, you need to re-evaluate the hand.
 
                 // Re-evaluate immediately after draw:
-                final Optional<Card> postDrawMove = chooseCardToPlay(game);
-                if (postDrawMove.isPresent()) {
-                    if (getHandSize() == 2) { // Will have 1 after playing
-                        hasCalledUno();
+                // But first, check if we are allowed to play after draw!
+                if (!game.getRules().isSkipAfterDrawEnabled()) {
+                    final Optional<Card> postDrawMove = chooseCardToPlay(game);
+                    if (postDrawMove.isPresent()) {
+                        if (getHandSize() == 2) { // Will have 1 after playing
+                            hasCalledUno();
+                        }
+                        game.playCard(postDrawMove);
+                    } else {
+                        game.aiAdvanceTurn();
                     }
-                    game.playCard(postDrawMove);
                 } else {
+                    // Rule enabled: must pass turn after drawing
                     game.aiAdvanceTurn();
                 }
             } else {
@@ -88,7 +95,8 @@ public abstract class AbstractAIPlayer extends AbstractPlayer {
      * Abstract Strategy: Each AI variant implements this differently.
      * 
      * @param game The current game state
-     * @return An Optional containing the chosen card, or empty if no valid move exists.
+     * @return An Optional containing the chosen card, or empty if no valid move
+     *         exists.
      */
     protected abstract Optional<Card> chooseCardToPlay(Game game);
 

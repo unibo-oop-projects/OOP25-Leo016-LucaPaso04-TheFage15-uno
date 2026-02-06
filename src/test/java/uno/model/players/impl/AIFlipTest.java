@@ -64,9 +64,10 @@ class AIFlipTest {
             );
         } else if (value == CardValue.DRAW_FIVE) {
             // Dark side power card
+            final int drawAmount = 5;
             return new DoubleSidedCard(
                     new NumericBehavior(CardColor.RED, CardValue.ONE), // Front dummy
-                    new WildBehavior(value, 5) // Back
+                    new WildBehavior(value, drawAmount) // Back
             );
         } else {
             return new DoubleSidedCard(
@@ -116,7 +117,7 @@ class AIFlipTest {
             final java.lang.reflect.Field field = GameImpl.class.getDeclaredField("currentPlayedCard");
             field.setAccessible(true);
             field.set(game, dummyCard);
-        } catch (ReflectiveOperationException e) {
+        } catch (final ReflectiveOperationException e) {
             org.junit.jupiter.api.Assertions.fail("Reflection failed: " + e.getMessage());
         }
 

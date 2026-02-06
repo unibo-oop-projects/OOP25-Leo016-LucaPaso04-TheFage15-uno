@@ -5,16 +5,13 @@ import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.GameState;
 import uno.model.players.impl.AbstractAIPlayer;
-import uno.model.players.impl.HumanPlayer;
 import uno.model.players.api.AbstractPlayer;
 import uno.view.scenes.impl.MenuSceneImpl;
 import uno.model.game.api.Game;
 import uno.view.scenes.api.GameScene;
 import uno.view.api.GameFrame;
-import uno.model.utils.api.GameLogger;
+import uno.model.players.impl.HumanPlayer;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,12 +27,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class GameControllerImpl implements GameController {
 
     private static final int AI_DELAY = 5000;
-    private static final int DIALOG_DELAY = 3000;
 
     private final Game gameModel;
     private final GameScene gameScene;
     private final GameFrame mainFrame;
-    private final GameLogger logger;
 
     private Optional<Timer> aiTimer = Optional.empty();
 
@@ -45,17 +40,14 @@ public class GameControllerImpl implements GameController {
      * @param gameModel model
      * @param gameScene scene
      * @param mainFrame frame
-     * @param logger logger
      */
-    @SuppressFBWarnings(
-    value = "EI_EXPOSE_REP2",
-    justification = "Il controller deve operare sulle istanze condivise di Model e View (MVC Pattern)")
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", 
+        justification = "Il controller deve operare sulle istanze condivise di Model e View (MVC Pattern)")
     public GameControllerImpl(final Game gameModel, final GameScene gameScene,
-            final GameFrame mainFrame, final GameLogger logger) {
+            final GameFrame mainFrame) {
         this.gameModel = gameModel;
         this.gameScene = gameScene;
         this.mainFrame = mainFrame;
-        this.logger = logger;
 
         this.gameModel.addObserver(this);
     }
@@ -67,30 +59,11 @@ public class GameControllerImpl implements GameController {
     public void showStartingPlayerPopupAndStartGame() {
         // 1. Otteniamo il giocatore che inizia (scelto a caso dal TurnManager)
         final AbstractPlayer startingPlayer = gameModel.getCurrentPlayer();
-        final String msg = "Inizia: " + startingPlayer.getName();
 
-        // 2. Creiamo il pannello del messaggio
-        final JOptionPane pane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE);
+        // 2. Usiamo la View per mostrare il popup
+        gameScene.showStartingPlayer(startingPlayer.getName());
 
-        // 3. Creiamo il Dialog (modale = blocca il codice)
-        final JDialog dialog = pane.createDialog((javax.swing.JPanel) gameScene, "Inizio Partita");
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // Impedisce la chiusura manuale
-
-        // 4. Creiamo un Thread per chiudere il dialog dopo 3 secondi
-        new Thread(() -> {
-            try {
-                Thread.sleep(DIALOG_DELAY);
-            } catch (final InterruptedException e) {
-                logger.logAction("ERROR", "EXCEPTION_CAUGHT", e.getClass().getSimpleName(), e.getMessage());
-            }
-            dialog.dispose(); // Chiude il dialog e sblocca il codice qui sotto
-        }).start();
-
-        // 5. Mostriamo il dialog. Il codice SI FERMA QUI finché il dialog non si
-        // chiude.
-        dialog.setVisible(true);
-
-        // 6. ORA che il popup è sparito, facciamo partire il gioco
+        // 3. Facciamo partire il gioco
         onGameUpdate();
     }
 
@@ -185,10 +158,7 @@ public class GameControllerImpl implements GameController {
             gameModel.playCard(card);
         } catch (final IllegalStateException e) {
             // Mostra un errore se la mossa non è valida
-            JOptionPane.showMessageDialog((javax.swing.JPanel) gameScene,
-                    e.getMessage(),
-                    "Carta non giocabile!",
-                    JOptionPane.ERROR_MESSAGE);
+            gameScene.showError(e.getMessage(), "Carta non giocabile!");
         }
     }
 
@@ -201,10 +171,7 @@ public class GameControllerImpl implements GameController {
             // Chiama il nuovo metodo con la logica di validazione
             gameModel.playerInitiatesDraw();
         } catch (final IllegalStateException e) {
-            JOptionPane.showMessageDialog((javax.swing.JPanel) gameScene,
-                    e.getMessage(), // Messaggio d'errore (es. "Hai già pescato")
-                    "Non puoi pescare!",
-                    JOptionPane.ERROR_MESSAGE);
+            gameScene.showError(e.getMessage(), "Non puoi pescare!");
         }
     }
 
@@ -216,10 +183,7 @@ public class GameControllerImpl implements GameController {
         try {
             gameModel.callUno(gameModel.getPlayers().getFirst());
         } catch (final IllegalStateException e) {
-            JOptionPane.showMessageDialog((javax.swing.JPanel) gameScene,
-                    e.getMessage(), // Messaggio d'errore (es. "Non puoi chiamare UNO ora")
-                    "Non puoi chiamare UNO!",
-                    JOptionPane.ERROR_MESSAGE);
+            gameScene.showError(e.getMessage(), "Non puoi chiamare UNO!");
         }
     }
 
@@ -229,13 +193,7 @@ public class GameControllerImpl implements GameController {
     @Override
     public void onBackToMenu() {
         // Logica per tornare al menu
-        final int choice = JOptionPane.showConfirmDialog(
-                (javax.swing.JPanel) gameScene,
-                "Sei sicuro di voler tornare al menu? La partita sarà persa.",
-                "Torna al Menu",
-                JOptionPane.YES_NO_OPTION);
-
-        if (choice == JOptionPane.YES_OPTION) {
+        if (gameScene.confirmExit()) {
             // Ricrea il controller e la scena del menu
             final MenuControllerImpl menuController = new MenuControllerImpl(mainFrame);
             final MenuSceneImpl menuScene = new MenuSceneImpl();
@@ -252,10 +210,7 @@ public class GameControllerImpl implements GameController {
         try {
             gameModel.playerPassTurn();
         } catch (final IllegalStateException e) {
-            JOptionPane.showMessageDialog((javax.swing.JPanel) gameScene,
-                    e.getMessage(), // Messaggio (es. "Non puoi passare se non hai pescato")
-                    "Non puoi passare!",
-                    JOptionPane.ERROR_MESSAGE);
+            gameScene.showError(e.getMessage(), "Non puoi passare!");
         }
     }
 

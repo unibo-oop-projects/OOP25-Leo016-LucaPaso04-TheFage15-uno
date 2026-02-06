@@ -6,14 +6,15 @@ import uno.model.cards.types.api.Card;
 import uno.model.game.impl.DiscardPileImpl;
 import uno.model.game.impl.TurnManagerImpl;
 import uno.model.players.api.AbstractPlayer;
-import uno.view.api.GameModelObserver;
+import uno.model.api.GameModelObserver;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Main interface for the UNO Game Model.
- * It maintains the game state, orchestrates turn flow, and manages rules execution.
+ * It maintains the game state, orchestrates turn flow, and manages rules
+ * execution.
  * Following the Observer Pattern, it notifies the View of any state changes.
  */
 public interface Game {
@@ -30,7 +31,7 @@ public interface Game {
      */
     void notifyObservers();
 
-    /** 
+    /**
      * Processes a player's attempt to play a card.
      * 
      * @param card The card the player wishes to play.
@@ -98,7 +99,8 @@ public interface Game {
     void requestColorChoice();
 
     /**
-     * Requests the current player to choose another player (for 'Wild Draw Player' cards).
+     * Requests the current player to choose another player (for 'Wild Draw Player'
+     * cards).
      */
     void requestPlayerChoice();
 
@@ -110,7 +112,8 @@ public interface Game {
     void drawCardForPlayer(AbstractPlayer player);
 
     /**
-     * Causes the next player to draw cards until they pick one of the specified color.
+     * Causes the next player to draw cards until they pick one of the specified
+     * color.
      * 
      * @param color The color that the next player must draw until they find.
      */
@@ -182,7 +185,8 @@ public interface Game {
     /**
      * Gets the winner of the game, if there is one.
      * 
-     * @return The winning {@link AbstractPlayer}, or null if the game is still ongoing.
+     * @return The winning {@link AbstractPlayer}, or null if the game is still
+     *         ongoing.
      */
     AbstractPlayer getWinner();
 
@@ -221,11 +225,18 @@ public interface Game {
     void aiAdvanceTurn();
 
     /**
+     * Gets the rules currently active in the game.
+     * 
+     * @return The {@link GameRules} object.
+     */
+    GameRules getRules();
+
+    /**
      * Logs a system action for auditing or debugging purposes.
      * 
-     * @param actionType The type of action being logged.
+     * @param actionType  The type of action being logged.
      * @param cardDetails Details about the card involved in the action.
-     * @param extraInfo Any additional information relevant to the action.
+     * @param extraInfo   Any additional information relevant to the action.
      */
     void logSystemAction(String actionType, String cardDetails, String extraInfo);
 }

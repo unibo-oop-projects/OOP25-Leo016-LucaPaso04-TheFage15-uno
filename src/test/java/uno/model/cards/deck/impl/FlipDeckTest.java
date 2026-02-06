@@ -80,7 +80,7 @@ class FlipDeckTest {
         assertEquals(DECK_SIZE, allCards.size());
 
         // 1. Verifica Carte Colorate Standard (Light Side: Rosso, Blu, Verde, Giallo)
-        final CardColor[] lightColors = { CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
+        final CardColor[] lightColors = {CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
 
         for (final CardColor color : lightColors) {
             final long count = allCards.stream()

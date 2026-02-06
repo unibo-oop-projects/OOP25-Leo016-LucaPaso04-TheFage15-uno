@@ -112,8 +112,10 @@ class AIAllWildTest {
         aiHand.add(Optional.of(createWildCard(CardValue.WILD_FORCED_SWAP))); // Swap
         aiAllWild.setHand(aiHand);
 
+        final int oppHandSize = 5;
+
         final List<Optional<Card>> oppHand = new LinkedList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < oppHandSize; i++) {
             oppHand.add(Optional.of(createWildCard(CardValue.WILD)));
         }
         opponent.setHand(oppHand);

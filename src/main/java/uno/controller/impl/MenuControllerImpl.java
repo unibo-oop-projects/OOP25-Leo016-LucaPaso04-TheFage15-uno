@@ -1,44 +1,36 @@
 package uno.controller.impl;
 
 import uno.controller.api.MenuController;
-import uno.model.cards.deck.impl.AllWildDeck;
-import uno.model.cards.deck.impl.FlipDeck;
-import uno.model.cards.deck.impl.StandardDeck;
-import uno.model.game.impl.GameImpl;
-import uno.model.game.impl.GameSetupImpl;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIAllWild;
 import uno.model.players.impl.AIClassic;
 import uno.model.players.impl.AIFlip;
 import uno.model.players.impl.HumanPlayer;
-import uno.model.utils.api.GameLogger;
-import uno.model.utils.impl.GameLoggerImpl;
 import uno.view.scenes.impl.GameSceneImpl;
+import uno.view.scenes.impl.MenuSceneImpl;
 import uno.view.scenes.impl.RulesSceneImpl;
-import uno.model.cards.deck.api.Deck;
-import uno.model.cards.types.api.Card;
 import uno.model.game.api.Game;
-import uno.model.game.api.GameSetup;
-import uno.controller.api.GameController;
-import uno.view.scenes.api.GameScene;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
 import uno.view.api.GameFrame;
 
+import uno.model.game.impl.GameFactoryImpl;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Concrete implementation of the MenuController.
  * It manages the transitions from the Menu Scene to the Game Scene based on
- * user selection.
+ * user selection, and handles Rules configuration.
  */
 public class MenuControllerImpl implements MenuController {
 
-    private static final boolean IS_ALL_WILD = true;
     private static final String HUMAN_NAME = "Giocatore 1";
     private static final String AI_ONE_NAME = "IA-1";
     private static final String AI_TWO_NAME = "IA-2";
     private static final String AI_THREE_NAME = "IA-3";
     private final GameFrame frame;
+    private GameRules currentRules;
 
     /**
      * Constructor for MenuControllerImpl.
@@ -48,6 +40,7 @@ public class MenuControllerImpl implements MenuController {
     @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("EI_EXPOSE_REP2")
     public MenuControllerImpl(final GameFrame frame) {
         this.frame = frame;
+        this.currentRules = GameRulesImpl.defaultRules();
     }
 
     /**
@@ -55,43 +48,7 @@ public class MenuControllerImpl implements MenuController {
      */
     @Override
     public void onStartClassicGame() {
-        // --- IMPOSTAZIONE DELLA PARTITA ---
-
-        // 1. Crea i giocatori
-        final List<AbstractPlayer> players = new ArrayList<>();
-        players.add(new HumanPlayer(HUMAN_NAME)); // Giocatore umano
-        players.add(new AIClassic(AI_ONE_NAME)); // Avversario
-        players.add(new AIClassic(AI_TWO_NAME));
-        players.add(new AIClassic(AI_THREE_NAME));
-        // puoi aggiungere altri giocatori qui...
-
-        // 2. Crea il Model (Mazzo e Partita)
-        final GameLogger logger = new GameLoggerImpl(String.valueOf(System.currentTimeMillis()));
-        final StandardDeck deck = new StandardDeck(logger);
-        final GameImpl gameModel = new GameImpl(deck, players, "CLASSIC", logger);
-
-        // 3. Esegui il setup (distribuisci carte, gira la prima carta)
-        // Questo popola le mani dei giocatori e la pila degli scarti.
-        final GameSetupImpl setup = new GameSetupImpl(
-                gameModel,
-                deck,
-                gameModel.getDiscardPile(),
-                players);
-        setup.initializeGame(!IS_ALL_WILD);
-
-        // 4. Crea la View del Gioco (GameScene)
-        final GameSceneImpl gameScene = new GameSceneImpl(gameModel);
-
-        // 5. Crea il Controller del Gioco
-        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame, logger);
-
-        // 6. Collega la Scena al suo Controller
-        gameScene.setObserver(gameController);
-
-        // 7. Mostra la nuova scena
-        frame.showScene(gameScene);
-
-        gameController.showStartingPlayerPopupAndStartGame();
+        startGame("CLASSIC");
     }
 
     /**
@@ -99,43 +56,7 @@ public class MenuControllerImpl implements MenuController {
      */
     @Override
     public void onStartFlipGame() {
-        // --- IMPOSTAZIONE DELLA PARTITA ---
-
-        // 1. Crea i giocatori
-        final List<AbstractPlayer> players = new ArrayList<>();
-        players.add(new HumanPlayer(HUMAN_NAME)); // Giocatore umano
-        players.add(new AIFlip(AI_ONE_NAME)); // Avversario
-        players.add(new AIFlip(AI_TWO_NAME));
-        players.add(new AIFlip(AI_THREE_NAME));
-        // puoi aggiungere altri giocatori qui...
-
-        // 2. Crea il Model (Mazzo e Partita)
-        final GameLogger logger = new GameLoggerImpl(String.valueOf(System.currentTimeMillis()));
-        final Deck<Card> deck = new FlipDeck(logger);
-        final Game gameModel = new GameImpl(deck, players, "FLIP", logger);
-
-        // 3. Esegui il setup (distribuisci carte, gira la prima carta)
-        // Questo popola le mani dei giocatori e la pila degli scarti.
-        final GameSetup setup = new GameSetupImpl(
-                gameModel,
-                deck,
-                gameModel.getDiscardPile(),
-                players);
-        setup.initializeGame(!IS_ALL_WILD);
-
-        // 4. Crea la View del Gioco (GameScene)
-        final GameScene gameScene = new GameSceneImpl(gameModel);
-
-        // 5. Crea il Controller del Gioco
-        final GameController gameController = new GameControllerImpl(gameModel, gameScene, frame, logger);
-
-        // 6. Collega la Scena al suo Controller
-        gameScene.setObserver(gameController);
-
-        // 7. Mostra la nuova scena
-        frame.showScene((javax.swing.JPanel) gameScene);
-
-        gameController.showStartingPlayerPopupAndStartGame();
+        startGame("FLIP");
     }
 
     /**
@@ -143,43 +64,56 @@ public class MenuControllerImpl implements MenuController {
      */
     @Override
     public void onStartAllWildGame() {
-        // --- IMPOSTAZIONE DELLA PARTITA ---
+        startGame("ALL_WILD");
+    }
 
+    private void startGame(final String gameMode) {
         // 1. Crea i giocatori
-        final List<AbstractPlayer> players = new ArrayList<>();
-        players.add(new HumanPlayer(HUMAN_NAME)); // Giocatore umano
-        players.add(new AIAllWild(AI_ONE_NAME)); // Avversario
-        players.add(new AIAllWild(AI_TWO_NAME));
-        players.add(new AIAllWild(AI_THREE_NAME));
-        // puoi aggiungere altri giocatori qui...
+        final List<AbstractPlayer> players = createPlayers(gameMode);
 
-        // 2. Crea il Model (Mazzo e Partita)
-        final GameLogger logger = new GameLoggerImpl(String.valueOf(System.currentTimeMillis()));
-        final AllWildDeck deck = new AllWildDeck(logger);
-        final GameImpl gameModel = new GameImpl(deck, players, "ALL_WILD", logger);
+        // 2. Crea la Factory e il Gioco
+        // La factory gestisce Deck, GameImpl e Setup
+        final GameFactoryImpl factory = new GameFactoryImpl(currentRules);
+        final Game gameModel = factory.createGame(HUMAN_NAME, gameMode, players);
 
-        // 3. Esegui il setup (distribuisci carte, gira la prima carta)
-        // Questo popola le mani dei giocatori e la pila degli scarti.
-        final GameSetupImpl setup = new GameSetupImpl(
-                gameModel,
-                deck,
-                gameModel.getDiscardPile(),
-                players);
-        setup.initializeGame(IS_ALL_WILD);
-
-        // 4. Crea la View del Gioco (GameScene)
+        // 3. Crea la View del Gioco (GameScene)
         final GameSceneImpl gameScene = new GameSceneImpl(gameModel);
 
-        // 5. Crea il Controller del Gioco
-        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame, logger);
+        // 4. Crea il Controller del Gioco
+        // Use factory.getLogger() to share the logger
+        final GameControllerImpl gameController = new GameControllerImpl(gameModel, gameScene, frame);
 
-        // 6. Collega la Scena al suo Controller
+        // 5. Collega la Scena al suo Controller
         gameScene.setObserver(gameController);
 
-        // 7. Mostra la nuova scena
+        // 6. Mostra la nuova scena
         frame.showScene(gameScene);
 
         gameController.showStartingPlayerPopupAndStartGame();
+    }
+
+    private List<AbstractPlayer> createPlayers(final String gameMode) {
+        final List<AbstractPlayer> players = new ArrayList<>();
+        players.add(new HumanPlayer(HUMAN_NAME)); // Giocatore umano
+
+        switch (gameMode) {
+            case "FLIP":
+                players.add(new AIFlip(AI_ONE_NAME));
+                players.add(new AIFlip(AI_TWO_NAME));
+                players.add(new AIFlip(AI_THREE_NAME));
+                break;
+            case "ALL_WILD":
+                players.add(new AIAllWild(AI_ONE_NAME));
+                players.add(new AIAllWild(AI_TWO_NAME));
+                players.add(new AIAllWild(AI_THREE_NAME));
+                break;
+            default: // Classic
+                players.add(new AIClassic(AI_ONE_NAME));
+                players.add(new AIClassic(AI_TWO_NAME));
+                players.add(new AIClassic(AI_THREE_NAME));
+                break;
+        }
+        return players;
     }
 
     /**
@@ -196,7 +130,27 @@ public class MenuControllerImpl implements MenuController {
      */
     @Override
     public void onOpenRules() {
-        final RulesSceneImpl rulesScene = new RulesSceneImpl();
+        final RulesSceneImpl rulesScene = new RulesSceneImpl(currentRules);
+        rulesScene.setObserver(this);
         frame.showScene(rulesScene);
+    }
+
+    /**
+     * Handles saving the custom rules.
+     */
+    @Override
+    public void onSaveRules(final GameRules rules) {
+        this.currentRules = rules;
+    }
+
+    /**
+     * Handles returning to the main menu.
+     */
+    @Override
+    public void onBackToMenu() {
+        // Re-create the Menu Scene (stateless usually)
+        final MenuSceneImpl menuScene = new MenuSceneImpl();
+        menuScene.setObserver(this);
+        frame.showScene(menuScene);
     }
 }

@@ -85,7 +85,7 @@ class StandardDeckTest {
         }
 
         // 1. Verifichiamo le carte colorate standard (100 carte totali: 25 x 4)
-        final CardColor[] standardColors = { CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
+        final CardColor[] standardColors = {CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
 
         for (final CardColor color : standardColors) {
             final long count = allCards.stream()

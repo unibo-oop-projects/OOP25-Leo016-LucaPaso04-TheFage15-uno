@@ -7,7 +7,6 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 
 import uno.model.cards.attributes.CardColor;
 import uno.model.cards.attributes.CardValue;
@@ -23,6 +22,9 @@ import uno.model.game.api.Game;
 import uno.model.utils.api.GameLogger;
 
 import java.util.Locale;
+
+import uno.model.cards.dto.CardSide;
+import uno.model.cards.dto.DoubleSidedEntryDTO;
 
 /**
  * Represents the UNO Flip deck (112 cards).
@@ -57,10 +59,10 @@ public class FlipDeck extends AbstractDeckImpl<Card> {
         try (InputStream is = FlipDeck.class.getResourceAsStream(RESOURCE_PATH)) {
 
             try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                // Parse JSON array into Mapping objects
-                final Mapping[] mappings = gson.fromJson(reader, Mapping[].class);
+                // Parse JSON array into DoubleSidedEntryDTO objects
+                final DoubleSidedEntryDTO[] mappings = gson.fromJson(reader, DoubleSidedEntryDTO[].class);
 
-                for (final Mapping mapping : mappings) {
+                for (final DoubleSidedEntryDTO mapping : mappings) {
                     // Generates the card(s) based on the mapping count
                     addCardMappingToDeck(mapping);
                 }
@@ -76,22 +78,22 @@ public class FlipDeck extends AbstractDeckImpl<Card> {
      * 
      * @param mapping The mapping defining light and dark sides and count.
      */
-    private void addCardMappingToDeck(final Mapping mapping) {
-        // 1. Create Data Objects (Faces)
-        final CardFace lightFace = new CardFace(
-                CardColor.valueOf(mapping.light.color.toUpperCase(Locale.ROOT)),
-                CardValue.valueOf(mapping.light.value.toUpperCase(Locale.ROOT)));
+    private void addCardMappingToDeck(final DoubleSidedEntryDTO mapping) {
+        // 1. Create Data Objects (Faces) locally
+        final CardSide lightFace = new CardSide(
+                CardColor.valueOf(mapping.getLight().getColor().toUpperCase(Locale.ROOT)),
+                CardValue.valueOf(mapping.getLight().getValue().toUpperCase(Locale.ROOT)));
 
-        final CardFace darkFace = new CardFace(
-                CardColor.valueOf(mapping.dark.color.toUpperCase(Locale.ROOT)),
-                CardValue.valueOf(mapping.dark.value.toUpperCase(Locale.ROOT)));
+        final CardSide darkFace = new CardSide(
+                CardColor.valueOf(mapping.getDark().getColor().toUpperCase(Locale.ROOT)),
+                CardValue.valueOf(mapping.getDark().getValue().toUpperCase(Locale.ROOT)));
 
         // 2. Create Behaviors (Logic)
         final CardSideBehavior lightBehavior = createBehavior(lightFace);
         final CardSideBehavior darkBehavior = createBehavior(darkFace);
 
         // 3. Add copies to the deck based on 'count'
-        final int quantity = (mapping.count > 0) ? mapping.count : 1; // Default to 1 if missing
+        final int quantity = (mapping.getCount() > 0) ? mapping.getCount() : 1; // Default to 1 if missing
 
         for (int i = 0; i < quantity; i++) {
             final Card card = new DoubleSidedCard(lightBehavior, darkBehavior);
@@ -100,15 +102,15 @@ public class FlipDeck extends AbstractDeckImpl<Card> {
     }
 
     /**
-     * Factory method: Converts raw Card Data (Face) into Executable Logic
+     * Factory method: Converts raw Card Data (Side) into Executable Logic
      * (Behavior).
      * 
-     * @param face The card face data (color and value).
+     * @param side The card side data (color and value).
      * @return The corresponding CardSideBehavior instance.
      */
-    private CardSideBehavior createBehavior(final CardFace face) {
-        final CardColor c = face.color();
-        final CardValue v = face.value();
+    private CardSideBehavior createBehavior(final CardSide side) {
+        final CardColor c = side.color();
+        final CardValue v = side.value();
 
         // --- A. WILD CARDS ---
         if (c == CardColor.WILD) {
@@ -155,30 +157,5 @@ public class FlipDeck extends AbstractDeckImpl<Card> {
             default:
                 return new NumericBehavior(c, v);
         }
-    }
-
-    // =========================================================================
-    // DTOs (Data Transfer Objects) for JSON Parsing
-    // =========================================================================
-
-    // Simple Record or Class to hold color/value pair temporarily
-    private record CardFace(CardColor color, CardValue value) {
-
-    }
-
-    private static final class CardConfig {
-        @SerializedName("color")
-        private String color;
-        @SerializedName("value")
-        private String value;
-    }
-
-    private static final class Mapping {
-        @SerializedName("light")
-        private CardConfig light;
-        @SerializedName("dark")
-        private CardConfig dark;
-        @SerializedName("count")
-        private int count;
     }
 }
