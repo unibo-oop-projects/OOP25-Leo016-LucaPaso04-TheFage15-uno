@@ -3,6 +3,8 @@ package uno.view.components.impl;
 import uno.controller.api.GameViewObserver;
 import uno.model.cards.attributes.CardColor;
 import uno.view.components.api.ColorChooserPanel;
+import uno.view.style.UnoTheme;
+
 import java.util.Optional;
 
 import javax.swing.SwingUtilities;
@@ -12,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Window;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -29,20 +30,7 @@ public final class ColorChooserPanelImpl extends JPanel implements ActionListene
 
     private static final long serialVersionUID = 1L;
 
-    private static final Color PANEL_BACKGROUND = new Color(50, 50, 50);
-    private static final Color TITLE_TEXT_COLOR = Color.WHITE;
-    private static final Font UI_FONT = new Font("Arial", Font.BOLD, 14);
-    private static final Dimension PANEL_SIZE = new Dimension(220, 150);
-
-    private static final Color PINK_COLOR = new Color(255, 105, 180);
-    private static final Color TEAL_COLOR = new Color(0, 128, 128);
-    private static final Color ORANGE_COLOR = new Color(255, 140, 0);
-    private static final Color PURPLE_COLOR = new Color(153, 50, 204);
-
-    private static final Color RED_COLOR = new Color(211, 47, 47);
-    private static final Color GREEN_COLOR = new Color(76, 175, 80);
-    private static final Color BLUE_COLOR = new Color(33, 150, 243);
-    private static final Color YELLOW_COLOR = new Color(255, 235, 59);
+    private static final Dimension PANEL_SIZE = new Dimension(400, 300);
 
     private final Optional<GameViewObserver> observer;
 
@@ -58,11 +46,11 @@ public final class ColorChooserPanelImpl extends JPanel implements ActionListene
 
         // 2 rows, 2 columns with 10px gap
         setLayout(new GridLayout(2, 2, 10, 10));
-        setBackground(PANEL_BACKGROUND);
+        setBackground(UnoTheme.PANEL_COLOR);
 
         setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(), "Pick a Color",
-                TitledBorder.LEFT, TitledBorder.TOP, UI_FONT, TITLE_TEXT_COLOR));
+                TitledBorder.LEFT, TitledBorder.TOP, UnoTheme.TEXT_FONT, UnoTheme.TEXT_COLOR));
 
         // 1. Determine which colors to display
         final List<CardColor> colorsToOffer = isDarkSide
@@ -85,27 +73,24 @@ public final class ColorChooserPanelImpl extends JPanel implements ActionListene
      */
     private void setupButtonForColor(final CardColor colorEnum, final boolean isDarkSide) {
         final Color bgColor;
-        Color fgColor = Color.WHITE; // Default text
         final String label;
 
         if (isDarkSide) {
             switch (colorEnum) {
                 case PINK:
-                    bgColor = PINK_COLOR;
-                    fgColor = Color.BLACK;
+                    bgColor = UnoTheme.PINK_COLOR;
                     label = "PINK";
                     break;
                 case TEAL:
-                    bgColor = TEAL_COLOR;
+                    bgColor = UnoTheme.TEAL_COLOR;
                     label = "TEAL";
                     break;
                 case ORANGE:
-                    bgColor = ORANGE_COLOR;
-                    fgColor = Color.BLACK;
+                    bgColor = UnoTheme.ORANGE_COLOR;
                     label = "ORANGE";
                     break;
                 case PURPLE:
-                    bgColor = PURPLE_COLOR;
+                    bgColor = UnoTheme.PURPLE_COLOR;
                     label = "PURPLE";
                     break;
                 default:
@@ -114,20 +99,19 @@ public final class ColorChooserPanelImpl extends JPanel implements ActionListene
         } else {
             switch (colorEnum) {
                 case RED:
-                    bgColor = RED_COLOR;
+                    bgColor = UnoTheme.BUTTON_COLOR; // Using standard red
                     label = "RED";
                     break;
                 case GREEN:
-                    bgColor = GREEN_COLOR;
+                    bgColor = UnoTheme.GREEN_COLOR;
                     label = "GREEN";
                     break;
                 case BLUE:
-                    bgColor = BLUE_COLOR;
+                    bgColor = UnoTheme.BLUE_COLOR;
                     label = "BLUE";
                     break;
                 case YELLOW:
-                    bgColor = YELLOW_COLOR;
-                    fgColor = Color.BLACK;
+                    bgColor = UnoTheme.YELLOW_COLOR;
                     label = "YELLOW";
                     break;
                 default:
@@ -135,17 +119,22 @@ public final class ColorChooserPanelImpl extends JPanel implements ActionListene
             }
         }
 
-        add(createButton(label, bgColor, fgColor, colorEnum));
+        // Create Styled Button with specific color and hover effect
+        // For hover, we just make it slightly brighter or same for now to keep simple
+        add(createButton(label, bgColor, colorEnum));
     }
 
-    private JButton createButton(final String text, final Color bg, final Color fg, final CardColor colorEnum) {
-        final JButton btn = new JButton(text);
-        btn.setFont(UI_FONT);
-        btn.setBackground(bg);
-        btn.setForeground(fg);
-        btn.setOpaque(true);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
+    private JButton createButton(final String text, final Color bg, final CardColor colorEnum) {
+        // Create StyledButton with custom background and a derived hover color
+        // (brighter)
+        final StyledButtonImpl btn = new StyledButtonImpl(text, bg, bg.brighter());
+
+        // Ensure text is readable (Black for Yellow/Pink/Orange, White for others)
+        if (bg.equals(UnoTheme.YELLOW_COLOR) || bg.equals(UnoTheme.PINK_COLOR) || bg.equals(UnoTheme.ORANGE_COLOR)) {
+            btn.setForeground(Color.BLACK);
+        } else {
+            btn.setForeground(Color.WHITE);
+        }
 
         btn.setActionCommand(colorEnum.name());
         btn.addActionListener(this);

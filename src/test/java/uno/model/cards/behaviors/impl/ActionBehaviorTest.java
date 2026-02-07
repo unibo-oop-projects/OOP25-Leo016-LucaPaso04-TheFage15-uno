@@ -24,6 +24,13 @@ import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
 import uno.model.utils.api.GameLogger;
 
+import uno.model.game.api.DiscardPile;
+import uno.model.game.impl.DiscardPileImpl;
+import uno.model.game.api.TurnManager;
+import uno.model.game.impl.TurnManagerImpl;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
+
 /**
  * Test class for verification of Card Behaviors using the Strategy Pattern.
  * Uses a MockGame to intercept and verify calls made by the behaviors.
@@ -47,7 +54,10 @@ class ActionBehaviorTest {
         players.add(aiClassic2);
         final Deck<Card> deck = new StandardDeck(logger);
 
-        game = new GameImpl(deck, players, "CLASSIC", logger);
+        final GameRules rules = new GameRulesImpl(false, false, false);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, turnManager, discardPile, "CLASSIC", logger, rules);
 
         final GameSetupImpl setup = new GameSetupImpl(
                 game,

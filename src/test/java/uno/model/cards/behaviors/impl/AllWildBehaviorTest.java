@@ -21,6 +21,13 @@ import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIAllWild;
 import uno.model.utils.api.GameLogger;
 
+import uno.model.game.api.DiscardPile;
+import uno.model.game.impl.DiscardPileImpl;
+import uno.model.game.api.TurnManager;
+import uno.model.game.impl.TurnManagerImpl;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
+
 class AllWildBehaviorTest {
 
     private Game game;
@@ -43,7 +50,10 @@ class AllWildBehaviorTest {
 
         final AllWildDeck deck = new AllWildDeck(logger);
 
-        game = new GameImpl(deck, players, "ALLWILD", logger);
+        final GameRules rules = new GameRulesImpl(false, false, false);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, turnManager, discardPile, "ALLWILD", logger, rules);
 
         final GameSetupImpl setup = new GameSetupImpl(
                 game,

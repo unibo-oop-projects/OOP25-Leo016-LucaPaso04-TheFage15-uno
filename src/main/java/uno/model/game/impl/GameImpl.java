@@ -49,38 +49,27 @@ public class GameImpl implements Game {
     private boolean isDarkSide;
 
     /**
-     * Constructor for GameImpl with default rules.
-     * 
-     * @param deck     deck of cards
-     * @param players  list of players
-     * @param gameMode game mode
-     * @param logger   logger
-     */
-    public GameImpl(final Deck<Card> deck, final List<AbstractPlayer> players, final String gameMode,
-            final GameLogger logger) {
-        this(deck, players, gameMode, logger, GameRulesImpl.defaultRules());
-    }
-
-    /**
      * Constructor for GameImpl with custom rules.
      * 
-     * @param deck     deck of cards
-     * @param players  list of players
-     * @param gameMode game mode
-     * @param logger   logger
-     * @param rules    game rules
+     * @param deck        deck of cards
+     * @param players     list of players
+     * @param turnManager turn manager
+     * @param discardPile discard pile
+     * @param gameMode    game mode
+     * @param logger      logger
+     * @param rules       game rules
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public GameImpl(final Deck<Card> deck, final List<AbstractPlayer> players, final String gameMode,
+    public GameImpl(final Deck<Card> deck, final List<AbstractPlayer> players, final TurnManager turnManager,
+            final DiscardPile discardPile, final String gameMode,
             final GameLogger logger, final GameRules rules) {
         this.drawDeck = deck;
         this.players = new ArrayList<>(players);
         this.logger = logger;
         this.rules = rules;
         this.winner = null;
-        this.discardPile = new DiscardPileImpl();
-
-        this.turnManager = new TurnManagerImpl(players, rules);
+        this.discardPile = discardPile;
+        this.turnManager = turnManager;
 
         this.currentState = GameState.RUNNING;
         this.currentColor = Optional.empty();
@@ -503,7 +492,7 @@ public class GameImpl implements Game {
         this.currentColor = Optional.of(this.currentPlayedCard.getColor(this));
 
         if (this.currentColor.get() == CardColor.WILD) {
-            final CardColor[] coloredValues = {CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
+            final CardColor[] coloredValues = { CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
             final CardColor chosenColor = coloredValues[RANDOM.nextInt(coloredValues.length)];
 
             this.currentColor = Optional.of(chosenColor);

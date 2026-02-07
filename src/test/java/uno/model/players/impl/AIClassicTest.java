@@ -27,6 +27,12 @@ import uno.model.game.impl.GameImpl;
 import uno.model.game.impl.GameSetupImpl;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
+import uno.model.game.api.DiscardPile;
+import uno.model.game.impl.DiscardPileImpl;
+import uno.model.game.api.TurnManager;
+import uno.model.game.impl.TurnManagerImpl;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
 
 class AIClassicTest {
 
@@ -43,7 +49,11 @@ class AIClassicTest {
 
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
         final Deck<Card> deck = new StandardDeck(logger);
-        game = new GameImpl(deck, players, "CLASSIC", logger);
+
+        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, turnManager, discardPile, "CLASSIC", logger, rules);
 
         // 3. Esegui il setup (distribuisci carte, gira la prima carta)
         // Questo popola le mani dei giocatori e la pila degli scarti.

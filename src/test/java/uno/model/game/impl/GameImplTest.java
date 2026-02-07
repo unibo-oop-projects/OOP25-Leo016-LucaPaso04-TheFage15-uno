@@ -16,6 +16,9 @@ import uno.model.cards.behaviors.impl.NumericBehavior;
 import uno.model.cards.behaviors.impl.BackSideBehavior;
 import uno.model.cards.types.impl.DoubleSidedCard;
 
+import uno.model.game.api.DiscardPile;
+import uno.model.game.api.TurnManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +45,9 @@ class GameImplTest {
     void testSkipAfterDrawEnabled() {
         // Rule: Skip After Draw = TRUE
         final GameRules rules = new GameRulesImpl(true, true, false);
-        final GameImpl game = new GameImpl(deck, players, GAME_MODE, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
         final GameSetupImpl setup = new GameSetupImpl(game, deck, game.getDiscardPile(), players);
         setup.initializeGame(false);
 
@@ -68,7 +73,9 @@ class GameImplTest {
     void testUnoPenaltyDisabled() {
         // Rule: Uno Penalty = FALSE
         final GameRules rules = new GameRulesImpl(false, false, false);
-        final GameImpl game = new GameImpl(deck, players, GAME_MODE, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
         final GameSetupImpl setup = new GameSetupImpl(game, deck, game.getDiscardPile(), players);
         setup.initializeGame(false);
 
@@ -96,8 +103,11 @@ class GameImplTest {
     void testNoReshuffleRule() {
         // Rule: Mandatory Pass / No Reshuffle = TRUE
         final GameRules rules = new GameRulesImpl(true, false, true);
-        final GameImpl game = new GameImpl(deck, players, GAME_MODE, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
         final GameSetupImpl setup = new GameSetupImpl(game, deck, game.getDiscardPile(), players);
+
         setup.initializeGame(false);
 
         // Empty deck

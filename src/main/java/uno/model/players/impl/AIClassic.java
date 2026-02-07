@@ -54,9 +54,9 @@ public class AIClassic extends AbstractAIPlayer {
 
         for (final Card card : playableCards) {
             final CardValue value = card.getValue(game);
-            if (value == CardValue.WILD || value == CardValue.WILD_DRAW_FOUR 
-                || value == CardValue.WILD_DRAW_COLOR || value == CardValue.WILD_FORCED_SWAP 
-                || value == CardValue.WILD_TARGETED_DRAW_TWO) {
+            if (value == CardValue.WILD || value == CardValue.WILD_DRAW_FOUR
+                    || value == CardValue.WILD_DRAW_COLOR || value == CardValue.WILD_FORCED_SWAP
+                    || value == CardValue.WILD_TARGETED_DRAW_TWO) {
                 wildCards.add(card);
             } else if (isActionCard(value)) {
                 actionCards.add(card);
@@ -66,17 +66,17 @@ public class AIClassic extends AbstractAIPlayer {
         }
 
         if (opponentHasUno) {
-            final Card offensiveCard = findBestOffensiveCard(actionCards, wildCards, game);
-            if (offensiveCard != null) {
-                return Optional.of(offensiveCard);
+            final Optional<Card> offensiveCard = findBestOffensiveCard(actionCards, wildCards, game);
+            if (offensiveCard.isPresent()) {
+                return offensiveCard;
             }
         }
 
         final boolean iAmClose = this.getHandSize() <= 3;
         if (iAmClose) {
             if (!actionCards.isEmpty()) {
-                actionCards.sort((c1, c2) -> getActionCardPriority(c2.getValue(game)) 
-                - getActionCardPriority(c1.getValue(game)));
+                actionCards.sort((c1, c2) -> getActionCardPriority(c2.getValue(game))
+                        - getActionCardPriority(c1.getValue(game)));
                 return Optional.of(actionCards.get(0));
             }
             if (!numberCards.isEmpty()) {
@@ -86,8 +86,8 @@ public class AIClassic extends AbstractAIPlayer {
         }
 
         if (!actionCards.isEmpty()) {
-            actionCards.sort((c1, c2) -> getActionCardPriority(c2.getValue(game)) 
-            - getActionCardPriority(c1.getValue(game)));
+            actionCards.sort((c1, c2) -> getActionCardPriority(c2.getValue(game))
+                    - getActionCardPriority(c1.getValue(game)));
             return Optional.of(actionCards.get(0));
         }
 
@@ -160,35 +160,36 @@ public class AIClassic extends AbstractAIPlayer {
      * Find the best offensive card to play when an opponent has UNO.
      * 
      * @param actionCards available action cards
-     * @param wildCards  available wild cards
-     * @param game The current game instance.
-     * @return The best offensive card, or null if none found.
+     * @param wildCards   available wild cards
+     * @param game        The current game instance.
+     * @return The best offensive card, or empty if none found.
      */
-    private Card findBestOffensiveCard(final List<Card> actionCards, final List<Card> wildCards, final Game game) {
+    private Optional<Card> findBestOffensiveCard(final List<Card> actionCards, final List<Card> wildCards,
+            final Game game) {
 
         for (final Card card : wildCards) {
             if (card.getValue(game) == CardValue.WILD_DRAW_FOUR) {
-                return card;
+                return Optional.of(card);
             }
         }
 
         for (final Card card : actionCards) {
             if (card.getValue(game) == CardValue.DRAW_TWO) {
-                return card;
+                return Optional.of(card);
             }
         }
 
         for (final Card card : actionCards) {
             if (card.getValue(game) == CardValue.SKIP) {
-                return card;
+                return Optional.of(card);
             }
         }
 
         if (!actionCards.isEmpty()) {
-            return actionCards.get(0);
+            return Optional.of(actionCards.get(0));
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -229,10 +230,10 @@ public class AIClassic extends AbstractAIPlayer {
      * @return True if it's an action card, false otherwise.
      */
     private boolean isActionCard(final CardValue value) {
-        return value == CardValue.SKIP 
-                || value == CardValue.REVERSE 
-                || value == CardValue.DRAW_TWO 
-                || value == CardValue.FLIP 
+        return value == CardValue.SKIP
+                || value == CardValue.REVERSE
+                || value == CardValue.DRAW_TWO
+                || value == CardValue.FLIP
                 || value == CardValue.SKIP_EVERYONE;
     }
 
@@ -244,12 +245,18 @@ public class AIClassic extends AbstractAIPlayer {
      */
     private int getActionCardPriority(final CardValue value) {
         switch (value) {
-            case DRAW_TWO: return NUMBER_FIVE;
-            case SKIP: return NUMBER_FOUR;
-            case SKIP_EVERYONE: return NUMBER_FOUR;
-            case REVERSE: return NUMBER_THREE;
-            case FLIP: return NUMBER_TWO;
-            default: return 0;
+            case DRAW_TWO:
+                return NUMBER_FIVE;
+            case SKIP:
+                return NUMBER_FOUR;
+            case SKIP_EVERYONE:
+                return NUMBER_FOUR;
+            case REVERSE:
+                return NUMBER_THREE;
+            case FLIP:
+                return NUMBER_TWO;
+            default:
+                return 0;
         }
     }
 
@@ -263,17 +270,28 @@ public class AIClassic extends AbstractAIPlayer {
     private int getNumericValue(final Card card, final Game game) {
         final CardValue value = card.getValue(game);
         switch (value) {
-            case ZERO: return 0;
-            case ONE: return NUMBER_ONE;
-            case TWO: return NUMBER_TWO;
-            case THREE: return NUMBER_THREE;
-            case FOUR: return NUMBER_FOUR;
-            case FIVE: return NUMBER_FIVE;
-            case SIX: return NUMBER_SIX;
-            case SEVEN: return NUMBER_SEVEN;
-            case EIGHT: return NUMBER_EIGHT;
-            case NINE: return NUMBER_NINE;
-            default: return 0;
+            case ZERO:
+                return 0;
+            case ONE:
+                return NUMBER_ONE;
+            case TWO:
+                return NUMBER_TWO;
+            case THREE:
+                return NUMBER_THREE;
+            case FOUR:
+                return NUMBER_FOUR;
+            case FIVE:
+                return NUMBER_FIVE;
+            case SIX:
+                return NUMBER_SIX;
+            case SEVEN:
+                return NUMBER_SEVEN;
+            case EIGHT:
+                return NUMBER_EIGHT;
+            case NINE:
+                return NUMBER_NINE;
+            default:
+                return 0;
         }
     }
 }

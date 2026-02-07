@@ -139,8 +139,9 @@ public class GameSetupImpl implements GameSetup {
         // List of prohibited starting cards
         return v != CardValue.WILD
                 && v != CardValue.WILD_DRAW_FOUR
-                && v != CardValue.WILD_DRAW_COLOR
+                && v != CardValue.WILD_DRAW_TWO
                 && v != CardValue.DRAW_TWO
+                && v != CardValue.DRAW_ONE
                 && v != CardValue.REVERSE
                 && v != CardValue.SKIP
                 && v != CardValue.FLIP;

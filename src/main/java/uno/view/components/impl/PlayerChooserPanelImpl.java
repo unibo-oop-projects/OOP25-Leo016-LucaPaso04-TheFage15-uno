@@ -2,7 +2,9 @@ package uno.view.components.impl;
 
 import uno.controller.api.GameViewObserver;
 import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.HumanPlayer;
 import uno.view.components.api.PlayerChooserPanel;
+import uno.view.style.UnoTheme;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -11,9 +13,7 @@ import javax.swing.BoxLayout;
 import javax.swing.BorderFactory;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,13 +29,8 @@ public final class PlayerChooserPanelImpl extends JPanel implements ActionListen
 
     private static final long serialVersionUID = 1L;
 
-    // UI Styling constants
-    private static final Color PANEL_BACKGROUND = new Color(50, 50, 50);
-    private static final Color TITLE_TEXT_COLOR = Color.WHITE;
-    private static final Font UI_FONT = new Font("Arial", Font.BOLD, 14);
-
-    private static final Dimension PANEL_SIZE = new Dimension(220, 150);
-    private static final Dimension BUTTON_SIZE = new Dimension(200, 40);
+    private static final Dimension PANEL_SIZE = new Dimension(400, 300);
+    private static final Dimension BUTTON_SIZE = new Dimension(350, 50);
     private static final Dimension SPACER_SIZE = new Dimension(0, 5);
 
     private final Optional<GameViewObserver> observer;
@@ -54,18 +49,19 @@ public final class PlayerChooserPanelImpl extends JPanel implements ActionListen
 
         // Vertical layout for the list of buttons
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(PANEL_BACKGROUND);
+        setBackground(UnoTheme.PANEL_COLOR);
 
         setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(), "Choose Opponent",
-                TitledBorder.LEFT, TitledBorder.TOP, UI_FONT, TITLE_TEXT_COLOR));
+                TitledBorder.LEFT, TitledBorder.TOP, UnoTheme.TEXT_FONT, UnoTheme.TEXT_COLOR));
 
         // Create a button for each valid opponent
+        add(Box.createVerticalGlue());
+
         for (final AbstractPlayer opponent : opponents) {
 
-            // Logic from original code: specific filtering based on class type.
-            // Assuming this filters out base 'Player' objects (e.g., Humans) if needed.
-            if (opponent.getClass().equals(AbstractPlayer.class)) {
+            // Filter out HumanPlayer instances
+            if (opponent instanceof HumanPlayer) {
                 continue;
             }
 
@@ -78,6 +74,8 @@ public final class PlayerChooserPanelImpl extends JPanel implements ActionListen
             add(Box.createRigidArea(SPACER_SIZE)); // Spacer between buttons
         }
 
+        add(Box.createVerticalGlue());
+
         // Set a preferred size suitable for a list
         setPreferredSize(PANEL_SIZE);
     }
@@ -89,21 +87,8 @@ public final class PlayerChooserPanelImpl extends JPanel implements ActionListen
      * @return The styled JButton.
      */
     private JButton createStyledButton(final String text) {
-        final JButton button = new JButton(text);
-        button.setFont(UI_FONT);
-        button.setBackground(Color.DARK_GRAY);
-        button.setForeground(Color.WHITE);
-
-        button.setOpaque(true);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        // button.setAlignmentX(JPanel.CENTER_ALIGNMENT);
-
-        // Fixed button size for uniformity
-        final Dimension btnSize = BUTTON_SIZE;
-        button.setMaximumSize(btnSize);
-        button.setPreferredSize(btnSize);
-
+        final StyledButtonImpl button = new StyledButtonImpl(text);
+        button.setSize(BUTTON_SIZE.width, BUTTON_SIZE.height);
         return button;
     }
 

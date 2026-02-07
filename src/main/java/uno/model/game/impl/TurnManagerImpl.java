@@ -111,9 +111,9 @@ public class TurnManagerImpl implements TurnManager {
             // methods.
             player.unoPenalty(game);
 
-            // This exception seems to be used for control flow in your Controller.
-            // Be careful catching this in the UI thread.
-            throw new IllegalStateException("UNO! Penalty applied to " + player.getName());
+            // The penalty is applied. The UI should successfully observe this event via
+            // NotificationCenter/Observer.
+            // No exception needed for control flow.
         }
 
         // Reset status for the new turn

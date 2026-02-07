@@ -15,6 +15,7 @@ import uno.model.game.impl.GameRulesImpl;
 import uno.view.api.GameFrame;
 
 import uno.model.game.impl.GameFactoryImpl;
+import uno.model.game.api.GameMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class MenuControllerImpl implements MenuController {
      */
     @Override
     public void onStartClassicGame() {
-        startGame("CLASSIC");
+        startGame(GameMode.STANDARD);
     }
 
     /**
@@ -56,7 +57,7 @@ public class MenuControllerImpl implements MenuController {
      */
     @Override
     public void onStartFlipGame() {
-        startGame("FLIP");
+        startGame(GameMode.FLIP);
     }
 
     /**
@@ -64,10 +65,10 @@ public class MenuControllerImpl implements MenuController {
      */
     @Override
     public void onStartAllWildGame() {
-        startGame("ALL_WILD");
+        startGame(GameMode.ALL_WILD);
     }
 
-    private void startGame(final String gameMode) {
+    private void startGame(final GameMode gameMode) {
         // 1. Crea i giocatori
         final List<AbstractPlayer> players = createPlayers(gameMode);
 
@@ -92,17 +93,17 @@ public class MenuControllerImpl implements MenuController {
         gameController.showStartingPlayerPopupAndStartGame();
     }
 
-    private List<AbstractPlayer> createPlayers(final String gameMode) {
+    private List<AbstractPlayer> createPlayers(final GameMode gameMode) {
         final List<AbstractPlayer> players = new ArrayList<>();
         players.add(new HumanPlayer(HUMAN_NAME)); // Giocatore umano
 
         switch (gameMode) {
-            case "FLIP":
+            case FLIP:
                 players.add(new AIFlip(AI_ONE_NAME));
                 players.add(new AIFlip(AI_TWO_NAME));
                 players.add(new AIFlip(AI_THREE_NAME));
                 break;
-            case "ALL_WILD":
+            case ALL_WILD:
                 players.add(new AIAllWild(AI_ONE_NAME));
                 players.add(new AIAllWild(AI_TWO_NAME));
                 players.add(new AIAllWild(AI_THREE_NAME));

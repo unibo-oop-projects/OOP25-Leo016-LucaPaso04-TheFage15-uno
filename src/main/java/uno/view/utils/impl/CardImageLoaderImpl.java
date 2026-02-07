@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Concrete implementation of CardImageLoader.
@@ -112,19 +113,19 @@ public class CardImageLoaderImpl implements CardImageLoader {
      */
     private void loadImage(final String cardName) {
         final String path = "/images/cards/" + cardName + ".png";
-        final java.net.URL resource = CardImageLoaderImpl.class.getResource(path);
 
-        if (resource != null) {
-            // Se la risorsa c'è, procediamo senza try-catch
-            final ImageIcon icon = new ImageIcon(resource);
-            final Image scaledImg = icon.getImage().getScaledInstance(cardWidth, cardHeight, Image.SCALE_SMOOTH);
-            final ImageIcon scaledIcon = new ImageIcon(scaledImg);
+        Optional.ofNullable(CardImageLoaderImpl.class.getResource(path))
+                .ifPresentOrElse(
+                        resource -> {
+                            final ImageIcon icon = new ImageIcon(resource);
+                            final Image scaledImg = icon.getImage().getScaledInstance(cardWidth, cardHeight,
+                                    Image.SCALE_SMOOTH);
+                            final ImageIcon scaledIcon = new ImageIcon(scaledImg);
 
-            cardImageCache.put(cardName, scaledIcon);
-            transparentImageCache.put(cardName, createTransparentIcon(scaledIcon, 0.5f));
-        } else {
-            LOGGER.warning("Risorsa non trovata: " + path);
-        }
+                            cardImageCache.put(cardName, scaledIcon);
+                            transparentImageCache.put(cardName, createTransparentIcon(scaledIcon, 0.5f));
+                        },
+                        () -> LOGGER.warning("Risorsa non trovata: " + path));
     }
 
     /**

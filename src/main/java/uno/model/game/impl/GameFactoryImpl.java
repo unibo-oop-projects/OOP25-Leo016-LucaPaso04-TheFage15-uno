@@ -3,6 +3,9 @@ package uno.model.game.impl;
 import uno.model.game.api.GameFactory;
 import uno.model.game.api.Game;
 import uno.model.game.api.GameRules;
+import uno.model.game.api.DiscardPile;
+import uno.model.game.api.TurnManager;
+import uno.model.game.api.GameMode;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.cards.deck.api.Deck;
 import uno.model.cards.deck.impl.StandardDeck;
@@ -36,15 +39,15 @@ public class GameFactoryImpl implements GameFactory {
      * {@inheritDoc}
      */
     @Override
-    public Game createGame(final String playerName, final String gameMode, final List<AbstractPlayer> players) {
+    public Game createGame(final String playerName, final GameMode gameMode, final List<AbstractPlayer> players) {
         final Deck<Card> deck;
         boolean isAllWild = false;
 
         switch (gameMode) {
-            case "FLIP":
+            case FLIP:
                 deck = new FlipDeck(logger);
                 break;
-            case "ALL_WILD":
+            case ALL_WILD:
                 deck = new AllWildDeck(logger);
                 isAllWild = true;
                 break;
@@ -53,7 +56,10 @@ public class GameFactoryImpl implements GameFactory {
                 break;
         }
 
-        final GameImpl game = new GameImpl(deck, players, gameMode, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, gameMode.name(), logger, rules);
 
         final GameSetupImpl setup = new GameSetupImpl(game, deck, game.getDiscardPile(), players);
         setup.initializeGame(isAllWild);

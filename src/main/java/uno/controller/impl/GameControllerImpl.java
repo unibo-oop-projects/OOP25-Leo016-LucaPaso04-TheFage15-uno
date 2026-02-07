@@ -41,8 +41,7 @@ public class GameControllerImpl implements GameController {
      * @param gameScene scene
      * @param mainFrame frame
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", 
-        justification = "Il controller deve operare sulle istanze condivise di Model e View (MVC Pattern)")
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Il controller deve operare sulle istanze condivise di Model e View (MVC Pattern)")
     public GameControllerImpl(final Game gameModel, final GameScene gameScene,
             final GameFrame mainFrame) {
         this.gameModel = gameModel;
@@ -75,8 +74,6 @@ public class GameControllerImpl implements GameController {
     public void onGameUpdate() {
         // --- CONTROLLO STATO PARTITA ---
         // Il Controller REAGISCE allo stato impostato dal Modello
-        final boolean isHumanTurn = gameModel.getCurrentPlayer().getClass() == HumanPlayer.class;
-
         if (gameModel.getGameState() == GameState.GAME_OVER) {
             // Se il modello dice che il gioco è finito, fermiamo tutto.
             if (aiTimer.isPresent()) {
@@ -89,6 +86,8 @@ public class GameControllerImpl implements GameController {
             gameScene.showWinnerPopup(winner.getName());
             return; // Non fare nient'altro
         }
+
+        final boolean isHumanTurn = gameModel.getCurrentPlayer().getClass() == HumanPlayer.class;
 
         if (isHumanTurn) {
             // Il modello dice che serve un colore?

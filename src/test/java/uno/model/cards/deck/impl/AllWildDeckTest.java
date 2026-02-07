@@ -18,6 +18,12 @@ import uno.model.game.impl.GameImpl;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
 import uno.model.utils.api.GameLogger;
+import uno.model.game.api.DiscardPile;
+import uno.model.game.impl.DiscardPileImpl;
+import uno.model.game.api.TurnManager;
+import uno.model.game.impl.TurnManagerImpl;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
 
 class AllWildDeckTest {
 
@@ -41,7 +47,10 @@ class AllWildDeckTest {
         deck = new AllWildDeck(logger);
 
         // Inizializziamo una partita fittizia
-        game = new GameImpl(deck, players, "ALLWILD", logger);
+        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, turnManager, discardPile, "ALLWILD", logger, rules);
     }
 
     @Test

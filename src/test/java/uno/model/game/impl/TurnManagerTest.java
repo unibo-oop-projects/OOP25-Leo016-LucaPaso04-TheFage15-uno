@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -26,6 +25,8 @@ import uno.model.game.api.TurnManager;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
 import uno.model.utils.api.GameLogger;
+import uno.model.game.api.DiscardPile;
+import uno.model.game.api.GameRules;
 
 class TurnManagerTest {
 
@@ -44,7 +45,13 @@ class TurnManagerTest {
 
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
         final Deck<Card> deck = new StandardDeck(logger);
-        game = new GameImpl(deck, players, "CLASSIC", logger);
+
+        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final DiscardPile discardPile = new DiscardPileImpl();
+        // Uses separate TM for instantiation passed to Game, capturing it back from
+        // game later
+        final TurnManager tm = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, tm, discardPile, "CLASSIC", logger, rules);
 
         final GameSetupImpl setup = new GameSetupImpl(
                 game,
@@ -165,24 +172,81 @@ class TurnManagerTest {
 
     @Test
     void testUnoPenaltyCheck() {
-        final AbstractPlayer next = turnManager.peekNextPlayer();
+        // Re-setup with Uno Penalty Rule ENABLED
+        final GameRules rules = new GameRulesImpl(true, false, false);
+        turnManager = new TurnManagerImpl(players, rules);
+        // We need to re-create game to link everything if needed, but TurnManager
+        // relies on its own rules reference.
+        // And Game relies on TurnManager.
+        // Actually, verifying TurnManager alone might be enough if we just call
+        // advanceTurn(game).
+        // But advanceTurn uses 'game' to draw cards for penalty?
+        // Let's verify 'advanceTurn'.
+
+        // Update game reference if necessary or just the turn manager usage
+        game = new GameImpl(new StandardDeck(new uno.model.utils.impl.TestLogger()),
+                players, turnManager, new DiscardPileImpl(), "CLASSIC", new uno.model.utils.impl.TestLogger(), rules);
+
+        // Before test: Current player is P1. Next is P2.
+        // We want to verify that when we advance turns from P1 to P2,
+        // if P2 has 1 card and forgot to call UNO, P2 gets penalty.
+        // Wait, the check happens when the PREVIOUS player ends turn?
+        // Usually: P1 plays. P1 has 1 card. Did P1 call Uno?
+        // Or is it a check on the *next* player?
+        // The test name says "testUnoPenaltyCheck".
+        // Code: `final AbstractPlayer next = turnManager.peekNextPlayer();`
+        // It sets hand of `next` (P2) to 1 card.
+        // Then calls `turnManager.advanceTurn(game)`.
+        // This advances turn FROM P1 TO P2.
+        // Does the penalty applying to P2 immediately when they START their turn?
+        // OR does it apply to P1 if P1 finished with 1 card?
+
+        // In the original code (exception based), `advanceTurn` probably checked the
+        // player who JUST played (Current).
+        // Let's verify who `next` is.
+        // If current is P1, next is P2.
+
+        // If the intention of the test is: "Player finishes turn with 1 card and didn't
+        // call Uno -> Penalty"
+        // Then it should be checking the CURRENT player (who is finishing turn).
+
+        // Let's look at what the original test did:
+        // `final AbstractPlayer next = turnManager.peekNextPlayer();`
+        // `next.setHand(...)` -> Sets P2's hand to 1 card.
+        // `turnManager.advanceTurn(game)`
+
+        // If this test passed before, it implies that `advanceTurn` checked `next` (P2)
+        // ?
+        // Or maybe `advanceTurn` changes current player FIRST, and THEN checks?
+        // If so, `next` becomes `current`.
+
+        // Let's assume the new implementation (Observer) does check for penalty.
+        // I will set up the scenario:
+        // Current player (P1) is ending turn.
+        // Let's say we want to test P1 failing to call Uno.
+        // But the original test used `next`.
+
+        // Let's just recreate the state where a player has 1 card and didn't call Uno.
+        // Since `advanceTurn` is called, likely checking if penalty is applied to
+        // *someone*.
+
+        final AbstractPlayer playerToPenalize = turnManager.peekNextPlayer(); // P2
 
         final Card redNine = new DoubleSidedCard(
                 new NumericBehavior(CardColor.RED, CardValue.NINE),
                 BackSideBehavior.getInstance());
         final List<Optional<Card>> listcard = new LinkedList<>();
         listcard.add(Optional.of(redNine));
-        next.setHand(listcard);
+        playerToPenalize.setHand(listcard);
 
-        assertFalse(next.isHasCalledUno());
-        assertEquals(1, next.getHandSize());
+        assertFalse(playerToPenalize.isHasCalledUno());
+        assertEquals(1, playerToPenalize.getHandSize());
 
-        final Exception exception = assertThrows(IllegalStateException.class, () -> {
-            turnManager.advanceTurn(game);
-        });
+        // EXECUTE
+        turnManager.advanceTurn(game);
 
-        assertTrue(exception.getMessage().contains("UNO! Penalty applied"),
-                "Deve lanciare eccezione per penalità UNO.");
-        assertEquals(3, next.getHandSize(), "Il giocatore deve avere 3 carte in mano dopo la penalità");
+        // VERIFY
+        assertEquals(3, playerToPenalize.getHandSize(),
+                "Il giocatore deve avere 3 carte in mano dopo la penalità (1 + 2 penalità)");
     }
 }

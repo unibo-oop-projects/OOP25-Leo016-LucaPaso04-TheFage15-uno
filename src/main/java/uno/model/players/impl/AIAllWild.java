@@ -32,16 +32,17 @@ public class AIAllWild extends AbstractAIPlayer {
      */
     @Override
     public void takeTurn(final Game game) {
-        // 1. Esegui il flusso standard (Scegli carta -> Gioca -> Scegli Colore -> Pesca se serve)
+        // 1. Esegui il flusso standard (Scegli carta -> Gioca -> Scegli Colore -> Pesca
+        // se serve)
         super.takeTurn(game);
 
-        // 2. Controllo Extra: Se il gioco aspetta un giocatore (es. per Swap o Targeted Draw)
+        // 2. Controllo Extra: Se il gioco aspetta un giocatore (es. per Swap o Targeted
+        // Draw)
         if (game.getGameState() == GameState.WAITING_FOR_PLAYER) {
-            final AbstractPlayer target = findBestTarget(game);
-            if (target != null) {
+            findBestTarget(game).ifPresent(target -> {
                 game.chosenPlayer(target);
                 game.aiAdvanceTurn();
-            }
+            });
         }
     }
 
@@ -57,25 +58,27 @@ public class AIAllWild extends AbstractAIPlayer {
         }
 
         // Analisi bersaglio migliore (chi ha meno carte)
-        final AbstractPlayer bestTarget = findBestTarget(game);
+        final Optional<AbstractPlayer> bestTargetOpt = findBestTarget(game);
 
         // --- 1. LOGICA SWAP (Scambio Forzato) ---
         // Cerchiamo se abbiamo la carta scambio
         final Optional<Card> swapCard = hand.stream()
-            .filter(c -> c.getValue(game) == CardValue.WILD_FORCED_SWAP)
-            .findFirst();
+                .filter(c -> c.getValue(game) == CardValue.WILD_FORCED_SWAP)
+                .findFirst();
 
-        if (swapCard.isPresent() && bestTarget != null && this.getHandSize() > bestTarget.getHandSize()) {
-            // CONVIENE SCAMBIARE? 
+        if (swapCard.isPresent() && bestTargetOpt.isPresent()) {
+            // CONVIENE SCAMBIARE?
             // Sì, se io ho PIÙ carte del bersaglio (gli rifilo il mio mazzo grosso)
-            return swapCard;
+            if (this.getHandSize() > bestTargetOpt.get().getHandSize()) {
+                return swapCard;
+            }
         }
 
         // --- 2. LOGICA ATTACCO (Priorità alle carte cattive) ---
         // Cerchiamo Targeted Draw 2, Draw 4, Skip Two, Draw Two
         final Optional<Card> attackCard = hand.stream()
-            .filter(c -> isAggressiveCard(c.getValue(game)))
-            .findFirst();
+                .filter(c -> isAggressiveCard(c.getValue(game)))
+                .findFirst();
 
         if (attackCard.isPresent()) {
             return attackCard;
@@ -85,13 +88,21 @@ public class AIAllWild extends AbstractAIPlayer {
         // Se non attacco e non scambio vantaggiosamente, gioca una carta qualsiasi.
         // MA: Evita di giocare lo Swap se mi danneggerebbe (ho meno carte del target).
         for (final Card card : hand) {
-            if (!(card.getValue(game) == CardValue.WILD_FORCED_SWAP 
-                && bestTarget != null && this.getHandSize() < bestTarget.getHandSize())) {
+            boolean isBadSwap = false;
+            // Se è uno swap e abbiamo un target, controlliamo se ci conviene
+            if (card.getValue(game) == CardValue.WILD_FORCED_SWAP && bestTargetOpt.isPresent()) {
+                if (this.getHandSize() < bestTargetOpt.get().getHandSize()) {
+                    isBadSwap = true;
+                }
+            }
+            // Se non è uno swap svantaggioso, giocala
+            if (!isBadSwap) {
                 return Optional.of(card);
             }
         }
 
-        // Se sono arrivato qui, ho solo carte Swap svantaggiose. Devo giocarne una per forza.
+        // Se sono arrivato qui, ho solo carte Swap svantaggiose. Devo giocarne una per
+        // forza.
         return Optional.of(hand.get(0));
     }
 
@@ -111,11 +122,10 @@ public class AIAllWild extends AbstractAIPlayer {
      * @param game Current game instance.
      * @return The best target player.
      */
-    private AbstractPlayer findBestTarget(final Game game) {
+    private Optional<AbstractPlayer> findBestTarget(final Game game) {
         return game.getPlayers().stream()
-                .filter(p -> !p.equals(this)) 
-                .min(Comparator.comparingInt(AbstractPlayer::getHandSize))
-                .orElse(null);
+                .filter(p -> !p.equals(this))
+                .min(Comparator.comparingInt(AbstractPlayer::getHandSize));
     }
 
     /**
@@ -126,7 +136,7 @@ public class AIAllWild extends AbstractAIPlayer {
      */
     private boolean isAggressiveCard(final CardValue val) {
         return val == CardValue.WILD_TARGETED_DRAW_TWO
-                || val == CardValue.WILD_DRAW_FOUR_ALLWILD 
+                || val == CardValue.WILD_DRAW_FOUR_ALLWILD
                 || val == CardValue.WILD_DRAW_TWO_ALLWILD
                 || val == CardValue.WILD_SKIP_TWO
                 || val == CardValue.WILD_SKIP;

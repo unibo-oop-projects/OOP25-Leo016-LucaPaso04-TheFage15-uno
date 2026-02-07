@@ -19,6 +19,12 @@ import uno.model.game.impl.GameImpl;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
 import uno.model.utils.api.GameLogger;
+import uno.model.game.api.DiscardPile;
+import uno.model.game.impl.DiscardPileImpl;
+import uno.model.game.api.TurnManager;
+import uno.model.game.impl.TurnManagerImpl;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
 
 class FlipDeckTest {
 
@@ -49,7 +55,10 @@ class FlipDeckTest {
         deck = new FlipDeck(logger);
 
         // Creiamo una partita fittizia per poter risolvere colori e valori dinamici
-        game = new GameImpl(deck, players, "FLIP", logger);
+        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, turnManager, discardPile, "FLIP", logger, rules);
     }
 
     @Test
@@ -80,7 +89,7 @@ class FlipDeckTest {
         assertEquals(DECK_SIZE, allCards.size());
 
         // 1. Verifica Carte Colorate Standard (Light Side: Rosso, Blu, Verde, Giallo)
-        final CardColor[] lightColors = {CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
+        final CardColor[] lightColors = { CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
 
         for (final CardColor color : lightColors) {
             final long count = allCards.stream()

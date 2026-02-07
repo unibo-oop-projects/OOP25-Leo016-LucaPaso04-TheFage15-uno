@@ -28,6 +28,11 @@ import uno.model.players.impl.AIClassic;
 import uno.model.utils.api.GameLogger; // Needed for mock
 import uno.model.utils.impl.TestLogger;
 
+import uno.model.game.api.DiscardPile;
+import uno.model.game.impl.DiscardPileImpl;
+import uno.model.game.api.TurnManager;
+import uno.model.game.impl.TurnManagerImpl;
+
 class AIWithCustomRulesTest {
 
     private Game game;
@@ -37,6 +42,7 @@ class AIWithCustomRulesTest {
     void setUp() {
         aiPlayer = new AIClassic("AI-Test");
         final AbstractPlayer aiPlayer2 = new AIClassic("AI-2");
+        final List<AbstractPlayer> players = List.of(aiPlayer, aiPlayer2);
 
         // Custom Rules: Skip After Draw ENABLED
         // Constructor: (unoPenalty, skipAfterDraw, mandatoryPass)
@@ -84,7 +90,9 @@ class AIWithCustomRulesTest {
             }
         };
 
-        game = new GameImpl(deck, List.of(aiPlayer, aiPlayer2), "CLASSIC", new TestLogger(), rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, turnManager, discardPile, "CLASSIC", new TestLogger(), rules);
     }
 
     @Test

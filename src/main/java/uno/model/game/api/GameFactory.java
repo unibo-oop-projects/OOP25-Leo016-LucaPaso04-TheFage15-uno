@@ -20,7 +20,7 @@ public interface GameFactory {
      * @param players    The list of players participating in the game.
      * @return A fully initialized Game instance.
      */
-    Game createGame(String playerName, String gameMode, List<AbstractPlayer> players);
+    Game createGame(String playerName, GameMode gameMode, List<AbstractPlayer> players);
 
     /**
      * Return the logger.

@@ -24,6 +24,8 @@ import uno.model.game.api.GameState;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
 import uno.model.utils.impl.TestLogger;
+import uno.model.game.api.DiscardPile;
+import uno.model.game.api.TurnManager;
 
 class CustomRulesTest {
 
@@ -49,7 +51,9 @@ class CustomRulesTest {
     void testUnoPenaltyDisabledNoPenaltyApplied() {
         // 1. Disable Uno Penalty
         final GameRules rules = new GameRulesImpl(false, false, false);
-        final GameImpl game = new GameImpl(deck, players, GAME_MODE, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
 
         // 2. Identify NEXT player (who will start their turn next)
         final AbstractPlayer nextPlayer = game.getTurnManager().peekNextPlayer();
@@ -76,7 +80,9 @@ class CustomRulesTest {
     void testUnoPenaltyEnabledPenaltyApplied() {
         // 1. Enable Uno Penalty
         final GameRules rules = new GameRulesImpl(true, false, false);
-        final GameImpl game = new GameImpl(deck, players, GAME_MODE, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
 
         // 2. Identify NEXT player
         final AbstractPlayer nextPlayer = game.getTurnManager().peekNextPlayer();
@@ -111,7 +117,9 @@ class CustomRulesTest {
     void testDeckReshuffleDefaultBehavior() {
         // 1. MandatoryPass = FALSE (Default)
         final GameRules rules = new GameRulesImpl(false, false, false);
-        final GameImpl game = new GameImpl(deck, players, GAME_MODE, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
         deck.addCard(createCard(CardColor.RED, CardValue.ONE)); // Ensure deck has cards initially
 
         // 2. Empty the deck manually
@@ -146,7 +154,9 @@ class CustomRulesTest {
     void testDeckNoReshuffleMandatoryPass() {
         // 1. MandatoryPass = TRUE
         final GameRules rules = new GameRulesImpl(false, false, true);
-        final GameImpl game = new GameImpl(deck, players, GAME_MODE, logger, rules);
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
         deck.addCard(createCard(CardColor.RED, CardValue.ONE));
 
         // 2. Empty the deck

@@ -24,6 +24,13 @@ import uno.model.game.impl.GameSetupImpl;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
+import uno.model.game.api.DiscardPile;
+import uno.model.game.impl.DiscardPileImpl;
+import uno.model.game.api.TurnManager;
+import uno.model.game.impl.TurnManagerImpl;
+import uno.model.game.api.GameRules;
+import uno.model.game.impl.GameRulesImpl;
+
 class AIFlipTest {
 
     private Game game;
@@ -38,7 +45,11 @@ class AIFlipTest {
 
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
         final Deck<Card> deck = new FlipDeck(logger);
-        game = new GameImpl(deck, players, "FLIP", logger);
+
+        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final DiscardPile discardPile = new DiscardPileImpl();
+        final TurnManager turnManager = new TurnManagerImpl(players, rules);
+        game = new GameImpl(deck, players, turnManager, discardPile, "FLIP", logger, rules);
 
         final GameSetupImpl setup = new GameSetupImpl(
                 game,
