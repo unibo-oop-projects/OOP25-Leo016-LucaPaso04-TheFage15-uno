@@ -46,7 +46,7 @@ class AIWithCustomRulesTest {
 
         // Custom Rules: Skip After Draw ENABLED
         // Constructor: (unoPenalty, skipAfterDraw, mandatoryPass)
-        final GameRules rules = new GameRulesImpl(false, true, false);
+        final GameRules rules = new GameRulesImpl(false, true, false, false);
 
         // Mock Deck that returns a specific card when drawn
         final Deck<Card> deck = new Deck<>() {

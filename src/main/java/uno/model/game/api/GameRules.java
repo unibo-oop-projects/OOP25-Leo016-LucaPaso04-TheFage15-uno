@@ -19,4 +19,10 @@ public interface GameRules {
      * @return true if the discard pile should NOT be reshuffled when deck is empty.
      */
     boolean isMandatoryPassEnabled();
+
+    /**
+     * @return true if the game ends when a player reaches a score limit (e.g. 500),
+     *         false if it ends after a single round.
+     */
+    boolean isScoringModeEnabled();
 }

@@ -47,7 +47,7 @@ class AllWildDeckTest {
         deck = new AllWildDeck(logger);
 
         // Inizializziamo una partita fittizia
-        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final GameRules rules = new GameRulesImpl(false, false, false, false); // Dummy rules
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         game = new GameImpl(deck, players, turnManager, discardPile, "ALLWILD", logger, rules);

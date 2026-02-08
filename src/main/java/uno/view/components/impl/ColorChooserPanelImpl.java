@@ -1,7 +1,7 @@
 package uno.view.components.impl;
 
-import uno.controller.api.GameViewObserver;
 import uno.model.cards.attributes.CardColor;
+import uno.view.api.GameViewObserver;
 import uno.view.components.api.ColorChooserPanel;
 import uno.view.style.UnoTheme;
 

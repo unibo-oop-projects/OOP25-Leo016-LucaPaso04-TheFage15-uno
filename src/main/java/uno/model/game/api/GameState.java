@@ -10,14 +10,21 @@ public enum GameState {
     RUNNING,
 
     /**
-     * The game is waiting for a player to choose a color (after playing a Wild card).
+     * The game is waiting for a player to choose a color (after playing a Wild
+     * card).
      */
     WAITING_FOR_COLOR,
 
     /**
-     * The game is waiting for a player to be chosen (after playing a "Choose Player" card).
+     * The game is waiting for a player to be chosen (after playing a "Choose
+     * Player" card).
      */
     WAITING_FOR_PLAYER,
+
+    /**
+     * The round has ended, but the match continues.
+     */
+    ROUND_OVER,
 
     /**
      * The game has ended.

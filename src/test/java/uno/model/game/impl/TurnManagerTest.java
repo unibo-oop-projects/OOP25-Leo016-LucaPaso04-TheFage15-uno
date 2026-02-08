@@ -46,7 +46,7 @@ class TurnManagerTest {
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
         final Deck<Card> deck = new StandardDeck(logger);
 
-        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final GameRules rules = new GameRulesImpl(false, false, false, false); // Dummy rules
         final DiscardPile discardPile = new DiscardPileImpl();
         // Uses separate TM for instantiation passed to Game, capturing it back from
         // game later
@@ -173,7 +173,7 @@ class TurnManagerTest {
     @Test
     void testUnoPenaltyCheck() {
         // Re-setup with Uno Penalty Rule ENABLED
-        final GameRules rules = new GameRulesImpl(true, false, false);
+        final GameRules rules = new GameRulesImpl(true, false, false, false);
         turnManager = new TurnManagerImpl(players, rules);
         // We need to re-create game to link everything if needed, but TurnManager
         // relies on its own rules reference.

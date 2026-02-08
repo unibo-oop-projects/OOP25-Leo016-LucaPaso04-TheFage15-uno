@@ -24,7 +24,7 @@ class GameFactoryTest {
 
     @BeforeEach
     void setUp() {
-        rules = new GameRulesImpl(false, false, false);
+        rules = new GameRulesImpl(false, false, false, false);
         factory = new GameFactoryImpl(rules);
     }
 

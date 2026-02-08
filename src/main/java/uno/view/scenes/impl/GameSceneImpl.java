@@ -1,6 +1,5 @@
 package uno.view.scenes.impl;
 
-import uno.controller.api.GameViewObserver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;
@@ -12,6 +11,7 @@ import uno.view.components.api.StyledButton;
 import uno.view.components.impl.StyledButtonImpl;
 import uno.view.scenes.api.GameScene;
 import uno.view.utils.impl.CardImageLoaderImpl;
+import uno.view.api.GameViewObserver;
 import uno.view.components.api.ColorChooserPanel;
 import uno.view.components.api.PlayerChooserPanel;
 import uno.view.style.UnoTheme;
@@ -98,6 +98,10 @@ public final class GameSceneImpl extends JPanel implements GameScene {
     private JLabel northAILabel;
     private JLabel eastAILabel;
 
+    private JLabel westScoreLabel;
+    private JLabel northScoreLabel;
+    private JLabel eastScoreLabel;
+
     private final JPanel centerPanel;
     private JLabel discardPileCard;
     private JButton drawDeckButton; // Keep as JButton for Card Image
@@ -105,6 +109,7 @@ public final class GameSceneImpl extends JPanel implements GameScene {
     private JLabel statusLabel;
     private JLabel deckInfoLabel; // New Label for Deck Count
     private JLabel colorInfoLabel; // New Label for Current Color
+    private JLabel humanScoreLabel; // New Label for Human Score
     private StyledButton unoButton;
 
     /**
@@ -265,6 +270,11 @@ public final class GameSceneImpl extends JPanel implements GameScene {
             colorInfoLabel.setText("Color: None");
             colorInfoLabel.setForeground(UnoTheme.TEXT_COLOR);
         }
+
+        // Update Human Score
+        if (!gameModel.getPlayers().isEmpty()) {
+            humanScoreLabel.setText("Punti: " + gameModel.getPlayers().get(0).getScore());
+        }
     }
 
     /**
@@ -315,7 +325,7 @@ public final class GameSceneImpl extends JPanel implements GameScene {
     public void showWinnerPopup(final String winnerName) {
         setHumanInputEnabled(false);
 
-        final Object[] options = {"Torna al Menu", "Chiudi Gioco" };
+        final Object[] options = { "Torna al Menu", "Chiudi Gioco" };
 
         final int choice = JOptionPane.showOptionDialog(
                 this,
@@ -377,16 +387,35 @@ public final class GameSceneImpl extends JPanel implements GameScene {
 
         if (title.contains("Ovest")) {
             this.westAILabel = cardLabel;
+            this.westScoreLabel = new JLabel("Punti: 0");
+            this.westScoreLabel.setFont(UnoTheme.TEXT_FONT);
+            this.westScoreLabel.setForeground(UnoTheme.DESC_COLOR);
+            this.westScoreLabel.setAlignmentX(CENTER_ALIGNMENT);
         } else if (title.contains("Nord")) {
             this.northAILabel = cardLabel;
+            this.northScoreLabel = new JLabel("Punti: 0");
+            this.northScoreLabel.setFont(UnoTheme.TEXT_FONT);
+            this.northScoreLabel.setForeground(UnoTheme.DESC_COLOR);
+            this.northScoreLabel.setAlignmentX(CENTER_ALIGNMENT);
         } else if (title.contains("Est")) {
             this.eastAILabel = cardLabel;
+            this.eastScoreLabel = new JLabel("Punti: 0");
+            this.eastScoreLabel.setFont(UnoTheme.TEXT_FONT);
+            this.eastScoreLabel.setForeground(UnoTheme.DESC_COLOR);
+            this.eastScoreLabel.setAlignmentX(CENTER_ALIGNMENT);
         }
 
         panel.add(Box.createVerticalGlue());
         panel.add(nameLabel);
         panel.add(Box.createVerticalStrut(BOX_VERTICAL_HEIGHT));
         panel.add(cardLabel);
+        if (title.contains("Ovest")) {
+            panel.add(this.westScoreLabel);
+        } else if (title.contains("Nord")) {
+            panel.add(this.northScoreLabel);
+        } else if (title.contains("Est")) {
+            panel.add(this.eastScoreLabel);
+        }
         panel.add(Box.createVerticalGlue());
         return panel;
     }
@@ -399,8 +428,12 @@ public final class GameSceneImpl extends JPanel implements GameScene {
      * @param label The label within the panel to update.
      * @param ai    The AI player associated with the panel.
      */
-    private void updateOpponentPanel(final JPanel panel, final JLabel label, final AbstractPlayer ai) {
+    private void updateOpponentPanel(final JPanel panel, final JLabel label, final JLabel scoreLabel,
+            final AbstractPlayer ai) {
         label.setText(ai.getHandSize() + " carte");
+        if (scoreLabel != null) {
+            scoreLabel.setText("Punti: " + ai.getScore());
+        }
 
         if (gameModel.getCurrentPlayer().equals(ai)) {
             // Active Turn: Thicker Gold (or Red) Border
@@ -443,7 +476,8 @@ public final class GameSceneImpl extends JPanel implements GameScene {
         this.discardPileCard.setOpaque(true);
 
         // Use StyledButton for Pass and UNO
-        this.passButton = new StyledButtonImpl("Passa", PASS_BUTTON_NORMAL_COLOR, PASS_BUTTON_HOVER_COLOR); // Custom Red
+        this.passButton = new StyledButtonImpl("Passa", PASS_BUTTON_NORMAL_COLOR, PASS_BUTTON_HOVER_COLOR); // Custom
+                                                                                                            // Red
         this.passButton.setSize(PASS_BUTTON_WIDTH, PASS_BUTTON_HEIGHT);
         this.passButton.setFont(UnoTheme.TEXT_BOLD_FONT);
 
@@ -611,10 +645,16 @@ public final class GameSceneImpl extends JPanel implements GameScene {
         this.colorInfoLabel.setForeground(UnoTheme.TEXT_COLOR);
         this.colorInfoLabel.setBorder(INFO_LABEL_BORDER);
 
+        this.humanScoreLabel = new JLabel("Punti: 0");
+        this.humanScoreLabel.setFont(UnoTheme.TEXT_BOLD_FONT);
+        this.humanScoreLabel.setForeground(UnoTheme.BUTTON_COLOR);
+        this.humanScoreLabel.setBorder(INFO_LABEL_BORDER);
+
         panel.add(this.statusLabel);
         panel.add(Box.createVerticalStrut(BOX_VERTICAL_HEIGHT));
         panel.add(this.deckInfoLabel);
         panel.add(this.colorInfoLabel);
+        panel.add(this.humanScoreLabel);
 
         return panel;
     }
@@ -796,9 +836,9 @@ public final class GameSceneImpl extends JPanel implements GameScene {
         final List<AbstractPlayer> players = gameModel.getPlayers();
 
         if (players.size() >= 4) {
-            updateOpponentPanel(westAIPanel, westAILabel, players.get(1));
-            updateOpponentPanel(northAIPanel, northAILabel, players.get(2));
-            updateOpponentPanel(eastAIPanel, eastAILabel, players.get(3));
+            updateOpponentPanel(westAIPanel, westAILabel, westScoreLabel, players.get(1));
+            updateOpponentPanel(northAIPanel, northAILabel, northScoreLabel, players.get(2));
+            updateOpponentPanel(eastAIPanel, eastAILabel, eastScoreLabel, players.get(3));
         }
 
     }

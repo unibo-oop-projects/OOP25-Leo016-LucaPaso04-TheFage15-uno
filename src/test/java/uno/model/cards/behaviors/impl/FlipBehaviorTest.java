@@ -54,7 +54,7 @@ class FlipBehaviorTest {
                 players.add(aiClassic2);
                 final Deck<Card> deck = new StandardDeck(logger);
 
-                final GameRules rules = new GameRulesImpl(false, false, false);
+                final GameRules rules = new GameRulesImpl(false, false, false, false);
                 final DiscardPile discardPile = new DiscardPileImpl();
                 final TurnManager turnManager = new TurnManagerImpl(players, rules);
                 game = new GameImpl(deck, players, turnManager, discardPile, "CLASSIC", logger, rules);

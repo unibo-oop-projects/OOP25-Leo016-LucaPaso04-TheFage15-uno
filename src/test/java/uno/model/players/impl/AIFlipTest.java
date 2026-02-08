@@ -46,7 +46,7 @@ class AIFlipTest {
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
         final Deck<Card> deck = new FlipDeck(logger);
 
-        final GameRules rules = new GameRulesImpl(false, false, false); // Dummy rules
+        final GameRules rules = new GameRulesImpl(false, false, false, false); // Dummy rules
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         game = new GameImpl(deck, players, turnManager, discardPile, "FLIP", logger, rules);

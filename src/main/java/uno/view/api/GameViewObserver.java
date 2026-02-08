@@ -1,4 +1,4 @@
-package uno.controller.api;
+package uno.view.api;
 
 import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;

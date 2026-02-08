@@ -44,7 +44,8 @@ class GameImplTest {
     @Test
     void testSkipAfterDrawEnabled() {
         // Rule: Skip After Draw = TRUE
-        final GameRules rules = new GameRulesImpl(true, true, false);
+        // Rule: Skip After Draw = TRUE, Scoring = FALSE
+        final GameRules rules = new GameRulesImpl(true, true, false, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
@@ -72,7 +73,8 @@ class GameImplTest {
     @Test
     void testUnoPenaltyDisabled() {
         // Rule: Uno Penalty = FALSE
-        final GameRules rules = new GameRulesImpl(false, false, false);
+        // Rule: Uno Penalty = FALSE, Scoring = FALSE
+        final GameRules rules = new GameRulesImpl(false, false, false, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
@@ -102,7 +104,8 @@ class GameImplTest {
     @Test
     void testNoReshuffleRule() {
         // Rule: Mandatory Pass / No Reshuffle = TRUE
-        final GameRules rules = new GameRulesImpl(true, false, true);
+        // Rule: Mandatory Pass / No Reshuffle = TRUE, Scoring = FALSE
+        final GameRules rules = new GameRulesImpl(true, false, true, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);

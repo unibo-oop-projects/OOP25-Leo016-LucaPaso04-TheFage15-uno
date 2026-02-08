@@ -5,6 +5,7 @@ import java.util.Optional;
 import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;
 import uno.model.players.api.AbstractPlayer;
+import uno.view.api.GameViewObserver;
 import uno.model.api.GameModelObserver;
 
 /**

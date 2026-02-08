@@ -217,6 +217,10 @@ class GameSetupTest {
         public GameRules getRules() {
             return null;
         }
+
+        @Override
+        public void startNewRound() {
+        }
     }
 
     static class MockDiscardPile implements DiscardPile {
@@ -234,7 +238,14 @@ class GameSetupTest {
 
         @Override
         public List<Card> takeAllExceptTop() {
-            return new ArrayList<>();
+            return new ArrayList<>(); // Mock logic
+        }
+
+        @Override
+        public List<Card> takeAll() {
+            List<Card> allCards = new ArrayList<>(cards);
+            cards.clear();
+            return allCards;
         }
 
         @Override

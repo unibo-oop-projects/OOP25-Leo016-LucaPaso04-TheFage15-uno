@@ -4,8 +4,10 @@ import uno.model.players.api.AbstractPlayer;
 
 /**
  * Interface for managing the flow of turns in the UNO game.
- * It handles the cyclic order of players, direction (clockwise/counter-clockwise),
- * skipping logic, and tracks turn-specific states (e.g., if the current player has drawn).
+ * It handles the cyclic order of players, direction
+ * (clockwise/counter-clockwise),
+ * skipping logic, and tracks turn-specific states (e.g., if the current player
+ * has drawn).
  */
 public interface TurnManager {
 
@@ -19,7 +21,8 @@ public interface TurnManager {
     /**
      * Advances the game state to the next player.
      * This calculates the next index based on the current direction and skip value,
-     * resets turn-specific flags, and performs start-of-turn checks (like UNO penalty).
+     * resets turn-specific flags, and performs start-of-turn checks (like UNO
+     * penalty).
      * 
      * @param game The current game instance (needed for penalty application).
      */
@@ -27,7 +30,8 @@ public interface TurnManager {
 
     /**
      * Previews who the next player will be without changing the state.
-     * Useful for UI hints or for "Targeted Draw" cards to know who receives the cards.
+     * Useful for UI hints or for "Targeted Draw" cards to know who receives the
+     * cards.
      * 
      * @return The next {@link AbstractPlayer} in line.
      */
@@ -65,4 +69,11 @@ public interface TurnManager {
      * @return true for Clockwise, false for Counter-Clockwise.
      */
     boolean isClockwise();
+
+    /**
+     * Resets the turn manager state for a new round.
+     * This typically involves resetting the direction, clearing flags,
+     * and potentially randomizing the starting player again.
+     */
+    void reset();
 }

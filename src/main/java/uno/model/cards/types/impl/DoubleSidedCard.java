@@ -10,8 +10,10 @@ import uno.model.game.impl.GameImpl;
 import java.util.Objects;
 
 /**
- * Implementation of a generic UNO card that possesses two sides (Light and Dark).
- * This class acts as a <b>Proxy</b>: it holds two {@link CardSideBehavior} strategies
+ * Implementation of a generic UNO card that possesses two sides (Light and
+ * Dark).
+ * This class acts as a <b>Proxy</b>: it holds two {@link CardSideBehavior}
+ * strategies
  * and delegates all calls (getColor, getValue, performEffect) to the currently
  * active side based on the {@link GameImpl#isDarkSide()} state.
  */
@@ -62,6 +64,14 @@ public class DoubleSidedCard implements Card {
      * {@inheritDoc}
      */
     @Override
+    public int getPointValue(final Game game) {
+        return getActiveSide(game).getPointValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isWild(final Game game) {
         return getActiveSide(game).isWild();
     }
@@ -75,13 +85,14 @@ public class DoubleSidedCard implements Card {
 
         // FIX: Gestione sicura del Colore.
         // 1. Prova a prendere il colore attivo dal gioco (es. impostato da un Jolly).
-        // 2. Se è vuoto (Optional.empty), usa il colore fisico della carta in cima agli scarti.
+        // 2. Se è vuoto (Optional.empty), usa il colore fisico della carta in cima agli
+        // scarti.
         // Questo evita NoSuchElementException e gestisce lo stato transitorio.
         final CardColor targetColor = game.getCurrentColor()
-                                        .orElse(topCard.getColor(game));
+                .orElse(topCard.getColor(game));
 
-        return myFace.getColor() == CardColor.WILD || myFace.getColor() == targetColor 
-            || myFace.getValue() == topCard.getValue(game);
+        return myFace.getColor() == CardColor.WILD || myFace.getColor() == targetColor
+                || myFace.getValue() == topCard.getValue(game);
     }
 
     /**

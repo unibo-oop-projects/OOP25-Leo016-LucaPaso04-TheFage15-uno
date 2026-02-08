@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import uno.controller.api.GameViewObserver;
 import uno.model.api.GameModelObserver;
 import uno.model.cards.attributes.CardColor;
 import uno.model.cards.deck.api.Deck;
@@ -26,6 +25,7 @@ import uno.model.game.api.TurnManager;
 import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.HumanPlayer;
 import uno.view.api.GameFrame;
+import uno.view.api.GameViewObserver;
 import uno.view.scenes.api.GameScene;
 
 class GameControllerTest {
@@ -247,6 +247,10 @@ class GameControllerTest {
         @Override
         public boolean isClockwise() {
             return true;
+        }
+
+        @Override
+        public void startNewRound() {
         }
 
         @Override

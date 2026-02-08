@@ -41,6 +41,7 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
     private final JCheckBox unoPenaltyCheck;
     private final JCheckBox skipAfterDrawCheck;
     private final JCheckBox mandatoryPassCheck;
+    private final JCheckBox scoringModeCheck;
 
     private Optional<MenuObserver> observer;
 
@@ -87,6 +88,13 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
                 currentRules.isMandatoryPassEnabled());
         mandatoryPassCheck = (JCheckBox) rule3.getClientProperty(CHECKBOX);
 
+        // Rule 4: Scoring Mode (Default: Off -> Single Round)
+        final JPanel rule4 = createRulePanel(
+                "Scoring Mode",
+                "If ENABLED, play until 500 points. If DISABLED, the first player to win a round wins the match.",
+                currentRules.isScoringModeEnabled());
+        scoringModeCheck = (JCheckBox) rule4.getClientProperty(CHECKBOX);
+
         // 3. "Save and Back" Button
         final StyledButton backButton = new StyledButtonImpl("Save & Back to Menu");
         backButton.setMnemonic(KeyEvent.VK_B);
@@ -96,7 +104,8 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
                 final GameRules newRules = new GameRulesImpl(
                         unoPenaltyCheck.isSelected(),
                         skipAfterDrawCheck.isSelected(),
-                        mandatoryPassCheck.isSelected());
+                        mandatoryPassCheck.isSelected(),
+                        scoringModeCheck.isSelected());
                 observer.get().onSaveRules(newRules);
                 observer.get().onBackToMenu();
             }
@@ -110,6 +119,8 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
         contentPanel.add(rule2);
         contentPanel.add(Box.createRigidArea(RIGID_AREA_2));
         contentPanel.add(rule3);
+        contentPanel.add(Box.createRigidArea(RIGID_AREA_2));
+        contentPanel.add(rule4);
         contentPanel.add(Box.createRigidArea(RIGID_AREA_3));
         contentPanel.add(backButton.getComponent());
 
@@ -148,6 +159,14 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
     @Override
     public boolean isMandatoryPassEnabled() {
         return mandatoryPassCheck.isSelected();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isScoringModeEnabled() {
+        return scoringModeCheck.isSelected();
     }
 
     // --- GUI Helper Methods ---

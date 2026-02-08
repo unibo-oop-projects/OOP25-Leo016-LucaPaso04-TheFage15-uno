@@ -228,5 +228,9 @@ class DoubleSidedCardTest {
         @Override
         public void logSystemAction(String actionType, String cardDetails, String extraInfo) {
         }
+
+        @Override
+        public void startNewRound() {
+        }
     }
 }

@@ -239,4 +239,9 @@ public interface Game {
      * @param extraInfo   Any additional information relevant to the action.
      */
     void logSystemAction(String actionType, String cardDetails, String extraInfo);
+
+    /**
+     * Resets the game state for a new round (keeping scores).
+     */
+    void startNewRound();
 }

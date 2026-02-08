@@ -49,6 +49,16 @@ public class DiscardPileImpl implements DiscardPile {
      * {@inheritDoc}
      */
     @Override
+    public List<Card> takeAll() {
+        final List<Card> allCards = new ArrayList<>(this.cards);
+        this.cards.clear();
+        return allCards;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<Card> takeAllExceptTop() {
         if (cards.size() <= 1) {
             return new ArrayList<>();

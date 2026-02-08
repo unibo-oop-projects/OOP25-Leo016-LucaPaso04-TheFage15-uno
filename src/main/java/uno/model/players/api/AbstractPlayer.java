@@ -16,6 +16,7 @@ public abstract class AbstractPlayer {
     private final String name;
     private final List<Optional<Card>> hand;
     private boolean hasCalledUno;
+    private int score;
 
     /**
      * Constructor to initialize a player with a name.
@@ -26,6 +27,34 @@ public abstract class AbstractPlayer {
         this.name = name;
         this.hand = new ArrayList<>();
         this.hasCalledUno = false;
+        this.score = 0;
+    }
+
+    /**
+     * Gets the current score of the player.
+     * 
+     * @return The player's score.
+     */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * Sets the player's score.
+     * 
+     * @param score The new score.
+     */
+    public void setScore(final int score) {
+        this.score = score;
+    }
+
+    /**
+     * Adds points to the player's current score.
+     * 
+     * @param points The points to add.
+     */
+    public void addScore(final int points) {
+        this.score += points;
     }
 
     /**

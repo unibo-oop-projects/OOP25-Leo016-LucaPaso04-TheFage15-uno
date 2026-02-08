@@ -50,7 +50,8 @@ class CustomRulesTest {
     @Test
     void testUnoPenaltyDisabledNoPenaltyApplied() {
         // 1. Disable Uno Penalty
-        final GameRules rules = new GameRulesImpl(false, false, false);
+        // 1. Disable Uno Penalty, Scoring default false
+        final GameRules rules = new GameRulesImpl(false, false, false, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
@@ -79,7 +80,8 @@ class CustomRulesTest {
     @Test
     void testUnoPenaltyEnabledPenaltyApplied() {
         // 1. Enable Uno Penalty
-        final GameRules rules = new GameRulesImpl(true, false, false);
+        // 1. Enable Uno Penalty, Scoring default false
+        final GameRules rules = new GameRulesImpl(true, false, false, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
@@ -116,7 +118,8 @@ class CustomRulesTest {
     @Test
     void testDeckReshuffleDefaultBehavior() {
         // 1. MandatoryPass = FALSE (Default)
-        final GameRules rules = new GameRulesImpl(false, false, false);
+        // 1. MandatoryPass = FALSE (Default)
+        final GameRules rules = new GameRulesImpl(false, false, false, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);
@@ -153,7 +156,8 @@ class CustomRulesTest {
     @Test
     void testDeckNoReshuffleMandatoryPass() {
         // 1. MandatoryPass = TRUE
-        final GameRules rules = new GameRulesImpl(false, false, true);
+        // 1. MandatoryPass = TRUE
+        final GameRules rules = new GameRulesImpl(false, false, true, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         final GameImpl game = new GameImpl(deck, players, turnManager, discardPile, GAME_MODE, logger, rules);

@@ -50,7 +50,7 @@ class AllWildBehaviorTest {
 
         final AllWildDeck deck = new AllWildDeck(logger);
 
-        final GameRules rules = new GameRulesImpl(false, false, false);
+        final GameRules rules = new GameRulesImpl(false, false, false, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         game = new GameImpl(deck, players, turnManager, discardPile, "ALLWILD", logger, rules);

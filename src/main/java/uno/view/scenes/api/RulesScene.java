@@ -36,4 +36,11 @@ public interface RulesScene {
      * @return true if the game ends/passes when the deck is empty (no reshuffle).
      */
     boolean isMandatoryPassEnabled();
+
+    /**
+     * Checks if the "Scoring Mode" rule is enabled.
+     * 
+     * @return true if the game ends when a player reaches a score limit.
+     */
+    boolean isScoringModeEnabled();
 }

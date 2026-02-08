@@ -87,6 +87,20 @@ public class GameControllerImpl implements GameController {
             return; // Non fare nient'altro
         }
 
+        if (gameModel.getGameState() == GameState.ROUND_OVER) {
+            if (aiTimer.isPresent()) {
+                aiTimer.get().stop();
+            }
+            gameScene.setHumanInputEnabled(false);
+
+            final AbstractPlayer roundWinner = gameModel.getWinner();
+            gameScene.showInfo("Round Winner: " + roundWinner.getName() + "!\nScore: " + roundWinner.getScore(),
+                    "Round Over");
+
+            gameModel.startNewRound();
+            return;
+        }
+
         final boolean isHumanTurn = gameModel.getCurrentPlayer().getClass() == HumanPlayer.class;
 
         if (isHumanTurn) {

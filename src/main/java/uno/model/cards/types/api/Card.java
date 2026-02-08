@@ -7,15 +7,16 @@ import uno.model.game.api.Game;
 /**
  * Interface representing a generic playing card in the UNO game.
  * This interface defines the contract for card behavior, including retrieving
- * dynamic attributes (Color/Value which may change based on the Game state, 
+ * dynamic attributes (Color/Value which may change based on the Game state,
  * e.g., in Uno Flip) and executing game effects.
  */
 public interface Card {
 
     /**
      * Retrieves the current color of the card.
-     * The `Game` parameter is required because the card's effective color might depend 
-     * on the game state (e.g., checking which side is active in Uno Flip, 
+     * The `Game` parameter is required because the card's effective color might
+     * depend
+     * on the game state (e.g., checking which side is active in Uno Flip,
      * or retrieving the declared color for a Wild card).
      * 
      * @param game The current game context.
@@ -29,18 +30,23 @@ public interface Card {
      * (Light vs. Dark side).
      * 
      * @param game The current game context.
-     * @return The {@link CardValue} representing the card's type (e.g., NINE, SKIP, WILD_DRAW_FOUR).
+     * @return The {@link CardValue} representing the card's type (e.g., NINE, SKIP,
+     *         WILD_DRAW_FOUR).
      */
     CardValue getValue(Game game);
 
     /**
-     * Determines if this card can be legally played on top of the discard pile's current card.
-     * This method implements the core matching logic (Match by Color, Match by Value, 
+     * Determines if this card can be legally played on top of the discard pile's
+     * current card.
+     * This method implements the core matching logic (Match by Color, Match by
+     * Value,
      * or Wild card rules).
      * 
      * @param topCard The card currently visible on top of the discard pile.
-     * @param game    The current game instance (needed to check the active color if topCard is Wild).
-     * @return {@code true} if the move is valid according to the rules, {@code false} otherwise.
+     * @param game    The current game instance (needed to check the active color if
+     *                topCard is Wild).
+     * @return {@code true} if the move is valid according to the rules,
+     *         {@code false} otherwise.
      */
     boolean canBePlayedOn(Card topCard, Game game);
 
@@ -57,6 +63,14 @@ public interface Card {
     void performEffect(Game game);
 
     /**
+     * Retrieves the point value of this card based on the current game state.
+     * 
+     * @param game The current game context.
+     * @return The point value.
+     */
+    int getPointValue(Game game);
+
+    /**
      * Checks if this side represents a Wild card based on its color logic.
      * This avoids code duplication in implementing classes.
      * 
@@ -64,7 +78,8 @@ public interface Card {
      * @return true if the card allows changing color, false otherwise.
      */
     default boolean isWild(final Game game) {
-        // Assumiamo che il tuo enum CardColor abbia un metodo o un valore per identificare i jolly
+        // Assumiamo che il tuo enum CardColor abbia un metodo o un valore per
+        // identificare i jolly
         // Esempio generico (adatta al tuo enum):
         return getColor(game).name().contains("WILD");
     }

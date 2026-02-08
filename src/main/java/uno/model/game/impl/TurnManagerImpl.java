@@ -178,4 +178,16 @@ public class TurnManagerImpl implements TurnManager {
     public boolean isClockwise() {
         return isClockwise;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        this.isClockwise = true;
+        this.hasDrawnThisTurn = false;
+        this.skipSize = 0;
+        // Pick a new random starting player
+        this.currentPlayerIndex = RANDOM.nextInt(players.size());
+    }
 }

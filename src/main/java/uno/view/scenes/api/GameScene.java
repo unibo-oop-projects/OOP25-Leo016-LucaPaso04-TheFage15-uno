@@ -1,7 +1,7 @@
 package uno.view.scenes.api;
 
-import uno.controller.api.GameViewObserver;
 import uno.model.players.api.AbstractPlayer;
+import uno.view.api.GameViewObserver;
 import uno.model.api.GameModelObserver; // Assumendo che questa sia l'interfaccia Observer generica
 
 import java.util.List;
