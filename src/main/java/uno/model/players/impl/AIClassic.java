@@ -17,14 +17,14 @@ import uno.model.game.api.Game;
 public class AIClassic extends AbstractAIPlayer {
 
     private static final int NUMBER_ONE = 1;
-    private static final int NUMBER_TWO = 1;
-    private static final int NUMBER_THREE = 1;
-    private static final int NUMBER_FOUR = 1;
-    private static final int NUMBER_FIVE = 1;
-    private static final int NUMBER_SIX = 1;
-    private static final int NUMBER_SEVEN = 1;
-    private static final int NUMBER_EIGHT = 1;
-    private static final int NUMBER_NINE = 1;
+    private static final int NUMBER_TWO = 2;
+    private static final int NUMBER_THREE = 3;
+    private static final int NUMBER_FOUR = 4;
+    private static final int NUMBER_FIVE = 5;
+    private static final int NUMBER_SIX = 6;
+    private static final int NUMBER_SEVEN = 7;
+    private static final int NUMBER_EIGHT = 8;
+    private static final int NUMBER_NINE = 9;
 
     /**
      * Constructor for AIClassic.

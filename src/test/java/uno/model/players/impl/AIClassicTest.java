@@ -165,7 +165,7 @@ class AIClassicTest {
 
         aiClassic.takeTurn(game);
 
-        assertEquals(CardValue.ONE, game.getTopDiscardCard().get().getValue(game),
+        assertEquals(CardValue.EIGHT, game.getTopDiscardCard().get().getValue(game),
                 "L'IA avrebbe dovuto giocare il numero più alto (8).");
     }
 
