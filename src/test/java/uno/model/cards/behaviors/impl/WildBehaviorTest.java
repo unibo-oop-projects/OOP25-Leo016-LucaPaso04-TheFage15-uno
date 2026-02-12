@@ -21,8 +21,8 @@ import uno.model.cards.types.impl.DoubleSidedCard;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
 import uno.model.game.impl.GameSetupImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import uno.model.game.api.DiscardPile;
@@ -45,10 +45,7 @@ class WildBehaviorTest {
 
     @BeforeEach
     void setUp() {
-        // Creiamo un logger fittizio (mock) poiché non ci interessa testare il logging
-        // qui
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
-        // Setup base
         aiClassic1 = new AIClassic("AI-Bot-1");
         aiClassic2 = new AIClassic("AI-Bot-2");
 
@@ -146,7 +143,6 @@ class WildBehaviorTest {
         hand.add(Optional.of(createCard(CardColor.RED, CardValue.ONE)));
         aiClassic1.setHand(hand);
 
-        // 3. Setup Scarti
         game.getDiscardPile().addCard(createCard(CardColor.BLUE, CardValue.NINE));
         game.setCurrentColor(CardColor.BLUE);
 
@@ -179,20 +175,20 @@ class WildBehaviorTest {
     }
 
     /**
-     * Helper per creare una carta semplice al volo per i test.
+     * Helper mothod to create cards with specific behaviors for testing purposes.
      *
-     * @param color colore
-     * @param value valore
-     * @return carta
+     * @param color card color
+     * @param value card value
+     * @return card with the appropriate behavior based on its value
      */
     private Card createCard(final CardColor color, final CardValue value) {
         if (value == CardValue.WILD) {
             return new DoubleSidedCard(
-                    new WildBehavior(value, 0), // Fronte
+                    new WildBehavior(value, 0),
                     BackSideBehavior.getInstance());
         } else if (value == CardValue.WILD_DRAW_FOUR) {
             return new DoubleSidedCard(
-                    new WildBehavior(value, 4), // Fronte
+                    new WildBehavior(value, 4),
                     BackSideBehavior.getInstance());
         } else if (isAction(value)) {
             return new DoubleSidedCard(
@@ -213,10 +209,22 @@ class WildBehaviorTest {
         }
     }
 
+    /**
+     * Helper method to determine if a card value corresponds to an action card.
+     * 
+     * @param value card value
+     * @return true if the value is an action card, false otherwise
+     */
     private boolean isAction(final CardValue value) {
         return value == CardValue.SKIP || value == CardValue.REVERSE;
     }
 
+    /**
+     * Helper method to return the correct action for a given action card value.
+     * 
+     * @param value card value
+     * @return a Consumer<Game> that performs the correct action for the given card value
+     */
     private Consumer<Game> correctAction(final CardValue value) {
         if (value == CardValue.SKIP) {
             return g -> g.skipPlayers(1);

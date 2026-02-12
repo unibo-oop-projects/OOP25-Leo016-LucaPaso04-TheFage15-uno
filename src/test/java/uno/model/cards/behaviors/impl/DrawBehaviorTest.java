@@ -19,8 +19,8 @@ import uno.model.cards.types.impl.DoubleSidedCard;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
 import uno.model.game.impl.GameSetupImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import uno.model.game.api.DiscardPile;
@@ -42,10 +42,7 @@ class DrawBehaviorTest {
 
     @BeforeEach
     void setUp() {
-        // Creiamo un logger fittizio (mock) poiché non ci interessa testare il logging
-        // qui.
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
-        // Setup base
         aiClassic1 = new AIClassic("AI-Bot-1");
         aiClassic2 = new AIClassic("AI-Bot-2");
 
@@ -93,35 +90,32 @@ class DrawBehaviorTest {
 
         final int finalHandSizeP2 = aiClassic2.getHand().size();
 
-        // CHECK 1: Il giocatore successivo deve aver ricevuto 2 carte
         assertEquals(initialHandSizeP2 + 2, finalHandSizeP2,
                 "Il giocatore successivo dovrebbe avere 2 carte in più (effetto Draw Two).");
 
-        // CHECK 2: La carta in cima agli scarti deve essere il Draw Two
         assertTrue(game.getTopDiscardCard().isPresent());
         assertEquals(blueDrawTwo, game.getTopDiscardCard().get(), "Il Draw Two deve essere in cima agli scarti.");
 
-        // CHECK 3: Verifica Salto Turno
         assertTrue(game.isClockwise(), "La direzione del gioco non deve cambiare.");
         assertEquals(aiClassic1, game.getCurrentPlayer(),
                 "In partita a 2, dopo un +2 l'avversario salta e tocca di nuovo a chi ha giocato.");
     }
 
     /**
-     * Helper per creare una carta semplice al volo per i test.
+     * Helper method to create a card with the specified color and value, using the appropriate behavior.
      *
-     * @param color colore carta
-     * @param value valore carta
-     * @return carta creata
+     * @param color card color
+     * @param value card value
+     * @return created card with the correct behavior
      */
     private Card createCard(final CardColor color, final CardValue value) {
         if (value == CardValue.WILD) {
             return new DoubleSidedCard(
-                    new WildBehavior(value, 0), // Fronte
+                    new WildBehavior(value, 0),
                     BackSideBehavior.getInstance());
         } else if (value == CardValue.WILD_DRAW_FOUR) {
             return new DoubleSidedCard(
-                    new WildBehavior(value, 4), // Fronte
+                    new WildBehavior(value, 4),
                     BackSideBehavior.getInstance());
         } else if (isAction(value)) {
             return new DoubleSidedCard(
@@ -138,10 +132,22 @@ class DrawBehaviorTest {
         }
     }
 
+    /**
+     * Helper method to determine if a card value corresponds to an action card (Skip or Reverse).
+     * 
+     * @param value card value to check
+     * @return true if the value is Skip or Reverse, false otherwise
+     */
     private boolean isAction(final CardValue value) {
         return value == CardValue.SKIP || value == CardValue.REVERSE;
     }
 
+    /**
+     * Helper method to return the correct action for Skip and Reverse cards.
+     * 
+     * @param value card value (should be Skip or Reverse)
+     * @return a Consumer<Game> that performs the correct action for the given card value
+     */
     private Consumer<Game> correctAction(final CardValue value) {
         if (value == CardValue.SKIP) {
             return g -> g.skipPlayers(1);

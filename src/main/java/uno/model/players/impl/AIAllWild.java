@@ -10,7 +10,6 @@ import uno.model.cards.attributes.CardValue;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.Game;
 import uno.model.game.api.GameState;
-import uno.model.players.api.AbstractPlayer;
 
 /**
  * AI implementation for UNO All Wild.

@@ -1,7 +1,6 @@
 package uno.model.players.impl;
 
 import uno.model.game.api.Game;
-import uno.model.players.api.AbstractPlayer;
 
 /**
  * Implementation of a human player in the UNO game.

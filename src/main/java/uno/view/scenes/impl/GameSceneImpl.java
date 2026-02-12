@@ -2,7 +2,7 @@ package uno.view.scenes.impl;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import uno.model.cards.attributes.CardColor;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.players.impl.HumanPlayer;
 import uno.model.game.api.GameState;
 import uno.view.components.impl.ColorChooserPanelImpl;

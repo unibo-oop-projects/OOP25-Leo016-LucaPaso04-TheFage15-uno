@@ -19,8 +19,8 @@ import uno.model.cards.types.impl.DoubleSidedCard;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
 import uno.model.game.impl.GameSetupImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import uno.model.game.api.DiscardPile;
@@ -42,10 +42,7 @@ class NumericBehaviorTest {
 
     @BeforeEach
     void setUp() {
-        // Creiamo un logger fittizio (mock) poiché non ci interessa testare il logging
-        // qui
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
-        // Setup base
         aiClassic1 = new AIClassic("AI-Bot-1");
         aiClassic2 = new AIClassic("AI-Bot-2");
 
@@ -103,20 +100,20 @@ class NumericBehaviorTest {
     }
 
     /**
-     * Helper per creare una carta semplice al volo per i test.
+     * Helper method to create a card with the appropriate behavior based on its value.
      *
-     * @param color colore carta
-     * @param value valore carta
-     * @return carta
+     * @param color card color
+     * @param value card value
+     * @return card with the correct behavior
      */
     private Card createCard(final CardColor color, final CardValue value) {
         if (value == CardValue.WILD) {
             return new DoubleSidedCard(
-                    new WildBehavior(value, 0), // Fronte
+                    new WildBehavior(value, 0),
                     BackSideBehavior.getInstance());
         } else if (value == CardValue.WILD_DRAW_FOUR) {
             return new DoubleSidedCard(
-                    new WildBehavior(value, 4), // Fronte
+                    new WildBehavior(value, 4),
                     BackSideBehavior.getInstance());
         } else if (isAction(value)) {
             return new DoubleSidedCard(
@@ -133,10 +130,22 @@ class NumericBehaviorTest {
         }
     }
 
+    /**
+     * Helper method to determine if a card value corresponds to an action card.
+     * 
+     * @param value card value
+     * @return true if the value is an action card, false otherwise
+     */
     private boolean isAction(final CardValue value) {
         return value == CardValue.SKIP || value == CardValue.REVERSE;
     }
 
+    /**
+     * Helper method to return the correct action for a given action card value.
+     * 
+     * @param value card value
+     * @return a Consumer<Game> that performs the correct action for the given card value
+     */
     private Consumer<Game> correctAction(final CardValue value) {
         if (value == CardValue.SKIP) {
             return g -> g.skipPlayers(1);

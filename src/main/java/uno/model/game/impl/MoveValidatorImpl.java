@@ -3,7 +3,7 @@ package uno.model.game.impl;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.GameContext;
 import uno.model.game.api.MoveValidator;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 
 import java.util.Optional;
 

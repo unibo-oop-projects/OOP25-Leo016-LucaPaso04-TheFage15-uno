@@ -1,6 +1,6 @@
 package uno.model.game.api;
 
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import java.util.List;

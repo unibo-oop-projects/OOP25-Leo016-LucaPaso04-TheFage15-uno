@@ -15,9 +15,9 @@ import uno.model.game.impl.states.GameOverState;
 import uno.model.game.impl.states.RunningState;
 import uno.model.game.impl.states.WaitingForColorState;
 import uno.model.game.impl.states.WaitingForPlayerState;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 import uno.model.api.GameModelObserver;
-import uno.model.players.api.AbstractPlayer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;

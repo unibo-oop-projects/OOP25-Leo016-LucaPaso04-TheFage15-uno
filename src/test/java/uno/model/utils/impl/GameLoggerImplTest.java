@@ -11,6 +11,9 @@ import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the GameLoggerImpl class, focusing on log rotation functionality.
+ */
 class GameLoggerImplTest {
 
     private static final String LOG_DIR = "logs";
@@ -20,19 +23,16 @@ class GameLoggerImplTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        // Clean up logs directory before each test
         deleteLogDirectory();
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        // Clean up logs directory after each test
         deleteLogDirectory();
     }
 
     @Test
     void testLogRotation() throws IOException, InterruptedException {
-        // Create 6 dummy log files with different timestamps
         final File logDir = new File(System.getProperty("user.dir") + File.separator + LOG_DIR);
         if (!logDir.exists()) {
             final boolean created = logDir.mkdirs();
@@ -53,28 +53,21 @@ class GameLoggerImplTest {
             }
         }
 
-        // Initialize GameLoggerImpl
         final GameLoggerImpl logger = new GameLoggerImpl("current");
 
-        // Trigger log creation
         logger.logAction("TestPlayer", "TEST", "None", "Testing rotation");
-
-        // Logic verification:
-        // We had 6 files.
-        // MAX is 5.
-        // cleanOldLogs sees 6 files.
-        // It deletes (6 - 5 + 1) = 2 files.
-        // Remaining: 4 files.
-        // Then we created "log_match_current.txt".
-        // Total files should be 5.
 
         final File[] remainingFiles = logDir
                 .listFiles((dir, name) -> name.startsWith(LOG_FILE_PREFIX) && name.endsWith(LOG_FILE_SUFFIX));
 
-        // We expect 4 old files + 1 new file = 5 files total.
         assertEquals(NEW_FILE, remainingFiles.length, "Should keep only 5 log files");
     }
 
+    /**
+     * Deletes the log directory and all its contents.
+     * 
+     * @throws IOException if an I/O error occurs while deleting files
+     */
     private void deleteLogDirectory() throws IOException {
         final File logDir = new File(System.getProperty("user.dir") + File.separator + LOG_DIR);
         if (logDir.exists()) {

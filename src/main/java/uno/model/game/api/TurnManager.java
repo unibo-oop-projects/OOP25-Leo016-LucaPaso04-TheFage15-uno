@@ -1,6 +1,6 @@
 package uno.model.game.api;
 
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 
 /**
  * Interface for managing the flow of turns in the UNO game.

@@ -2,7 +2,7 @@ package uno.model.game.impl;
 
 import uno.model.game.api.Game;
 import uno.model.game.api.TurnManager;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.game.api.GameRules;
 
 import java.util.ArrayList;

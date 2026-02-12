@@ -22,8 +22,11 @@ import uno.model.game.api.Game;
 import uno.model.game.api.GameRules;
 import uno.model.game.api.GameState;
 import uno.model.game.api.TurnManager;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 
+/**
+ * Unit tests for the {@link DoubleSidedCard} class.
+ */
 class DoubleSidedCardTest {
 
     private DoubleSidedCard card;

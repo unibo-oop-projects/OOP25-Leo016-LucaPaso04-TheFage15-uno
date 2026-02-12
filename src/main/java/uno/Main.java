@@ -8,6 +8,7 @@ import uno.view.scenes.api.MenuScene;
 import uno.view.scenes.impl.MenuSceneImpl;
 
 import javax.swing.SwingUtilities;
+import java.awt.Container;
 
 /**
  * Entry point of the UNO application.
@@ -32,7 +33,7 @@ public final class Main {
             final MenuScene menuScene = new MenuSceneImpl();
 
             menuScene.setObserver(menuController);
-            frame.showScene((java.awt.Container) menuScene);
+            frame.showScene((Container) menuScene);
 
             frame.setVisible(true);
         });

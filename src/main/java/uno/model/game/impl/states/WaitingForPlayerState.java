@@ -5,7 +5,7 @@ import uno.model.cards.types.api.Card;
 import uno.model.game.api.GameContext;
 import uno.model.game.api.GameState;
 import uno.model.game.impl.AbstractGameState;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 
 import java.util.ArrayList;
 import java.util.List;

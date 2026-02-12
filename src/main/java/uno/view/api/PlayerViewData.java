@@ -1,8 +1,8 @@
 package uno.view.api;
 
-import uno.model.players.api.AbstractPlayer;
-
 import java.util.List;
+
+import uno.model.players.impl.AbstractPlayer;
 
 /**
  * DTO representing a Player for the View.

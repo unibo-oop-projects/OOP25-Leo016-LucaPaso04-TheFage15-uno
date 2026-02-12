@@ -6,7 +6,7 @@ import uno.model.cards.deck.api.Deck;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.DiscardPile;
 import uno.model.game.api.GameSetup;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.game.api.Game;
 
 import java.util.ArrayList;

@@ -6,7 +6,7 @@ import uno.model.game.api.DeckHandler;
 import uno.model.game.api.DiscardPile;
 import uno.model.game.api.GameContext;
 import uno.model.game.api.GameRules;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package uno.controller.api;
 import uno.model.api.GameModelObserver;
 import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.view.api.GameViewObserver;
 
 import java.util.Optional;

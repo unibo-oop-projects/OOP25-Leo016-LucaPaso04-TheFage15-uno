@@ -19,9 +19,12 @@ import uno.model.game.api.Game;
 import uno.model.game.api.GameRules;
 import uno.model.game.api.GameState;
 import uno.model.game.api.TurnManager;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.players.impl.HumanPlayer;
 
+/**
+ * Unit tests for the GameSetupImpl class.
+ */
 class GameSetupTest {
 
     private static final int INITIAL_HAND_SIZE = 7;
@@ -79,7 +82,6 @@ class GameSetupTest {
             setCurrentColorCalled = true;
         }
 
-        // Complete interface implementation
         @Override
         public void addObserver(final GameModelObserver observer) {
         }
@@ -239,7 +241,7 @@ class GameSetupTest {
 
         @Override
         public List<Card> takeAllExceptTop() {
-            return new ArrayList<>(); // Mock logic
+            return new ArrayList<>();
         }
 
         @Override
@@ -280,7 +282,6 @@ class GameSetupTest {
         @Override
         public Optional<Card> draw() {
             if (cards.isEmpty()) {
-                // Return a safe card to start game: Red 1
                 return Optional.of(new uno.model.cards.types.impl.DoubleSidedCard(
                         new uno.model.cards.behaviors.impl.NumericBehavior(
                                 CardColor.RED, uno.model.cards.attributes.CardValue.ONE),

@@ -10,10 +10,9 @@ public class TestLogger implements GameLogger {
 
     @Override
     public void logAction(final String playerName, final String actionType, final String cardDetails, final String extraInfo) {
-        // No-op for tests.
-        // Uncomment the line below if you want to see logs in the console during tests.
-        // System.out.println(String.format("[%s] %s: %s (%s) - %s", playerName,
-        // actionType, cardDetails, extraInfo));
+        // No-op or print to stdout
+        // System.out.println("LOG: " + playerName + " performed " + 
+        // actionType + " with " + cardDetails + ". Extra: " + extraInfo);
     }
 
     @Override

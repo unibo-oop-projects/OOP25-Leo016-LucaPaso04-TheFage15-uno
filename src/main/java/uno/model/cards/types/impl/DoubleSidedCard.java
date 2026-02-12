@@ -78,7 +78,7 @@ public class DoubleSidedCard implements Card {
      */
     @Override
     public boolean canBePlayedOn(final Card topCard, final Game game) {
-        final CardSideBehavior myFace = getActiveSide(game);
+        final CardSideBehavior myFace = this.getActiveSide(game);
 
         final CardColor targetColor = game.getCurrentColor()
                 .orElse(topCard.getColor(game));

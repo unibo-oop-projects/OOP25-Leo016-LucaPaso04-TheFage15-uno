@@ -2,7 +2,6 @@ package uno.model.players.impl;
 
 import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.game.api.Game;
 import uno.model.game.api.GameState;
 

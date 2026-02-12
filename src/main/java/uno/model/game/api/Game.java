@@ -5,7 +5,7 @@ import uno.model.cards.deck.api.Deck;
 import uno.model.cards.types.api.Card;
 import uno.model.game.impl.DiscardPileImpl;
 import uno.model.game.impl.TurnManagerImpl;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.api.GameModelObserver;
 
 import java.util.List;

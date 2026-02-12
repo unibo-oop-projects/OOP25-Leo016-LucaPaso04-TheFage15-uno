@@ -2,8 +2,8 @@ package uno.model.game.impl;
 
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.Game;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.game.api.ScoreManager;
+import uno.model.players.impl.AbstractPlayer;
 
 import java.util.List;
 import java.util.Optional;

@@ -39,7 +39,6 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
     private static final float FONT_SIZE = 12f;
     private static final String CHECKBOX = "checkbox";
 
-    // Input components
     private final JCheckBox unoPenaltyCheck;
     private final JCheckBox skipAfterDrawCheck;
     private final JCheckBox mandatoryPassCheck;
@@ -61,7 +60,7 @@ public final class RulesSceneImpl extends JPanel implements RulesScene {
         contentPanel.setOpaque(false);
         contentPanel.setBorder(UnoTheme.PADDING_BORDER);
 
-        final JLabel title = new JLabel("House Rules");
+        final JLabel title = new JLabel("Game Rules");
         title.setFont(UnoTheme.SUBTITLE_FONT);
         title.setForeground(UnoTheme.TEXT_COLOR);
         title.setAlignmentX(CENTER_ALIGNMENT);

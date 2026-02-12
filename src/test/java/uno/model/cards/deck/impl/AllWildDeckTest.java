@@ -15,8 +15,8 @@ import uno.model.cards.deck.api.Deck;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 import uno.model.game.api.DiscardPile;
 import uno.model.game.impl.DiscardPileImpl;
@@ -25,6 +25,10 @@ import uno.model.game.impl.TurnManagerImpl;
 import uno.model.game.api.GameRules;
 import uno.model.game.impl.GameRulesImpl;
 
+/**
+ * Test for the AllWildDeck class, ensuring it initializes correctly, maintains the expected composition of cards,
+ * and behaves as expected when drawing and refilling.
+ */
 class AllWildDeckTest {
 
     private static final int DECK_SIZE = 112;
@@ -37,16 +41,13 @@ class AllWildDeckTest {
 
     @BeforeEach
     void setUp() {
-        // Setup logger e giocatori
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
         final AIClassic aiClassic = new AIClassic("AI-Bot");
         final List<AbstractPlayer> players = new ArrayList<>();
         players.add(aiClassic);
 
-        // Inizializziamo il mazzo AllWild
         deck = new AllWildDeck(logger);
 
-        // Inizializziamo una partita fittizia
         final GameRules rules = new GameRulesImpl(false, false, false, false); // Dummy rules
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
@@ -55,7 +56,6 @@ class AllWildDeckTest {
 
     @Test
     void testDeckInitializationSize() {
-        // Il mazzo All Wild deve contenere 112 carte (14 copie per 8 tipi)
         assertEquals(DECK_SIZE, deck.size(), "Il mazzo All Wild deve contenere inizialmente 112 carte.");
         assertFalse(deck.isEmpty(), "Il mazzo appena creato non deve essere vuoto.");
     }
@@ -71,7 +71,6 @@ class AllWildDeckTest {
 
     @Test
     void testDeckComposition() {
-        // Estraiamo tutte le carte
         final List<Card> allCards = new ArrayList<>();
         while (!deck.isEmpty()) {
             deck.draw().ifPresent(allCards::add);
@@ -79,16 +78,15 @@ class AllWildDeckTest {
 
         assertEquals(DECK_SIZE, allCards.size());
 
-        // Definiamo i tipi di carte attesi in All Wild
         final CardValue[] expectedValues = {
-                CardValue.WILD_ALLWILD, // Classic Wild
-                CardValue.WILD_DRAW_FOUR_ALLWILD, // Wild Draw 4
-                CardValue.WILD_DRAW_TWO_ALLWILD, // Wild Draw 2
-                CardValue.WILD_REVERSE, // Wild Reverse
-                CardValue.WILD_SKIP, // Wild Skip (Salto 1)
-                CardValue.WILD_SKIP_TWO, // Wild Skip Two (Salto 2)
-                CardValue.WILD_FORCED_SWAP, // Forced Swap
-                CardValue.WILD_TARGETED_DRAW_TWO, // Targeted Draw 2
+                CardValue.WILD_ALLWILD,
+                CardValue.WILD_DRAW_FOUR_ALLWILD,
+                CardValue.WILD_DRAW_TWO_ALLWILD,
+                CardValue.WILD_REVERSE,
+                CardValue.WILD_SKIP,
+                CardValue.WILD_SKIP_TWO,
+                CardValue.WILD_FORCED_SWAP,
+                CardValue.WILD_TARGETED_DRAW_TWO,
         };
 
         for (final CardValue value : expectedValues) {
@@ -99,7 +97,6 @@ class AllWildDeckTest {
             assertEquals(COPIES_PER_TYPE, count, "Ci devono essere 14 carte di tipo " + value);
         }
 
-        // Verifica che NON ci siano carte colorate normali o altri tipi non previsti
         final long unexpectedCards = allCards.stream()
                 .filter(c -> !List.of(expectedValues).contains(c.getValue(game)))
                 .count();
@@ -115,13 +112,11 @@ class AllWildDeckTest {
         final List<Card> cards1 = new ArrayList<>();
         final List<Card> cards2 = new ArrayList<>();
 
-        // Peschiamo un campione di carte
         for (int i = 0; i < SAMPLE_SIZE; i++) {
             deck1.draw().ifPresent(cards1::add);
             deck2.draw().ifPresent(cards2::add);
         }
 
-        // Verifica che l'ordine sia diverso
         assertNotEquals(cards1, cards2,
                 "Due mazzi AllWild mescolati non dovrebbero avere la stessa identica sequenza.");
     }
@@ -133,7 +128,6 @@ class AllWildDeckTest {
         }
         assertEquals(0, deck.size());
 
-        // Simuliamo pila degli scarti
         final List<Card> discardPile = new ArrayList<>();
         final AllWildDeck tempDeck = new AllWildDeck(new uno.model.utils.impl.TestLogger());
         for (int i = 0; i < DISCARD_SIZE; i++) {

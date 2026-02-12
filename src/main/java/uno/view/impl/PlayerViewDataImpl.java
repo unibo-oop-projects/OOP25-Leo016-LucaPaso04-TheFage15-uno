@@ -1,6 +1,6 @@
 package uno.view.impl;
 
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.view.api.CardViewData;
 import uno.view.api.PlayerViewData;
 

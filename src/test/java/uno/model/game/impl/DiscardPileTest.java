@@ -16,6 +16,10 @@ import uno.model.cards.types.api.Card;
 import uno.model.cards.types.impl.DoubleSidedCard;
 import uno.model.game.api.DiscardPile;
 
+/**
+ * Test class for DiscardPileImpl. It verifies the correct behavior of the discard pile, including adding cards, 
+ * retrieving the top card, and taking all cards except the top one.
+ */
 class DiscardPileTest {
 
     private DiscardPile discardPile;
@@ -100,7 +104,13 @@ class DiscardPileTest {
         assertEquals(1, discardPile.size(), "Il metodo getSnapshot() deve restituire una copia difensiva.");
     }
 
-    // --- Helper ---
+    /**
+     * Creates a dummy card with the specified color and value. This is a helper method to simplify test setup.
+     * 
+     * @param color the color of the card
+     * @param value the value of the card
+     * @return a new Card instance with the given color and value
+     */
     private Card createDummyCard(final CardColor color, final CardValue value) {
         return new DoubleSidedCard(
                 new NumericBehavior(color, value),

@@ -17,8 +17,8 @@ import uno.model.cards.types.impl.DoubleSidedCard;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
 import uno.model.game.impl.GameSetupImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIAllWild;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import uno.model.game.api.DiscardPile;
@@ -28,6 +28,10 @@ import uno.model.game.impl.TurnManagerImpl;
 import uno.model.game.api.GameRules;
 import uno.model.game.impl.GameRulesImpl;
 
+/**
+ * Test class for verification of All Wild Card Behaviors using the Strategy Pattern.
+ * Uses a MockGame to intercept and verify calls made by the behaviors.
+ */
 class AllWildBehaviorTest {
 
     private Game game;
@@ -193,14 +197,26 @@ class AllWildBehaviorTest {
         assertEquals(reverseCard, game.getTopDiscardCard().get());
     }
 
-    // --- Helper Methods ---
-
+    /**
+     * Helper to create a complex wild card with specific behaviors for testing.
+     * 
+     * @param val value of the wild card
+     * @param draw number of cards to draw (if applicable)
+     * @param skip number of players to skip (if applicable)
+     * @param target whether the card has a targeted effect (like Targeted Draw or Forced Swap)
+     * @return the created complex wild card
+     */
     private Card createComplexWild(final CardValue val, final int draw, final int skip, final boolean target) {
         return new DoubleSidedCard(
                 new WildBehavior(val, draw, false, target, skip, false),
                 BackSideBehavior.getInstance());
     }
 
+    /**
+     * Helper to create a dummy card for testing purposes.
+     * 
+     * @return a dummy card
+     */
     private Card createDummyCard() {
         return new DoubleSidedCard(
                 new WildBehavior(CardValue.WILD_FORCED_SWAP, 0, false),

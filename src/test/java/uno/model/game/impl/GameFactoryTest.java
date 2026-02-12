@@ -15,9 +15,12 @@ import uno.model.game.api.GameFactory;
 import uno.model.game.api.GameMode;
 import uno.model.game.api.GameRules;
 import uno.model.game.api.GameState;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.players.impl.HumanPlayer;
 
+/**
+ * Test class for {@link GameFactoryImpl}.
+ */
 class GameFactoryTest {
 
     private static final String PLAYER_NAME = "P1";
@@ -38,9 +41,6 @@ class GameFactoryTest {
 
         assertNotNull(game);
         assertEquals(GameMode.STANDARD, GameMode.valueOf(game.getGameState() == GameState.RUNNING ? "STANDARD" : "ERROR"));
-        // We can't easily check deck type from Game interface without casting or
-        // getter,
-        // but verify it runs.
     }
 
     @Test
@@ -49,9 +49,15 @@ class GameFactoryTest {
         players.add(new HumanPlayer(PLAYER_NAME));
         final Game game = factory.createGame(PLAYER_NAME, GameMode.FLIP, players);
         assertNotNull(game);
-        // Cast to check internal if possible, or just trust factory logic given
-        // integration nature
         assertTrue(game instanceof GameImpl);
+    }
+
+    @Test
+    void testCreateGameAllWild() {
+        final List<AbstractPlayer> players = new ArrayList<>();
+        players.add(new HumanPlayer(PLAYER_NAME));
+        final Game game = factory.createGame(PLAYER_NAME, GameMode.ALL_WILD, players);
+        assertNotNull(game);
     }
 
     @Test

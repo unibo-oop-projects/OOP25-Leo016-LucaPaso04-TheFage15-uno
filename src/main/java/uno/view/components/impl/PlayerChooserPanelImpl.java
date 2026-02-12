@@ -1,6 +1,6 @@
 package uno.view.components.impl;
 
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.players.impl.HumanPlayer;
 import uno.view.api.GameViewObserver;
 import uno.view.components.api.PlayerChooserPanel;

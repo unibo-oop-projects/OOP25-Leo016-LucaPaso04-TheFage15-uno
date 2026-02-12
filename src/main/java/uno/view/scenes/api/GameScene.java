@@ -1,7 +1,7 @@
 package uno.view.scenes.api;
 
-import uno.model.players.api.AbstractPlayer;
 import uno.view.api.GameViewObserver;
+import uno.model.players.impl.AbstractPlayer;
 import uno.view.api.GameViewData;
 
 import java.util.List;

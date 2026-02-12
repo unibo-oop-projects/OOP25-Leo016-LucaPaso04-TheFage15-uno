@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test class for {@link HumanPlayer}.
+ */
 class HumanPlayerTest {
 
     private static final String PLAYER_NAME = "TestPlayer";
@@ -17,7 +20,6 @@ class HumanPlayerTest {
     @Test
     void testTakeTurn() {
         final HumanPlayer p = new HumanPlayer(PLAYER_NAME);
-        // Verify it doesn't throw and does nothing interactive (passive)
         p.takeTurn(null);
     }
 }

@@ -4,7 +4,7 @@ import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.GameContext;
 import uno.model.game.api.GameStateBehavior;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 
 import java.util.Optional;
 

@@ -6,8 +6,8 @@ import uno.model.cards.attributes.CardColor;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.GameState;
 import uno.model.game.api.Game;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AbstractAIPlayer;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.players.impl.HumanPlayer;
 import uno.view.api.GameFrame;
 import uno.view.api.CardViewData;
@@ -37,7 +37,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class GameControllerImpl implements GameController {
 
-    private static final int AI_DELAY = 3000;
+    private static final int AI_DELAY = 4000;
 
     private final Game gameModel;
     private final GameScene gameScene;

@@ -16,8 +16,8 @@ import uno.model.cards.deck.api.Deck;
 import uno.model.cards.types.api.Card;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 import uno.model.game.api.DiscardPile;
 import uno.model.game.impl.DiscardPileImpl;
@@ -26,6 +26,9 @@ import uno.model.game.impl.TurnManagerImpl;
 import uno.model.game.api.GameRules;
 import uno.model.game.impl.GameRulesImpl;
 
+/**
+ * Test for the FlipDeck class, ensuring correct initialization, composition, and behavior of the UNO Flip deck.
+ */
 class FlipDeckTest {
 
     private static final int DECK_SIZE = 112;
@@ -43,18 +46,14 @@ class FlipDeckTest {
 
     @BeforeEach
     void setUp() {
-        // Mock logger
         logger = new uno.model.utils.impl.TestLogger();
 
-        // Setup base
         final AIClassic aiClassic = new AIClassic("AI-Bot");
         final List<AbstractPlayer> players = new ArrayList<>();
         players.add(aiClassic);
 
-        // Inizializziamo il FlipDeck invece dello StandardDeck
         deck = new FlipDeck(logger);
 
-        // Creiamo una partita fittizia per poter risolvere colori e valori dinamici
         final GameRules rules = new GameRulesImpl(false, false, false, false); // Dummy rules
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
@@ -63,7 +62,6 @@ class FlipDeckTest {
 
     @Test
     void testDeckInitializationSize() {
-        // Un mazzo UNO Flip deve avere 112 carte
         assertEquals(DECK_SIZE, deck.size(), "Il mazzo Flip deve contenere inizialmente 112 carte.");
         assertFalse(deck.isEmpty(), "Il mazzo appena creato non deve essere vuoto.");
     }
@@ -79,8 +77,6 @@ class FlipDeckTest {
 
     @Test
     void testLightSideComposition() {
-        // Peschiamo tutte le carte per analizzarne la composizione (Lato Chiaro di
-        // default)
         final List<Card> allCards = new ArrayList<>();
         while (!deck.isEmpty()) {
             deck.draw().ifPresent(allCards::add);
@@ -88,7 +84,6 @@ class FlipDeckTest {
 
         assertEquals(DECK_SIZE, allCards.size());
 
-        // 1. Verifica Carte Colorate Standard (Light Side: Rosso, Blu, Verde, Giallo)
         final CardColor[] lightColors = {CardColor.RED, CardColor.BLUE, CardColor.GREEN, CardColor.YELLOW };
 
         for (final CardColor color : lightColors) {
@@ -98,13 +93,11 @@ class FlipDeckTest {
             assertEquals(CARDS_PER_COLOR, count,
                     "Ci devono essere 26 carte per il colore " + color + " nel lato chiaro.");
 
-            // Verifica specifica Carta Flip per colore
             final long flipCount = allCards.stream()
                     .filter(c -> c.getColor(game) == color && c.getValue(game) == CardValue.FLIP)
                     .count();
             assertEquals(FLIP_CARDS_PER_COLOR, flipCount, "Ci devono essere 2 carte Flip per il colore " + color);
 
-            // Verifica specifica Draw One (pesca 1) per colore
             final long drawOneCount = allCards.stream()
                     .filter(c -> c.getColor(game) == color && c.getValue(game) == CardValue.DRAW_ONE)
                     .count();
@@ -112,8 +105,6 @@ class FlipDeckTest {
                     "Ci devono essere 2 carte Draw One (+1) per il colore " + color);
         }
 
-        // 2. Verifica Carte Wild (Light Side)
-        // 4 Wild + 4 Wild Draw Two = 8 carte speciali nere
         final long wildCount = allCards.stream()
                 .filter(c -> c.getValue(game) == CardValue.WILD)
                 .count();
@@ -124,8 +115,6 @@ class FlipDeckTest {
                 .count();
         assertEquals(WILD_DRAW_TWO_COUNT, wildDrawTwoCount, "Ci devono essere 4 carte Wild Draw Two (+2).");
 
-        // 3. Totale complessivo
-        // 104 (colorate) + 8 (wild) = 112
         assertEquals(DECK_SIZE, allCards.size(), "Il totale delle carte Flip deve essere 112.");
     }
 
@@ -153,8 +142,6 @@ class FlipDeckTest {
         assertEquals(0, deck.size());
 
         final List<Card> discardPile = new ArrayList<>();
-        // Creiamo un mazzo temporaneo solo per estrarre carte valide da inserire negli
-        // scarti
         final FlipDeck tempDeck = new FlipDeck(logger);
         for (int i = 0; i < REFILL_SIZE; i++) {
             tempDeck.draw().ifPresent(discardPile::add);

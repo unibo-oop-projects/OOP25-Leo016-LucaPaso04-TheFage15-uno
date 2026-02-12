@@ -21,7 +21,6 @@ import uno.model.cards.types.impl.DoubleSidedCard;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
 import uno.model.game.impl.GameSetupImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import uno.model.game.api.DiscardPile;
@@ -31,6 +30,9 @@ import uno.model.game.impl.TurnManagerImpl;
 import uno.model.game.api.GameRules;
 import uno.model.game.impl.GameRulesImpl;
 
+/**
+ * Test class for AIFlip behavior in Uno game.
+ */
 class AIFlipTest {
 
     private Game game;
@@ -46,7 +48,7 @@ class AIFlipTest {
         final GameLogger logger = new uno.model.utils.impl.TestLogger();
         final Deck<Card> deck = new FlipDeck(logger);
 
-        final GameRules rules = new GameRulesImpl(false, false, false, false); // Dummy rules
+        final GameRules rules = new GameRulesImpl(false, false, false, false);
         final DiscardPile discardPile = new DiscardPileImpl();
         final TurnManager turnManager = new TurnManagerImpl(players, rules);
         game = new GameImpl(deck, players, turnManager, discardPile, "FLIP", logger, rules);
@@ -60,25 +62,22 @@ class AIFlipTest {
     }
 
     private Card createCard(final CardColor color, final CardValue value, final boolean isDarkSide) {
-        // Semplicificazione: creiamo una carta DoubleSided dove conta il lato attivo.
-        // Se isDarkSide è true, mettiamo il comportamento sul back.
+
         if (value == CardValue.FLIP) {
             return new DoubleSidedCard(
-                    new FlipBehavior(color, value), // Front
-                    new FlipBehavior(CardColor.ORANGE, value) // Back (placeholder)
+                    new FlipBehavior(color, value),
+                    new FlipBehavior(CardColor.ORANGE, value)
             );
         } else if (value == CardValue.WILD_DRAW_COLOR) {
-            // Dark side power card
             return new DoubleSidedCard(
-                    new NumericBehavior(CardColor.RED, CardValue.ONE), // Front dummy
-                    new WildBehavior(value, 0) // Back
+                    new NumericBehavior(CardColor.RED, CardValue.ONE),
+                    new WildBehavior(value, 0)
             );
         } else if (value == CardValue.DRAW_FIVE) {
-            // Dark side power card
             final int drawAmount = 5;
             return new DoubleSidedCard(
-                    new NumericBehavior(CardColor.RED, CardValue.ONE), // Front dummy
-                    new WildBehavior(value, drawAmount) // Back
+                    new NumericBehavior(CardColor.RED, CardValue.ONE),
+                    new WildBehavior(value, drawAmount)
             );
         } else {
             return new DoubleSidedCard(
@@ -89,7 +88,6 @@ class AIFlipTest {
 
     @Test
     void testAIPrioritizesFlipCard() {
-        // Scenario: AI ha una carta FLIP. Dovrebbe giocarla subito (Score 100).
 
         game.getDiscardPile().addCard(createCard(CardColor.RED, CardValue.ONE, false));
         game.setCurrentColor(CardColor.RED);
@@ -102,7 +100,6 @@ class AIFlipTest {
         listcard.add(Optional.of(flipCard));
         aiFlip.setHand(listcard);
 
-        // Forza turno IA
         if (!game.getCurrentPlayer().equals(aiFlip)) {
             game.aiAdvanceTurn();
         }
@@ -116,13 +113,6 @@ class AIFlipTest {
     @Test
     @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     void testAIDarkSidePowerCards() {
-        // Scenario: Siamo nel Dark Side. L'IA ha una WILD_DRAW_COLOR.
-
-        // --- FIX NPE & State (Reflection approach) ---
-        // game.flipTheWorld() cerca currentPlayedCard.
-        // Impostiamo il campo currentPlayedCard tramite Reflection per evitare
-        // side-effects di game.playCard() che fa avanzare il gioco o controlla regole.
-
         final Card dummyCard = createCard(CardColor.RED, CardValue.ONE, false);
         try {
             final java.lang.reflect.Field field = GameImpl.class.getDeclaredField("currentPlayedCard");
@@ -132,35 +122,30 @@ class AIFlipTest {
             org.junit.jupiter.api.Assertions.fail("Reflection failed: " + e.getMessage());
         }
 
-        // Setup mazzo e mano normale
         game.getDiscardPile().addCard(createCard(CardColor.RED, CardValue.NINE, false));
         game.setCurrentColor(CardColor.RED);
 
-        game.flipTheWorld(); // Passa al Dark Side
+        game.flipTheWorld();
         assertTrue(game.isDarkSide());
 
         game.getDiscardPile().addCard(createCard(CardColor.TEAL, CardValue.ONE, true));
-        game.setCurrentColor(CardColor.TEAL); // Colore Dark
+        game.setCurrentColor(CardColor.TEAL);
 
         final Card darkWild = createCard(CardColor.WILD, CardValue.WILD_DRAW_COLOR, true);
-        // Nota: createCard mette WILD_DRAW_COLOR sul retro
 
         final Card tealNine = createCard(CardColor.TEAL, CardValue.NINE, true);
 
-        // SET HAND PRIMA DI TUTTO
         final List<Optional<Card>> listcard = new LinkedList<>();
         listcard.add(Optional.of(tealNine));
         listcard.add(Optional.of(darkWild));
         aiFlip.setHand(listcard);
 
-        // Ora assicuriamoci che sia il turno di AI
         while (!game.getCurrentPlayer().equals(aiFlip)) {
             game.aiAdvanceTurn();
         }
 
         aiFlip.takeTurn(game);
 
-        // Verifica che abbia giocato la carta potente
         assertEquals(CardValue.WILD_DRAW_COLOR, game.getTopDiscardCard().get().getValue(game));
     }
 }

@@ -2,7 +2,7 @@ package uno.model.game.api;
 
 import uno.model.cards.deck.api.Deck;
 import uno.model.cards.types.api.Card;
-import uno.model.players.api.AbstractPlayer;
+import uno.model.players.impl.AbstractPlayer;
 
 /**
  * Interface responsible for deck and discard pile management.

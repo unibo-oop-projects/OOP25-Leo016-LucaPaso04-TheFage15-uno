@@ -20,8 +20,8 @@ import uno.model.cards.types.impl.DoubleSidedCard;
 import uno.model.game.api.Game;
 import uno.model.game.impl.GameImpl;
 import uno.model.game.impl.GameSetupImpl;
-import uno.model.players.api.AbstractPlayer;
 import uno.model.players.impl.AIClassic;
+import uno.model.players.impl.AbstractPlayer;
 import uno.model.utils.api.GameLogger;
 
 import uno.model.game.api.DiscardPile;
@@ -42,10 +42,7 @@ class FlipBehaviorTest {
 
         @BeforeEach
         void setUp() {
-                // Creiamo un logger fittizio (mock) poiché non ci interessa testare il logging
-                // qui.
                 final GameLogger logger = new uno.model.utils.impl.TestLogger();
-                // Setup base
                 aiClassic1 = new AIClassic("AI-Bot-1");
                 final AIClassic aiClassic2 = new AIClassic("AI-Bot-2");
 
@@ -70,12 +67,10 @@ class FlipBehaviorTest {
         @Test
         void testFlipBehavior() {
 
-                // Carta FLIP: Lato Chiaro = Verde Flip | Lato Scuro = Teal Flip
                 final CardSideBehavior lightFlip = new FlipBehavior(CardColor.GREEN, CardValue.FLIP);
                 final CardSideBehavior darkFlip = new FlipBehavior(CardColor.TEAL, CardValue.FLIP);
                 final Card flipCard = new DoubleSidedCard(lightFlip, darkFlip);
 
-                // Lato Chiaro = Rosso 1 | Lato Scuro = Arancione 5
                 final CardSideBehavior lightNum = new NumericBehavior(CardColor.RED, CardValue.ONE);
                 final CardSideBehavior darkNum = new NumericBehavior(CardColor.ORANGE, CardValue.FIVE);
                 final Card testCard = new DoubleSidedCard(lightNum, darkNum);
